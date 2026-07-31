@@ -33,7 +33,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 - Removed `settings.yml.template` — settings generation now lives entirely
   in `run.sh` as a single YAML dump, removing the sed-substitution step.
 
-## 1.0.9
+## 1.0.9 Not publicly released
 
 ### Added
 - Added a warning about port change to DOCS.md, Changing port will brake the Webui Button.
