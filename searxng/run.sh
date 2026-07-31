@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # The image ships its own venv with python + PyYAML (SearXNG needs both to

@@ -9,4 +9,4 @@ COPY run.sh /run.sh
 RUN sed -i 's/\r$//' /run.sh && \
     chmod 755 /run.sh
 
-ENTRYPOINT ["/bin/bash", "/run.sh"]
+ENTRYPOINT ["/bin/sh", "/run.sh"]
