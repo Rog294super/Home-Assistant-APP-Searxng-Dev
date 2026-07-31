@@ -33,7 +33,7 @@ options:
   instance_name: "SearXNG"
   port: 18080
 
-  autocomplete: brave
+  autocomplete: google
   safesearch: 0
   image_proxy: true
 
