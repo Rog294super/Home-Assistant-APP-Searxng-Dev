@@ -20,7 +20,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   out of sync with `config.yaml` again.
 - `image_proxy` was present in `config.yaml`, `schema`, and translations but
   never actually read anywhere — the toggle did nothing. It's now wired
-  into `server.image_proxy`.
+  into `server.image_proxy`(run.sh).
 
 ### Changed
 - Switched the server process from `python -m searx.webapp --host ... --port
@@ -28,7 +28,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   ignored since that entry point doesn't parse CLI args at all) to Granian,
   the production WSGI server the official SearXNG container itself uses.
 - `webui` now defaults to `http` instead of `https`, since this app doesn't
-  terminate TLS anywhere. Fork the repo and change it back to `[PROTO:https]` if you're
+  terminate TLS anywhere. Fork the repo for yourself and change it back to `[PROTO:https]` if you're
   fronting it with a TLS-terminating reverse proxy.
 - Removed `settings.yml.template` — settings generation now lives entirely
   in `run.sh` as a single YAML dump, removing the sed-substitution step.
