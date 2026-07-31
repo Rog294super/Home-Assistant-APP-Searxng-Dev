@@ -1,5 +1,5 @@
 name: "SearXNG"
-version: "1.0.9"
+version: "1.1.0"
 slug: "searxng"
 description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
 url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng"
@@ -15,12 +15,17 @@ init: false
 host_network: true
 
 # Convenience "open web ui" link shown on the app info page in HA.
-webui: "[PROTO:https]://[HOST]:[PORT:18080]"
+# NOTE: this app does not terminate TLS anywhere, so this uses http by
+# default. If you put a TLS-terminating reverse proxy in front of it,
+# change this back to [PROTO:https].
+webui: "[PROTO:http]://[HOST]:[PORT:18080]"
 
 boot: auto
 startup: services
 
-# /data is the persistent storage HA gives every app. We use it to
+# /data and the app's own config directory are the persistent storage
+# HA gives every app. We use /data to remember the auto-generated
+# secret_key across restarts and updates.
 map:
   - type: app_config
     read_only: false

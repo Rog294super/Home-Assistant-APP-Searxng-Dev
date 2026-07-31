@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# The image ships its own venv with python + PyYAML (SearXNG needs both to
+# load its own settings), so we reuse that interpreter instead of relying
+# on a bare system python3 having PyYAML available.
+PYTHON="/usr/local/searxng/.venv/bin/python"
+if [ ! -x "$PYTHON" ]; then
+    PYTHON="python3"
+fi
+
 OPTIONS_FILE="/data/options.json"
 SETTINGS_FILE="/etc/searxng/settings.yml"
 SECRET_FILE="/data/generated_secret"
@@ -8,136 +16,116 @@ SECRET_FILE="/data/generated_secret"
 mkdir -p /etc/searxng
 
 if [ ! -f "$OPTIONS_FILE" ]; then
-    echo "[searxng-addon] ERROR: $OPTIONS_FILE not found."
+    echo "[searxng-app] ERROR: $OPTIONS_FILE not found."
     exit 1
 fi
 
-BASE_URL=$(python3 -c "
-import json
-print(json.load(open('$OPTIONS_FILE')).get('base_url', ''))
-")
-
-INSTANCE_NAME=$(python3 -c "
-import json
-print(json.load(open('$OPTIONS_FILE')).get('instance_name', 'SearXNG'))
-")
-
-PORT=$(python3 -c "
-import json
-print(json.load(open('$OPTIONS_FILE')).get('port', 18080))
-")
-
-SECRET_KEY=$(python3 -c "
-import json
-print(json.load(open('$OPTIONS_FILE')).get('secret_key', ''))
-")
-
-AUTOCOMPLETE=$(python3 -c "
-import json
-print(json.load(open('$OPTIONS_FILE')).get('autocomplete', ''))
-")
+PORT=$("$PYTHON" -c "import json; print(json.load(open('$OPTIONS_FILE')).get('port', 18080))")
+SECRET_KEY=$("$PYTHON" -c "import json; print(json.load(open('$OPTIONS_FILE')).get('secret_key') or '')")
 
 # ---------------------------------------------------------
-# Generate persistent secret key
+# Persistent secret key — keep it stable across restarts
+# instead of regenerating (and invalidating sessions) every boot.
 # ---------------------------------------------------------
 
-if [ -z "$SECRET_KEY" ] || [ "$SECRET_KEY" = "None" ] || [ "$SECRET_KEY" = "null" ]; then
+if [ -z "$SECRET_KEY" ]; then
     if [ -f "$SECRET_FILE" ]; then
         SECRET_KEY=$(cat "$SECRET_FILE")
     else
         SECRET_KEY=$(head -c 32 /dev/urandom | sha256sum | cut -d' ' -f1)
         echo "$SECRET_KEY" > "$SECRET_FILE"
-
-        echo "[searxng-addon] Generated and stored a new secret_key"
+        echo "[searxng-app] Generated and stored a new secret_key"
     fi
 fi
 
-export BASE_URL INSTANCE_NAME SECRET_KEY PORT
-
 # ---------------------------------------------------------
-# Generate base SearXNG configuration
-# ---------------------------------------------------------
-
-sed \
-    -e "s|\${BASE_URL}|${BASE_URL}|g" \
-    -e "s|\${INSTANCE_NAME}|${INSTANCE_NAME}|g" \
-    -e "s|\${SECRET_KEY}|${SECRET_KEY}|g" \
-    -e "s|\${PORT}|${PORT}|g" \
-    /settings.yml.template > "$SETTINGS_FILE"
-
-# ---------------------------------------------------------
-# Optional autocomplete configuration
-# ---------------------------------------------------------
-
-if [ -n "$AUTOCOMPLETE" ]; then
-    cat >> "$SETTINGS_FILE" <<EOF
-
-search:
-  autocomplete: "$AUTOCOMPLETE"
-EOF
-fi
-
-# ---------------------------------------------------------
-# Engine overrides
+# Build settings.yml as a single Python dict -> YAML dump.
+#
+# This replaces the old sed-template + cat-append approach, which produced
+# TWO top-level `search:` keys whenever `autocomplete` was set (the default).
+# YAML doesn't merge duplicate keys — the second one silently won, which
+# meant `safesearch` and the JSON API (`formats`) were dropped on every
+# normal boot. Building one dict and dumping it once makes that class of
+# bug structurally impossible.
+#
+# The engines list is built from whatever keys exist under options.engines
+# in config.yaml — NOT a hardcoded list in this script. That's what used to
+# let `brave`/`wikidata` stay force-enabled here after they were removed
+# from config.yaml/schema/translations (see CHANGELOG). Now this script
+# automatically stays in sync with config.yaml with no separate list to
+# maintain or forget to update.
 # ---------------------------------------------------------
 
-ENGINES_YAML=""
-
-for engine in \
-    google \
-    bing \
-    duckduckgo \
-    brave \
-    startpage \
-    qwant \
-    wikipedia \
-    github \
-    youtube \
-    reddit \
-    stackoverflow \
-    wolframalpha \
-    wikidata
-do
-
-    enabled=$(python3 -c "
+SECRET_KEY="$SECRET_KEY" "$PYTHON" - "$OPTIONS_FILE" "$SETTINGS_FILE" <<'PYEOF'
 import json
-data = json.load(open('$OPTIONS_FILE'))
-print(data.get('engines', {}).get('$engine', True))
-")
+import os
+import sys
 
-    if [ "$enabled" = "True" ]; then
-        disabled="false"
-    else
-        disabled="true"
-    fi
+import yaml
 
-    ENGINES_YAML="${ENGINES_YAML}  - name: \"${engine}\"
-    disabled: ${disabled}
-"
-done
+options_path, settings_path = sys.argv[1], sys.argv[2]
 
-{
-    echo ""
-    echo "engines:"
-    echo "$ENGINES_YAML"
-} >> "$SETTINGS_FILE"
+with open(options_path) as f:
+    options = json.load(f)
 
-# ---------------------------------------------------------
-# Debug output
-# ---------------------------------------------------------
+secret_key = os.environ["SECRET_KEY"]
 
-echo "[searxng-addon] Generated settings:"
+settings = {
+    "use_default_settings": True,
+    "general": {
+        "instance_name": options.get("instance_name") or "SearXNG",
+    },
+    "server": {
+        "secret_key": secret_key,
+        "base_url": options.get("base_url") or "",
+        "image_proxy": bool(options.get("image_proxy", True)),
+    },
+    "search": {
+        "safesearch": int(options.get("safesearch", 0)),
+        "formats": ["html", "json"],
+    },
+}
+
+autocomplete = options.get("autocomplete")
+if autocomplete:
+    settings["search"]["autocomplete"] = autocomplete
+
+engines = options.get("engines", {})
+settings["engines"] = [
+    {"name": name, "disabled": not bool(enabled)}
+    for name, enabled in engines.items()
+]
+
+with open(settings_path, "w") as f:
+    yaml.safe_dump(settings, f, sort_keys=False, allow_unicode=True)
+
+print(f"[searxng-app] Wrote {settings_path}")
+PYEOF
+
+echo "[searxng-app] Generated settings:"
 cat "$SETTINGS_FILE"
 
 export SEARXNG_SETTINGS_PATH="$SETTINGS_FILE"
 
 # ---------------------------------------------------------
-# Start SearXNG
+# Start SearXNG via Granian — the production WSGI server the official
+# SearXNG container itself uses (see container/entrypoint.sh upstream),
+# rather than `python -m searx.webapp`, which launches Flask's built-in
+# development server (single-worker, not meant for continuous use).
+# Calling Granian directly with explicit --host/--port also avoids relying
+# on internal entrypoint script paths, which have moved between SearXNG
+# releases.
 # ---------------------------------------------------------
 
-echo "[searxng-addon] Starting SearXNG on port $PORT"
+GRANIAN="/usr/local/searxng/.venv/bin/granian"
+if [ ! -x "$GRANIAN" ]; then
+    GRANIAN="granian"
+fi
 
-exec /usr/local/searxng/.venv/bin/python \
-    -m searx.webapp \
+echo "[searxng-app] Starting SearXNG on port $PORT via Granian"
+
+exec "$GRANIAN" \
+    --interface wsgi \
     --host 0.0.0.0 \
-    --port "$PORT"
+    --port "$PORT" \
+    searx.webapp:app
