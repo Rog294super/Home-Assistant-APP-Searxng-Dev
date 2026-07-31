@@ -1,0 +1,74 @@
+configuration:
+  base_url:
+    name: Basis-URL
+    description: >
+      De openbare URL waarop je SearXNG-instantie bereikbaar is.
+      Voorbeeld: https://searxng.local
+
+  instance_name:
+    name: Naam van de instantie
+    description: Naam die door SearXNG wordt weergegeven.
+
+  port:
+    name: Poort
+    description: >
+      Externe poort waarop SearXNG beschikbaar is.
+      Laat een reverse proxy naar deze poort verwijzen.
+
+  autocomplete:
+    name: Autocompleteprovider
+    description: >
+      Provider die wordt gebruikt voor zoeksuggesties.
+      Beschikbare autocomplete-backends zijn:
+      "360search", "baidu", "brave", "dbpedia", "duckduckgo", "google",
+      "yandex", "mwmbl", "naver", "seznam", "sogou", "startpage",
+      "stract", "swisscows", "quark", "qwant" en "wikipedia".
+
+  safesearch:
+    name: SafeSearch
+    description: >
+      SafeSearch-niveau (0 = Uit, 1 = Gemiddeld, 2 = Strikt).
+
+  image_proxy:
+    name: Afbeeldingsproxy
+    description: >
+      Laat externe afbeeldingen via SearXNG verlopen.
+
+  engines:
+    name: Zoekmachines
+    description: >
+      Engines die hier niet staan maar wel worden gebruikt door searxng settings.yml, 
+      gebruiken default van searxng image.
+
+  engines.google:
+    name: Google
+
+  engines.bing:
+    name: Bing
+
+  engines.duckduckgo:
+    name: DuckDuckGo
+
+  engines.startpage:
+    name: Startpage
+
+  engines.qwant:
+    name: Qwant
+
+  engines.wikipedia:
+    name: Wikipedia
+
+  engines.github:
+    name: GitHub
+
+  engines.youtube:
+    name: YouTube
+
+  engines.reddit:
+    name: Reddit
+
+  engines.stackoverflow:
+    name: Stack Overflow
+
+  engines.wolframalpha:
+    name: WolframAlpha

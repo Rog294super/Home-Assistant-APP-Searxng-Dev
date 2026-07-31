@@ -1,0 +1,72 @@
+configuration:
+  base_url:
+    name: Base URL
+    description: >
+      The public URL where your SearXNG instance can be reached.
+      Example: https://searxng.local
+
+  instance_name:
+    name: Instance name
+    description: Name displayed by SearXNG.
+  
+  port: 
+    name: Port
+    description: >
+      External port SearXNG, 
+      Point reverse proxy to this port.
+  
+  autocomplete:
+    name: Autocomplete provider
+    description: > 
+      Provider used for search suggestions.
+      Existing autocomplete backends: 
+      "360search", "baidu", "brave", "dbpedia", "duckduckgo", "google", 
+      "yandex","mwmbl", "naver", "seznam", "sogou", "startpage", 
+      "stract", "swisscows", "quark", "qwant", "wikipedia"
+  
+  safesearch:
+    name: SafeSearch
+    description: SafeSearch level (0 = Off, 1 = Moderate, 2 = Strict).
+
+  image_proxy:
+    name: Image proxy
+    description: Proxy remote images through SearXNG.
+
+  engines:
+    name: Search engines
+    description: >
+      Engines which are not noted here but are used in the searxng setting.yml, 
+      are using default set by Searxng image
+
+  engines.google:
+    name: Google
+
+  engines.bing:
+    name: Bing
+
+  engines.duckduckgo:
+    name: DuckDuckGo
+
+  engines.startpage:
+    name: Startpage
+
+  engines.qwant:
+    name: Qwant
+
+  engines.wikipedia:
+    name: Wikipedia
+  
+  engines.github:
+    name: GitHub
+
+  engines.youtube:
+    name: YouTube
+
+  engines.reddit:
+    name: Reddit
+
+  engines.stackoverflow:
+    name: Stack Overflow
+
+  engines.wolframalpha:
+    name: WolframAlpha

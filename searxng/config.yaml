@@ -1,0 +1,75 @@
+name: "SearXNG"
+version: "1.0.9"
+slug: "searxng"
+description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
+url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng"
+arch:
+  - aarch64
+  - amd64
+init: false
+
+# host_network is the key setting that gets you away from the
+# "homeassistant.local:8123/api/hassio_ingress/xxxx/" style path.
+# The container shares the host's network stack directly, so SearXNG
+# is reachable at <host-ip>:<port> with no HA path prefix at all.
+host_network: true
+
+# Convenience "open web ui" link shown on the app info page in HA.
+webui: "[PROTO:https]://[HOST]:[PORT:18080]"
+
+boot: auto
+startup: services
+
+# /data is the persistent storage HA gives every app. We use it to
+map:
+  - type: app_config
+    read_only: false
+
+  - type: data
+    read_only: false
+
+options:
+  base_url: "http://searxng.local/"
+  instance_name: "SearXNG"
+  port: 18080
+
+  autocomplete: brave
+  safesearch: 0
+  image_proxy: true
+
+  engines:
+    google: true
+    bing: true
+    duckduckgo: true
+    startpage: false
+    qwant: false
+    wikipedia: true
+    github: true
+    youtube: true
+    reddit: false
+    stackoverflow: true
+    wolframalpha: false
+
+
+# Visible part with type in HAOS
+schema:
+  base_url: str
+  instance_name: str
+  port: int(1024,65535)
+
+  autocomplete: str
+  safesearch: int(0,2)
+  image_proxy: bool
+
+  engines:
+    google: bool
+    bing: bool
+    duckduckgo: bool
+    startpage: bool
+    qwant: bool
+    wikipedia: bool
+    github: bool
+    youtube: bool
+    reddit: bool
+    stackoverflow: bool
+    wolframalpha: bool
