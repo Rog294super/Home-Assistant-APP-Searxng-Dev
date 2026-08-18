@@ -74,14 +74,43 @@ class SearXNGMonitor:
         return None
 
     def _get_stats(self) -> Optional[Dict[str, Any]]:
-        """Fetch stats from SearXNG"""
+        """Fetch stats from SearXNG.
+
+        SearXNG can briefly return an HTML error page or other non-JSON text
+        while starting up, while rate-limited, or during temporary backend
+        issues. Those are transient conditions and should not be treated as a
+        hard failure that floods the logs.
+        """
+        url = f"http://localhost:{self.port}/stats"
         try:
-            url = f"http://localhost:{self.port}/stats"
             with urllib.request.urlopen(url, timeout=5) as response:
-                data = response.read()
-                return json.loads(data)
-        except (urllib.error.URLError, json.JSONDecodeError) as e:
-            logger.error(f"Failed to fetch stats: {e}")
+                payload = response.read()
+                if not payload:
+                    logger.warning("SearXNG stats endpoint returned empty content")
+                    return None
+
+                text = payload.decode("utf-8", errors="replace").strip()
+                content_type = response.headers.get("Content-Type", "") if hasattr(response, "headers") else ""
+
+                if not text or not text.startswith("{"):
+                    logger.warning(
+                        "SearXNG stats endpoint returned non-JSON content "
+                        f"(content-type={content_type!r}, preview={text[:200]!r})"
+                    )
+                    return None
+
+                return json.loads(text)
+        except urllib.error.HTTPError as e:
+            logger.warning(f"SearXNG stats endpoint returned HTTP {e.code}: {e.reason}")
+            return None
+        except urllib.error.URLError as e:
+            logger.warning(f"SearXNG stats endpoint unreachable: {e.reason}")
+            return None
+        except json.JSONDecodeError as e:
+            logger.warning(
+                "SearXNG stats endpoint returned invalid JSON; server may still be starting or rate-limited: "
+                f"{e}"
+            )
             return None
 
     def _create_entity_id(self, stat_name: str) -> str:
