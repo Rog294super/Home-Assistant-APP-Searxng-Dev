@@ -13,6 +13,7 @@ This app is designed to provide a lightweight, easy-to-maintain integration for 
 * Automatically generates and persists a secure `secret_key`.
 * Keeps configuration as close as possible to the upstream defaults.
 * Supports enabling and disabling search engines through the Home Assistant configuration.
+* **Automatic entity registration** — SearXNG statistics are registered as Home Assistant entities.
 * Designed for minimal maintenance across future SearXNG releases.
 
 ## Design Philosophy
@@ -49,6 +50,10 @@ Common configuration options include:
 * Base URL
 * Instance name
 * Search engine configuration
+* **Enable Stats Entities** — Enable automatic registration of SearXNG statistics as Home Assistant entities (default: enabled)
+* **Entity Update Interval** — How often to update statistics in Home Assistant, in seconds (default: 60)
+
+For detailed information about entity registration and usage examples, see the [DOCS.md](searxng/DOCS.md#home-assistant-entity-registration) file.
 
 ## Project Goals
 

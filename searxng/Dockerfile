@@ -4,9 +4,14 @@
 # manifest, so the same FROM line resolves correctly on amd64/aarch64 hosts.
 FROM searxng/searxng:2026.7.31-057a77168
 
+# Install additional Python packages for Home Assistant integration
+RUN pip install --no-cache-dir requests paho-mqtt
+
 COPY run.sh /run.sh
+COPY monitor.py /monitor.py
 
 RUN sed -i 's/\r$//' /run.sh && \
-    chmod 755 /run.sh
+    chmod 755 /run.sh && \
+    chmod 755 /monitor.py
 
 ENTRYPOINT ["/bin/sh", "/run.sh"]

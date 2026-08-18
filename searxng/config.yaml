@@ -1,5 +1,5 @@
 name: "SearXNG"
-version: "1.1.0"
+version: "1.2.0"
 slug: "searxng"
 description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
 url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng"
@@ -42,6 +42,10 @@ options:
   safesearch: 0
   image_proxy: true
 
+  # Home Assistant entity registration options
+  enable_stats_entities: true
+  entity_update_interval: 60
+
   engines:
     google: true
     bing: true
@@ -65,6 +69,9 @@ schema:
   autocomplete: str
   safesearch: int(0,2)
   image_proxy: bool
+
+  enable_stats_entities: bool
+  entity_update_interval: int(10,3600)
 
   engines:
     google: bool

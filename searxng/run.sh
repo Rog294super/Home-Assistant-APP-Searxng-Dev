@@ -124,8 +124,49 @@ fi
 
 echo "[searxng-app] Starting SearXNG on port $PORT via Granian"
 
-exec "$GRANIAN" \
+# Start SearXNG in the background
+"$GRANIAN" \
     --interface wsgi \
     --host 0.0.0.0 \
     --port "$PORT" \
-    searx.webapp:app
+    searx.webapp:app &
+
+GRANIAN_PID=$!
+echo "[searxng-app] SearXNG started with PID $GRANIAN_PID"
+
+# ---------------------------------------------------------
+# Start Home Assistant entity monitor (if enabled)
+# The monitor registers SearXNG stats as Home Assistant entities
+# ---------------------------------------------------------
+
+if command -v python3 &> /dev/null || command -v "$PYTHON" &> /dev/null; then
+    export OPTIONS_FILE="$OPTIONS_FILE"
+    
+    echo "[searxng-app] Starting entity monitor service"
+    
+    PYTHON_BIN="$PYTHON"
+    if [ ! -x "$PYTHON_BIN" ]; then
+        PYTHON_BIN="python3"
+    fi
+    
+    # Start monitor in background
+    "$PYTHON_BIN" /monitor.py &
+    MONITOR_PID=$!
+    echo "[searxng-app] Monitor started with PID $MONITOR_PID"
+else
+    echo "[searxng-app] Python not found, skipping entity monitor"
+    MONITOR_PID=""
+fi
+
+# ---------------------------------------------------------
+# Wait for both services
+# If either exits, the container stops
+# ---------------------------------------------------------
+
+wait $GRANIAN_PID
+
+if [ -n "$MONITOR_PID" ]; then
+    kill $MONITOR_PID 2>/dev/null || true
+fi
+
+echo "[searxng-app] SearXNG service stopped"

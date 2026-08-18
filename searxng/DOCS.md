@@ -78,3 +78,83 @@ Engines not named in config.yaml but used by searxng default settings.yml will u
 - If `searxng.local` does not resolve reliably, switch to `searxng.lan`.
 - If an engine does not appear as expected, verify that its name in the configuration exactly matches the engine name in SearXNG.
 - If something looks wrong, review the app logs, which print the generated settings on every boot.
+
+## Home Assistant Entity Registration
+
+This app includes automatic Home Assistant entity registration, similar to other home assistant apps. When enabled, SearXNG statistics are automatically registered as Home Assistant entities that can be used in automations, dashboards, and templates.
+
+### Enabling Entity Registration
+
+1. Open the app configuration in Home Assistant
+2. Set **Enable Stats Entities** to `on`
+3. Optionally adjust **Entity Update Interval** (in seconds, default: 60)
+4. Restart the app
+
+### Available Entities
+
+Once enabled, the following entities will be automatically created in Home Assistant:
+
+- `sensor.searxng_requests` - Total number of search requests
+- `sensor.searxng_average_response_time` - Average response time in milliseconds
+- `sensor.searxng_engine_count` - Number of active search engines
+- `sensor.searxng_uptime_seconds` - App uptime in seconds
+- `sensor.searxng_engine_*` - Per-engine statistics (one sensor per enabled engine)
+
+### Using Entities in Home Assistant
+
+#### In Dashboards
+Display search statistics on your Home Assistant dashboard:
+```yaml
+type: entities
+entities:
+  - entity: sensor.searxng_requests
+  - entity: sensor.searxng_average_response_time
+  - entity: sensor.searxng_uptime_seconds
+```
+
+#### In Automations
+Create automations based on search activity:
+```yaml
+automation:
+  - alias: "Alert on high response times"
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.searxng_average_response_time
+      above: 500
+    action:
+      service: notify.mobile_app_phone
+      data:
+        message: "SearXNG response time is high: {{ states('sensor.searxng_average_response_time') }}ms"
+```
+
+#### In Templates
+Use SearXNG stats in templates:
+```yaml
+template:
+  - sensor:
+      - name: "Search Activity Status"
+        state: >
+          {% if states('sensor.searxng_requests') | int > 100 %}
+            High Activity
+          {% elif states('sensor.searxng_requests') | int > 50 %}
+            Medium Activity
+          {% else %}
+            Low Activity
+          {% endif %}
+```
+
+### Disabling Entity Registration
+
+To disable entity registration:
+1. Open the app configuration
+2. Set **Enable Stats Entities** to `off`
+3. Restart the app
+
+The entity monitor process will not start if this option is disabled, saving system resources.
+
+### Troubleshooting Entity Registration
+
+- **Entities not appearing**: Check the app logs for errors. Make sure the app has access to the Home Assistant API.
+- **Update delays**: The default update interval is 60 seconds. Entities are refreshed according to this interval.
+- **Missing engine entities**: Only engines that are enabled in the app configuration will have corresponding entities.
+- **API errors in logs**: Ensure Home Assistant is running and the supervisor token is accessible.
