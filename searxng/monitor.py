@@ -9,10 +9,12 @@ import logging
 import os
 import sys
 import time
+import urllib.request
+import urllib.error
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
-import requests
+
 import yaml
 
 # Setup logging
@@ -75,10 +77,10 @@ class SearXNGMonitor:
         """Fetch stats from SearXNG"""
         try:
             url = f"http://localhost:{self.port}/stats"
-            response = requests.get(url, timeout=5)
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as e:
+            with urllib.request.urlopen(url, timeout=5) as response:
+                data = response.read()
+                return json.loads(data)
+        except (urllib.error.URLError, json.JSONDecodeError) as e:
             logger.error(f"Failed to fetch stats: {e}")
             return None
 
@@ -102,10 +104,11 @@ class SearXNGMonitor:
                 "state": str(state),
                 "attributes": attributes,
             }
-            response = requests.post(url, json=payload, headers=headers, timeout=5)
-            response.raise_for_status()
-            return True
-        except requests.RequestException as e:
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=5) as response:
+                return response.status == 200
+        except (urllib.error.URLError, json.JSONDecodeError) as e:
             logger.error(f"Failed to register entity {entity_id}: {e}")
             return False
 
