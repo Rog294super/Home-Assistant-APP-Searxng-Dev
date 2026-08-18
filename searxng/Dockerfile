@@ -5,7 +5,8 @@
 FROM searxng/searxng:2026.7.31-057a77168
 
 # Install additional Python packages for Home Assistant integration
-RUN pip install --no-cache-dir requests paho-mqtt
+# Use the SearXNG venv to ensure packages are in the same environment
+RUN /usr/local/searxng/.venv/bin/pip install --no-cache-dir requests paho-mqtt
 
 COPY run.sh /run.sh
 COPY monitor.py /monitor.py

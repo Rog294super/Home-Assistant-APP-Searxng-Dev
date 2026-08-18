@@ -9,7 +9,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   - New `enable_stats_entities` configuration option to enable/disable entity registration (default: enabled).
   - New `entity_update_interval` configuration option to set the polling interval in seconds (default: 60, range: 10-3600).
   - Entities created include: total requests, average response time, engine count, uptime, and per-engine statistics.
-  - Entity monitor runs as a background service alongside SearXNG, similar to AdGuard Home integration.
+  - Entity monitor runs as a background service alongside SearXNG, similar to other HA integrations.
   - Entities can be used in Home Assistant automations, dashboards, and templates.
   - Added comprehensive documentation for entity usage and troubleshooting.
 
