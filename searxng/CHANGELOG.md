@@ -13,7 +13,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   - Entities can be used in Home Assistant automations, dashboards, and templates.
   - Added comprehensive documentation for entity usage and troubleshooting.
   - Added optional `disabled_engines` configuration for explicitly disabling
-    SearXNG engines while preserving upstream defaults for all other engines.
+  -  SearXNG engines while preserving upstream defaults for all other engines.
     Added translations for `enable_stats_entities`, `entity_update_interval` and `disabled_engines`
 
 ### Changed
