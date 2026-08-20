@@ -79,6 +79,7 @@ settings = {
         "secret_key": secret_key,
         "base_url": options.get("base_url") or "",
         "image_proxy": bool(options.get("image_proxy", True)),
+        "port": int(options.get("port", 18080)),
     },
     "search": {
         "safesearch": int(options.get("safesearch", 0)),
@@ -90,11 +91,29 @@ autocomplete = options.get("autocomplete")
 if autocomplete:
     settings["search"]["autocomplete"] = autocomplete
 
-engines = options.get("engines", {})
-settings["engines"] = [
-    {"name": name, "disabled": not bool(enabled)}
-    for name, enabled in engines.items()
-]
+disabled_engines = options.get("disabled_engines")
+
+if isinstance(disabled_engines, list) and disabled_engines:
+    print("[searxng-app] Using new disabled_engines configuration")
+    settings["engines"] = [
+        {"name": str(name), "disabled": True}
+        for name in disabled_engines
+        if name
+    ]
+else:
+    legacy_engines = options.get("engines")
+
+    if isinstance(legacy_engines, dict):
+        print("[searxng-app] Using legacy engines configuration")
+        settings["engines"] = [
+            {"name": str(name), "disabled": not bool(enabled)}
+            for name, enabled in legacy_engines.items()
+        ]
+    else:
+        print(
+            "[searxng-app] No engine overrides configured; "
+            "using SearXNG upstream defaults"
+        )
 
 with open(settings_path, "w") as f:
     yaml.safe_dump(settings, f, sort_keys=False, allow_unicode=True)

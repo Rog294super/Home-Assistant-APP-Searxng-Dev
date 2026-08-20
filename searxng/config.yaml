@@ -46,6 +46,11 @@ options:
   enable_stats_entities: true
   entity_update_interval: 60
 
+  # Explicitly disabled engines. An empty list preserves the legacy
+  # engines configuration below for existing installations.
+  disabled_engines: []
+
+  # Legacy configuration retained for backwards compatibility.
   engines:
     google: true
     bing: true
@@ -72,6 +77,9 @@ schema:
 
   enable_stats_entities: bool
   entity_update_interval: int(10,3600)
+
+  disabled_engines:
+    - str
 
   engines:
     google: bool
