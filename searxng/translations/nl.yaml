@@ -40,7 +40,7 @@ configuration:
 
   entity_update_interval:
     name: entiteit update frequentie
-    description: Hoevaak moeten de sensors updaten gemeten in seconden.
+    description: Na hoeveel tijd moeten de sensors updaten gemeten in seconden.
 
   disabled_engines:
     name: Uitgeschakelde Zoekmachines
