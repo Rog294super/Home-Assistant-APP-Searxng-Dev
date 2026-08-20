@@ -12,10 +12,17 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   - Entity monitor runs as a background service alongside SearXNG, similar to other HA integrations.
   - Entities can be used in Home Assistant automations, dashboards, and templates.
   - Added comprehensive documentation for entity usage and troubleshooting.
+  - Added optional `disabled_engines` configuration for explicitly disabling
+    SearXNG engines while preserving upstream defaults for all other engines.
 
 ### Changed
 - Modified `run.sh` to start both SearXNG and the entity monitor service.
 - Updated Dockerfile to include Python packages required for Home Assistant API integration (requests, paho-mqtt).
+- `run.sh` now uses `disabled_engines` only when the list is non-empty.
+- Existing `engines` configuration remains supported for backwards
+  compatibility and is used when `disabled_engines` is empty or absent.
+- The legacy `engines` configuration will not be considered for deprecation
+  before version 1.4.0.
 
 ## 1.1.0
 
