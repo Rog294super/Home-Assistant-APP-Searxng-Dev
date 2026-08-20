@@ -68,6 +68,10 @@ class SearXNGMonitor:
 
     def _get_ha_token(self) -> Optional[str]:
         """Get Home Assistant API token from supervisor"""
+        token = os.environ.get("SUPERVISOR_TOKEN")
+        if token:
+            return token
+
         token_file = "/var/run/supervisor/homeassistant.auth.json"
         try:
             if os.path.exists(token_file):
@@ -75,6 +79,7 @@ class SearXNGMonitor:
                     return json.load(f).get("access_token")
         except Exception as e:
             logger.warning(f"Failed to read HA token: {e}")
+        logger.warning("Home Assistant Supervisor token is unavailable")
         return None
 
     def _get_metrics_password(self) -> str:
