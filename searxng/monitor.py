@@ -11,6 +11,7 @@ import sys
 import time
 import urllib.request
 import urllib.error
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -163,8 +164,6 @@ class SearXNGMonitor:
 
     def _process_stats(self, stats: Dict[str, Any]) -> bool:
         """Process and register stats as entities"""
-        success_count = 0
-        
         # Extract key metrics
         metrics = {
             "requests": stats.get("requests", 0),
@@ -173,7 +172,9 @@ class SearXNGMonitor:
             "uptime_seconds": stats.get("uptime", 0),
         }
 
-        # Register main metrics
+        entities = []
+
+        # Build the complete update batch before sending any requests.
         for metric_name, value in metrics.items():
             entity_id = self._create_entity_id(metric_name)
             attributes = {
@@ -189,11 +190,9 @@ class SearXNGMonitor:
             elif metric_name == "uptime_seconds":
                 attributes["unit_of_measurement"] = "s"
 
-            if self._register_entity(entity_id, value, attributes):
-                success_count += 1
-                logger.debug(f"Registered entity {entity_id}: {value}")
+            entities.append((entity_id, value, attributes))
 
-        # Register per-engine stats
+        # Add per-engine stats to the same batch.
         engines = stats.get("engines", {})
         for engine_name, engine_stats in engines.items():
             entity_id = self._create_entity_id(f"engine_{engine_name}")
@@ -203,10 +202,20 @@ class SearXNGMonitor:
                 "requests": engine_stats.get("total", 0),
                 "avg_response_time": round(engine_stats.get("avg_response_time", 0), 2),
             }
-            
-            if self._register_entity(entity_id, engine_stats.get("total", 0), attributes):
-                success_count += 1
-                logger.debug(f"Registered engine entity {entity_id}")
+
+            entities.append((entity_id, engine_stats.get("total", 0), attributes))
+
+        success_count = 0
+        with ThreadPoolExecutor(max_workers=min(10, len(entities))) as executor:
+            requests = {
+                executor.submit(self._register_entity, entity_id, value, attributes): entity_id
+                for entity_id, value, attributes in entities
+            }
+            for request in as_completed(requests):
+                entity_id = requests[request]
+                if request.result():
+                    success_count += 1
+                    logger.debug(f"Registered entity {entity_id}")
 
         logger.info(f"Registered {success_count} entities")
         return success_count > 0
