@@ -17,6 +17,9 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   - Added optional `disabled_engines` configuration for explicitly disabling
     SearXNG engines while preserving upstream defaults for all other engines.
   - Added translations for `enable_stats_entities`, `entity_update_interval` and `disabled_engines`
+  - Use the Home Assistant Core API token for entity registration.
+  - Enable Home Assistant API access for the add-on.
+
 
 ### Changed
 - Modified `run.sh` to start both SearXNG and the entity monitor service.

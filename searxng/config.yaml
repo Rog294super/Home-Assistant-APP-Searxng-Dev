@@ -7,6 +7,7 @@ arch:
   - aarch64
   - amd64
 init: false
+homeassistant_api: true
 
 # host_network is the key setting that gets you away from the
 # "homeassistant.local:8123/api/hassio_ingress/xxxx/" style path.

@@ -67,8 +67,8 @@ class SearXNGMonitor:
         return os.environ.get("HA_URL", "http://supervisor/core")
 
     def _get_ha_token(self) -> Optional[str]:
-        """Get Home Assistant API token from supervisor"""
-        token = os.environ.get("SUPERVISOR_TOKEN")
+        """Get the token granted for Home Assistant's Core API."""
+        token = os.environ.get("HASSIO_TOKEN")
         if token:
             return token
 
