@@ -32,6 +32,14 @@ configuration:
     name: Image proxy
     description: Proxy remote images through SearXNG.
 
+  disabled_engines:
+    name: Disabled Engines
+    description: >
+      search engines here noted shall be disabled at default for users. 
+      Users can enable through prefferences in the browser.
+      search engines noted here should not be enabled by Search Engines which is below this option.
+      Search engines options shall be deprecated at earliest on version 1.4.0
+
   engines:
     name: Search engines
     description: >

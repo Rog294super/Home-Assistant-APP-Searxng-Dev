@@ -34,6 +34,14 @@ configuration:
     description: >
       Laat externe afbeeldingen via SearXNG verlopen.
 
+  disabled_engines:
+    name: Uitgeschakelde Zoekmachines
+    description: >
+      De hier vermelde zoekmachines zijn standaard uitgeschakeld voor gebruikers. 
+      Gebruikers kunnen ze inschakelen via de voorkeuren knop in de browser.
+      De hier vermelde zoekmachines mogen niet worden ingeschakeld bij optie zoekmachines, die onder deze optie staat.
+      De zoekmachine-opties worden op zijn vroegst in versie 1.4.0 afgeschaft.
+
   engines:
     name: Zoekmachines
     description: >
