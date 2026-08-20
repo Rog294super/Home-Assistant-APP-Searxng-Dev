@@ -1,4 +1,3 @@
-.github/workflows/
 # Exclude /Build if exist
 /build/
 /build
