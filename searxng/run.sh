@@ -74,6 +74,8 @@ settings = {
     "use_default_settings": True,
     "general": {
         "instance_name": options.get("instance_name") or "SearXNG",
+        "enable_metrics": True,
+        "open_metrics": secret_key,
     },
     "server": {
         "secret_key": secret_key,

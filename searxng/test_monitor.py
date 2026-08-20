@@ -29,15 +29,29 @@ class TestMonitor(unittest.TestCase):
         self.monitor = monitor_module.SearXNGMonitor.__new__(monitor_module.SearXNGMonitor)
         self.monitor.port = 18080
 
-    def test_get_stats_parses_json(self):
-        payload = b'{"requests": 7, "engines": {}}'
-        with patch.object(monitor_module.urllib.request, "urlopen", return_value=FakeResponse(payload)):
-            self.assertEqual(self.monitor._get_stats(), {"requests": 7, "engines": {}})
+    def test_parse_metrics(self):
+        payload = """\
+searxng_engines_request_count_total{engine_name="google"} 7
+searxng_engines_response_time_total_seconds{engine_name="google"} 0.42
+searxng_engines_request_count_total{engine_name="bing"} 3
+"""
+        self.assertEqual(
+            self.monitor._parse_metrics(payload),
+            {
+                "requests": 10,
+                "engines": {
+                    "google": {"total": 7, "avg_response_time": 420.0},
+                    "bing": {"total": 3},
+                },
+                "average_response_time": 420.0,
+            },
+        )
 
     def test_get_stats_rejects_non_json_html(self):
-        payload = b"<html><body>Service unavailable</body></html>"
-        with patch.object(monitor_module.urllib.request, "urlopen", return_value=FakeResponse(payload, "text/html")):
-            self.assertIsNone(self.monitor._get_stats())
+        self.assertEqual(
+            self.monitor._parse_metrics("<html>Service unavailable</html>"),
+            {"requests": 0, "average_response_time": 0, "engines": {}},
+        )
 
 
 if __name__ == "__main__":

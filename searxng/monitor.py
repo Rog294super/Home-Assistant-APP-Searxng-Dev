@@ -11,8 +11,10 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import base64
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+import re
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -44,6 +46,7 @@ class SearXNGMonitor:
         self.port = self.options.get("port", 18080)
         self.instance_name = self.options.get("instance_name", "SearXNG")
         self.update_interval = self.options.get("entity_update_interval", 60)
+        self.metrics_password = self._get_metrics_password()
         
         logger.info(f"Initialized SearXNG Monitor for {self.instance_name}")
         logger.info(f"Home Assistant URL: {self.ha_url}")
@@ -74,45 +77,67 @@ class SearXNGMonitor:
             logger.warning(f"Failed to read HA token: {e}")
         return None
 
-    def _get_stats(self) -> Optional[Dict[str, Any]]:
-        """Fetch stats from SearXNG.
-
-        SearXNG can briefly return an HTML error page or other non-JSON text
-        while starting up, while rate-limited, or during temporary backend
-        issues. Those are transient conditions and should not be treated as a
-        hard failure that floods the logs.
-        """
-        url = f"http://localhost:{self.port}/stats"
+    def _get_metrics_password(self) -> str:
+        """Read the metrics password shared with the SearXNG server."""
         try:
-            with urllib.request.urlopen(url, timeout=5) as response:
-                payload = response.read()
-                if not payload:
-                    logger.warning("SearXNG stats endpoint returned empty content")
+            with open("/data/generated_secret", "r") as secret_file:
+                return secret_file.read().strip()
+        except OSError:
+            return ""
+
+    def _get_stats(self) -> Optional[Dict[str, Any]]:
+        """Fetch engine metrics from SearXNG's authenticated metrics endpoint."""
+        url = f"http://localhost:{self.port}/metrics"
+        try:
+            request = urllib.request.Request(url)
+            credentials = f":{getattr(self, 'metrics_password', '')}".encode("utf-8")
+            request.add_header(
+                "Authorization",
+                f"Basic {base64.b64encode(credentials).decode('ascii')}",
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                text = response.read().decode("utf-8", errors="replace")
+                if not text.strip():
+                    logger.warning("SearXNG metrics endpoint returned empty content")
                     return None
-
-                text = payload.decode("utf-8", errors="replace").strip()
-                content_type = response.headers.get("Content-Type", "") if hasattr(response, "headers") else ""
-
-                if not text or not text.startswith("{"):
-                    logger.warning(
-                        "SearXNG stats endpoint returned non-JSON content "
-                        f"(content-type={content_type!r}, preview={text[:200]!r})"
-                    )
-                    return None
-
-                return json.loads(text)
+                return self._parse_metrics(text)
         except urllib.error.HTTPError as e:
-            logger.warning(f"SearXNG stats endpoint returned HTTP {e.code}: {e.reason}")
+            logger.warning(f"SearXNG metrics endpoint returned HTTP {e.code}: {e.reason}")
             return None
         except urllib.error.URLError as e:
-            logger.warning(f"SearXNG stats endpoint unreachable: {e.reason}")
+            logger.warning(f"SearXNG metrics endpoint unreachable: {e.reason}")
             return None
-        except json.JSONDecodeError as e:
-            logger.warning(
-                "SearXNG stats endpoint returned invalid JSON; server may still be starting or rate-limited: "
-                f"{e}"
-            )
-            return None
+
+    def _parse_metrics(self, text: str) -> Dict[str, Any]:
+        """Convert SearXNG OpenMetrics output into the monitor's stats shape."""
+        engines: Dict[str, Dict[str, Any]] = {}
+        pattern = re.compile(
+            r"^searxng_engines_(request_count_total|response_time_total_seconds)"
+            r'\{engine_name="([^"]+)"\}\s+([0-9.eE+-]+)$'
+        )
+        for line in text.splitlines():
+            match = pattern.match(line.strip())
+            if not match:
+                continue
+            metric_name, engine_name, value = match.groups()
+            engine = engines.setdefault(engine_name, {})
+            if "request_count" in metric_name:
+                engine["total"] = int(float(value))
+            else:
+                engine["avg_response_time"] = round(float(value) * 1000, 2)
+
+        response_times = [
+            engine["avg_response_time"]
+            for engine in engines.values()
+            if "avg_response_time" in engine
+        ]
+        return {
+            "requests": sum(engine.get("total", 0) for engine in engines.values()),
+            "average_response_time": round(sum(response_times) / len(response_times), 2)
+            if response_times
+            else 0,
+            "engines": engines,
+        }
 
     def _create_entity_id(self, stat_name: str) -> str:
         """Create a valid Home Assistant entity ID"""
@@ -169,8 +194,9 @@ class SearXNGMonitor:
             "requests": stats.get("requests", 0),
             "average_response_time": round(stats.get("average_response_time", 0), 2),
             "engine_count": len(stats.get("engines", {})),
-            "uptime_seconds": stats.get("uptime", 0),
         }
+        if "uptime" in stats:
+            metrics["uptime_seconds"] = stats["uptime"]
 
         entities = []
 
