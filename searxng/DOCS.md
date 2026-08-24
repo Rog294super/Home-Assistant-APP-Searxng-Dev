@@ -88,8 +88,7 @@ This app includes automatic Home Assistant entity registration, similar to other
 
 1. Open the app configuration in Home Assistant
 2. Set **Enable Stats Entities** to `on`
-3. Optionally adjust **Entity Update Interval** (in seconds, default: 60)
-4. Restart the app
+3. Restart the app
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
 metrics endpoint** enabled when entity registration is enabled. The app stores
@@ -165,6 +164,6 @@ The entity monitor process will not start if this option is disabled, saving sys
 ### Troubleshooting Entity Registration
 
 - **Entities not appearing**: Check the app logs for errors. Make sure the app has access to the Home Assistant API.
-- **Update delays**: The default update interval is 60 seconds. Entities are refreshed according to this interval.
+- **Update delays**: Entities are refreshed every 60 seconds. This is the monitor polling interval; dashboard and Recorder refresh behavior is controlled by Home Assistant.
 - **Missing engine entities**: Only engines that are enabled in the app configuration will have corresponding entities.
 - **API errors in logs**: Ensure Home Assistant is running and the supervisor token is accessible.

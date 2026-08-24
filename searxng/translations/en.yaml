@@ -40,10 +40,6 @@ configuration:
     name: Enable entity stats.
     description: Enable this for sensors with stats about the searxng app.
 
-  entity_update_interval:
-    name: Entity update interval
-    description: After how many seconds should the entities update in seconds.
-
   disabled_engines:
     name: Disabled Engines
     description: >

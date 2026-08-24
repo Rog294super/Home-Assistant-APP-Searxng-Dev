@@ -29,6 +29,8 @@ logger = logging.getLogger("searxng-monitor")
 class SearXNGMonitor:
     """Monitor SearXNG stats and register entities with Home Assistant"""
 
+    update_interval = 60
+
     def __init__(self, options_file: str):
         self.options_file = options_file
         self.options = self._load_options()
@@ -44,7 +46,6 @@ class SearXNGMonitor:
         self.ha_token = self._get_ha_token()
         self.port = self.options.get("port", 18080)
         self.instance_name = self.options.get("instance_name", "SearXNG")
-        self.update_interval = self.options.get("entity_update_interval", 60)
         self.metrics_password = self._get_metrics_password()
         
         logger.info(f"Initialized SearXNG Monitor for {self.instance_name}")
