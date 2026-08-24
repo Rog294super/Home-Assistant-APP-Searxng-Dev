@@ -63,7 +63,7 @@ fi
 # ---------------------------------------------------------
 
 SECRET_KEY="$SECRET_KEY" METRICS_SECRET="$(cat "$METRICS_SECRET_FILE")" \
-    "$PYTHON" - "$OPTIONS_FILE" "$SETTINGS_FILE" <<'PYEOF
+    "$PYTHON" - "$OPTIONS_FILE" "$SETTINGS_FILE" <<'PYEOF'
 import json
 import os
 import sys
