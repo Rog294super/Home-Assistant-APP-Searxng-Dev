@@ -87,7 +87,7 @@ This app includes automatic Home Assistant entity registration, similar to other
 ### Enabling Entity Registration
 
 1. Open the app configuration in Home Assistant
-2. Set **Enable Stats Entities** to `on`
+2. Set **Enable Stats Entities** to `on`, Also set **enable metrics** to `on`.
 3. Restart the app
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
