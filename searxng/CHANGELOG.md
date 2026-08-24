@@ -23,7 +23,8 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 
 ### Changed
 - Modified `run.sh` to start both SearXNG and the entity monitor service.
-- Updated Dockerfile to include Python packages required for Home Assistant API integration (requests, paho-mqtt).
+- The monitor uses the Python packages already present in the SearXNG image;
+  MQTT publishing remains optional when `paho-mqtt` is available.
 - `run.sh` now uses `disabled_engines` only when the list is non-empty.
 - Existing `engines` configuration remains supported for backwards
   compatibility and is used when `disabled_engines` is empty or absent.
@@ -33,6 +34,12 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 ## 1.1.0
 
 ### Fixed
+- Use the current `SUPERVISOR_TOKEN` environment variable for Home Assistant
+  Core API entity registration.
+- Store a separately generated password for the authenticated metrics endpoint
+  instead of reusing SearXNG's `server.secret_key`.
+- Add an `enable_metrics` option and use POSIX-compatible shell redirections.
+- URL-encode entity IDs before sending Home Assistant API requests.
 - Fixed a bug where `settings.yml` ended up with two top-level `search:` keys
   (one from the template for `safesearch`/`formats`, one appended for
   `autocomplete`). YAML doesn't merge duplicate keys, so the second one

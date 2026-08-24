@@ -32,6 +32,10 @@ configuration:
     name: Image proxy
     description: Proxy remote images through SearXNG.
 
+  enable_metrics:
+    name: Enable metrics endpoint
+    description: Enable the authenticated metrics endpoint used by statistics entities.
+
   enable_stats_entities:
     name: Enable entity stats.
     description: Enable this for sensors with stats about the searxng app.

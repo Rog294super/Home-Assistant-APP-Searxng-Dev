@@ -43,6 +43,10 @@ options:
   safesearch: 0
   image_proxy: true
 
+  # SearXNG's authenticated Prometheus metrics endpoint. Disable this when
+  # entity registration is not needed.
+  enable_metrics: true
+
   # Home Assistant entity registration options
   enable_stats_entities: true
   entity_update_interval: 60
@@ -75,6 +79,7 @@ schema:
   autocomplete: str
   safesearch: int(0,2)
   image_proxy: bool
+  enable_metrics: bool
 
   enable_stats_entities: bool
   entity_update_interval: int(10,3600)

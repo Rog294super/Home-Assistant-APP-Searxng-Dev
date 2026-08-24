@@ -8,6 +8,7 @@ This app installs SearXNG as a self-hosted search engine for Home Assistant OS o
 - Simple on/off toggles for individual search engines
 - A local, privacy-friendly alternative to public search services
 - Compatibility with a custom DNS setup or reverse proxy for cleaner URLs
+- Optional authenticated metrics endpoint for Home Assistant statistics entities
 
 ## Installation
 
@@ -89,6 +90,15 @@ This app includes automatic Home Assistant entity registration, similar to other
 2. Set **Enable Stats Entities** to `on`
 3. Optionally adjust **Entity Update Interval** (in seconds, default: 60)
 4. Restart the app
+
+The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
+metrics endpoint** enabled when entity registration is enabled. The app stores
+the metrics password separately from SearXNG's `server.secret_key`; it is
+generated automatically and is not shown in the app configuration.
+
+Metrics can be disabled with **Enable metrics endpoint**, for example when
+entity registration is not needed. The endpoint is enabled by default for
+backwards compatibility.
 
 ### Available Entities
 

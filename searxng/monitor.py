@@ -11,14 +11,12 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import urllib.parse
 import base64
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 import re
-from pathlib import Path
 from typing import Any, Dict, Optional
-
-import yaml
 
 # Setup logging
 logging.basicConfig(
@@ -34,6 +32,7 @@ class SearXNGMonitor:
     def __init__(self, options_file: str):
         self.options_file = options_file
         self.options = self._load_options()
+        self.metrics_enabled = self.options.get("enable_metrics", True)
         
         # Check if entity registration is enabled
         self.enabled = self.options.get("enable_stats_entities", True)
@@ -68,30 +67,24 @@ class SearXNGMonitor:
 
     def _get_ha_token(self) -> Optional[str]:
         """Get the token granted for Home Assistant's Core API."""
-        token = os.environ.get("HASSIO_TOKEN")
+        token = os.environ.get("SUPERVISOR_TOKEN")
         if token:
             return token
-
-        token_file = "/var/run/supervisor/homeassistant.auth.json"
-        try:
-            if os.path.exists(token_file):
-                with open(token_file, "r") as f:
-                    return json.load(f).get("access_token")
-        except Exception as e:
-            logger.warning(f"Failed to read HA token: {e}")
         logger.warning("Home Assistant Supervisor token is unavailable")
         return None
 
     def _get_metrics_password(self) -> str:
         """Read the metrics password shared with the SearXNG server."""
         try:
-            with open("/data/generated_secret", "r") as secret_file:
+            with open("/data/generated_metrics_secret", "r") as secret_file:
                 return secret_file.read().strip()
         except OSError:
             return ""
 
     def _get_stats(self) -> Optional[Dict[str, Any]]:
         """Fetch engine metrics from SearXNG's authenticated metrics endpoint."""
+        if not getattr(self, "metrics_enabled", True):
+            return None
         url = f"http://localhost:{self.port}/metrics"
         try:
             request = urllib.request.Request(url)
@@ -155,7 +148,7 @@ class SearXNGMonitor:
             return False
 
         try:
-            url = f"{self.ha_url}/api/states/{entity_id}"
+            url = f"{self.ha_url}/api/states/{urllib.parse.quote(entity_id, safe='')}"
             headers = {
                 "Authorization": f"Bearer {self.ha_token}",
                 "Content-Type": "application/json",

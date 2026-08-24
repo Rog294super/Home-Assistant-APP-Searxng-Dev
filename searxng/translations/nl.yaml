@@ -34,13 +34,17 @@ configuration:
     description: >
       Laat externe afbeeldingen via SearXNG verlopen.
 
+  enable_metrics:
+    name: Metrics-eindpunt inschakelen
+    description: Schakel het beveiligde metrics-eindpunt in dat door statistiekentiteiten wordt gebruikt.
+
   enable_stats_entities:
     name: inschakelen statistieken entiteit.
     description: Schakel dit in voor sensors met statistieken over de searxng app.
 
   entity_update_interval:
     name: entiteit update frequentie
-    description: Na hoeveel tijd moeten de sensors updaten gemeten in seconden.
+    description: Na hoeveel tijd moeten de sensors updaten, gemeten in seconden.
 
   disabled_engines:
     name: Uitgeschakelde Zoekmachines

@@ -12,6 +12,7 @@ fi
 OPTIONS_FILE="/data/options.json"
 SETTINGS_FILE="/etc/searxng/settings.yml"
 SECRET_FILE="/data/generated_secret"
+METRICS_SECRET_FILE="/data/generated_metrics_secret"
 
 mkdir -p /etc/searxng
 
@@ -38,6 +39,11 @@ if [ -z "$SECRET_KEY" ]; then
     fi
 fi
 
+if [ ! -f "$METRICS_SECRET_FILE" ]; then
+    head -c 32 /dev/urandom | sha256sum | cut -d' ' -f1 > "$METRICS_SECRET_FILE"
+    echo "[searxng-app] Generated and stored a separate metrics password"
+fi
+
 # ---------------------------------------------------------
 # Build settings.yml as a single Python dict -> YAML dump.
 #
@@ -56,7 +62,8 @@ fi
 # maintain or forget to update.
 # ---------------------------------------------------------
 
-SECRET_KEY="$SECRET_KEY" "$PYTHON" - "$OPTIONS_FILE" "$SETTINGS_FILE" <<'PYEOF'
+SECRET_KEY="$SECRET_KEY" METRICS_SECRET="$(cat "$METRICS_SECRET_FILE")" \
+    "$PYTHON" - "$OPTIONS_FILE" "$SETTINGS_FILE" <<'PYEOF
 import json
 import os
 import sys
@@ -74,8 +81,8 @@ settings = {
     "use_default_settings": True,
     "general": {
         "instance_name": options.get("instance_name") or "SearXNG",
-        "enable_metrics": True,
-        "open_metrics": secret_key,
+        "enable_metrics": bool(options.get("enable_metrics", True)),
+        "open_metrics": os.environ["METRICS_SECRET"],
     },
     "server": {
         "secret_key": secret_key,
@@ -160,7 +167,7 @@ echo "[searxng-app] SearXNG started with PID $GRANIAN_PID"
 # The monitor registers SearXNG stats as Home Assistant entities
 # ---------------------------------------------------------
 
-if command -v python3 &> /dev/null || command -v "$PYTHON" &> /dev/null; then
+if command -v python3 >/dev/null 2>&1 || command -v "$PYTHON" >/dev/null 2>&1; then
     export OPTIONS_FILE="$OPTIONS_FILE"
     
     echo "[searxng-app] Starting entity monitor service"
