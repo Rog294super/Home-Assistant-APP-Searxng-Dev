@@ -282,7 +282,11 @@ class SearXNGMonitor:
             try:
                 stats = self._get_stats()
                 if stats:
-                    self._process_stats(stats)
+                    self._last_stats = stats
+                    if self.mqtt_connected:
+                        self._process_stats(stats)
+                    else:
+                        logger.info("MQTT is not connected yet; waiting to publish stats")
                     consecutive_failures = 0
                 else:
                     consecutive_failures += 1
