@@ -66,11 +66,17 @@ import urllib.request
 env_path = sys.argv[1]
 request = urllib.request.Request(
     "http://supervisor/services/mqtt",
-    headers={"Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"},
+    headers={
+        "Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}",
+        "X-Supervisor-Token": os.environ["SUPERVISOR_TOKEN"],
+        "Accept": "application/json",
+    },
 )
 try:
     with urllib.request.urlopen(request, timeout=10) as response:
         service = json.loads(response.read().decode("utf-8"))
+        if not service.get("host"):
+            raise ValueError(f"Supervisor returned no MQTT host: {service}")
     values = {
         "MQTT_HOST": service.get("host", ""),
         "MQTT_PORT": service.get("port", "1883"),
@@ -81,7 +87,7 @@ try:
         for key, value in values.items():
             env_file.write(f"export {key}={shlex.quote(str(value))}\n")
     print("[searxng-app] Loaded MQTT service configuration from Supervisor")
-except (OSError, urllib.error.URLError, json.JSONDecodeError, KeyError) as error:
+except (OSError, urllib.error.URLError, json.JSONDecodeError, KeyError, ValueError) as error:
     print(f"[searxng-app] WARNING: Could not load MQTT service configuration: {error}")
 PYEOF
         if [ -s "$MQTT_ENV_FILE" ]; then
