@@ -146,32 +146,25 @@ class SearXNGMonitor:
     def _availability_topic(self) -> str:
         return f"{self.mqtt_base_topic}/status"
 
-    def _mqtt_option(self, option_name: str, environment_name: str, default: str = "") -> str:
-        """Prefer HAOS MQTT service values, with legacy options as fallback."""
-        environment_value = os.environ.get(environment_name)
-        if environment_value is not None and environment_value != "":
-            return environment_value
-        return str(self.options.get(option_name, default))
-
     def _connect_mqtt(self) -> None:
         """Start Paho's network loop; it reconnects after broker outages."""
-        host = self._mqtt_option("mqtt_host", "MQTT_HOST", "core-mosquitto").strip()
+        host = os.environ.get("MQTT_HOST", "").strip()
         if not host:
-            logger.error("MQTT Discovery is enabled but mqtt_host is empty")
+            logger.error("MQTT Discovery requires the HAOS mqtt:need service (MQTT_HOST is missing)")
             self.mqtt_enabled = False
             return
         try:
             import paho.mqtt.client as mqtt  # type: ignore
 
             client = mqtt.Client(client_id=f"searxng-{self.instance_name.lower().replace(' ', '-')}")
-            username = os.environ.get("MQTT_USER") or os.environ.get("MQTT_USERNAME") or self.options.get("mqtt_username", "")
+            username = os.environ.get("MQTT_USER") or os.environ.get("MQTT_USERNAME")
             if username:
-                password = os.environ.get("MQTT_PASSWORD") or self.options.get("mqtt_password", "")
+                password = os.environ.get("MQTT_PASSWORD", "")
                 client.username_pw_set(username, password)
             client.will_set(self._availability_topic(), "offline", qos=1, retain=True)
             client.on_connect = self._on_mqtt_connect
             client.on_disconnect = self._on_mqtt_disconnect
-            port = int(self._mqtt_option("mqtt_port", "MQTT_PORT", "1883"))
+            port = int(os.environ.get("MQTT_PORT", "1883"))
             client.connect_async(host, port, keepalive=60)
             self.mqtt_client = client
             client.loop_start()

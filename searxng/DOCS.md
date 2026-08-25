@@ -91,7 +91,7 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery. MQT
 3. Install or restart SearXNG. The `mqtt:need` service automatically supplies the broker host, port, username, and password.
 4. Keep **Enable Stats Entities** and **Enable Metrics Endpoint** enabled.
 
-No MQTT username, password, host, or port needs to be entered in the SearXNG app configuration. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
+No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS `mqtt:need` service. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
 metrics endpoint** enabled when MQTT Discovery is enabled. The app stores
