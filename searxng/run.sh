@@ -52,6 +52,9 @@ fi
 
 MQTT_ENV_FILE="/tmp/searxng-mqtt.env"
 if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
+    MQTT_SERVICE_LOADED=""
+    MQTT_ATTEMPT=1
+    while [ "$MQTT_ATTEMPT" -le 12 ]; do
     SUPERVISOR_TOKEN="$SUPERVISOR_TOKEN" "$PYTHON" - "$MQTT_ENV_FILE" <<'PYEOF'
 import json
 import os
@@ -81,6 +84,16 @@ try:
 except (OSError, urllib.error.URLError, json.JSONDecodeError, KeyError) as error:
     print(f"[searxng-app] WARNING: Could not load MQTT service configuration: {error}")
 PYEOF
+        if [ -s "$MQTT_ENV_FILE" ]; then
+            MQTT_SERVICE_LOADED="yes"
+            break
+        fi
+        echo "[searxng-app] MQTT service not ready; retrying ($MQTT_ATTEMPT/12)"
+        MQTT_ATTEMPT=$((MQTT_ATTEMPT + 1))
+        sleep 5
+    done
+else
+    echo "[searxng-app] WARNING: SUPERVISOR_TOKEN is missing; cannot query MQTT service"
 fi
 
 if [ -f "$MQTT_ENV_FILE" ]; then
