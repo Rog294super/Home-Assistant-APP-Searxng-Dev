@@ -75,6 +75,7 @@ request = urllib.request.Request(
 try:
     with urllib.request.urlopen(request, timeout=10) as response:
         service = json.loads(response.read().decode("utf-8"))
+        service = service.get("data", service)
         if not service.get("host"):
             raise ValueError(f"Supervisor returned no MQTT host: {service}")
     values = {
