@@ -8,7 +8,7 @@ This app installs SearXNG as a self-hosted search engine for Home Assistant OS o
 - Simple on/off toggles for individual search engines
 - A local, privacy-friendly alternative to public search services
 - Compatibility with a custom DNS setup or reverse proxy for cleaner URLs
-- Optional authenticated metrics endpoint for Home Assistant statistics entities
+- Optional MQTT Discovery sensors for SearXNG statistics
 
 ## Installation
 
@@ -80,18 +80,19 @@ Engines not named in config.yaml but used by searxng default settings.yml will u
 - If an engine does not appear as expected, verify that its name in the configuration exactly matches the engine name in SearXNG.
 - If something looks wrong, review the app logs, which print the generated settings on every boot.
 
-## Home Assistant Entity Registration
+## Home Assistant MQTT Discovery
 
-This app includes automatic Home Assistant entity registration, similar to other home assistant apps. When enabled, SearXNG statistics are automatically registered as Home Assistant entities that can be used in automations, dashboards, and templates.
+This app publishes SearXNG statistics through Home Assistant MQTT Discovery. MQTT Discovery is the only entity registration method in version 1.2.0. The MQTT broker must be reachable from the app container.
 
-### Enabling Entity Registration
+### Enabling MQTT Discovery
 
-1. Open the app configuration in Home Assistant
-2. Set **Enable Stats Entities** to `on`, Also set **enable metrics** to `on`.
-3. Restart the app
+1. Configure an MQTT integration and broker in Home Assistant.
+2. Open the app configuration and set **Enable MQTT Discovery** to `on`.
+3. Set the broker host, port, and optional credentials. The default broker host is `core-mosquitto`.
+4. Keep **Enable Metrics Endpoint** enabled and restart the app.
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
-metrics endpoint** enabled when entity registration is enabled. The app stores
+metrics endpoint** enabled when MQTT Discovery is enabled. The app stores
 the metrics password separately from SearXNG's `server.secret_key`; it is
 generated automatically and is not shown in the app configuration.
 
@@ -101,7 +102,7 @@ backwards compatibility.
 
 ### Available Entities
 
-Once enabled, the following entities will be automatically created in Home Assistant:
+Once enabled and connected to the broker, the following entities will be automatically created in Home Assistant:
 
 - `sensor.searxng_requests` - Total number of search requests
 - `sensor.searxng_average_response_time` - Average response time in milliseconds
@@ -150,19 +151,15 @@ template:
           {% endif %}
 ```
 
-### Disabling Entity Registration
+### Disabling MQTT Discovery
 
-To disable entity registration:
-1. Open the app configuration
-2. Set **Enable Stats Entities** to `off`, Also set **enable metrics** to `off`, 
-   This should be done for security reasons around the metrics endpoint <host>:<port>/metrics.
-3. Restart the app
+To disable the monitor, set **Enable Stats Entities** to `off` and restart the app. To keep the monitor but stop MQTT entities, set **Enable MQTT Discovery** to `off`. Existing MQTT entities remain in Home Assistant until their discovery entries are removed manually.
 
 The entity monitor process will not start if this option is disabled, saving system resources.
 
 ### Troubleshooting Entity Registration
 
-- **Entities not appearing**: Check the app logs for errors. Make sure the app has access to the Home Assistant API.
+- **Entities not appearing**: Check the app logs for broker connection errors and confirm that the MQTT integration uses the same discovery prefix.
 - **Update delays**: Entities are refreshed every 60 seconds. This is the monitor polling interval; dashboard and Recorder refresh behavior is controlled by Home Assistant.
 - **Missing engine entities**: Only engines that are enabled in the app configuration will have corresponding entities.
-- **API errors in logs**: Ensure Home Assistant is running and the supervisor token is accessible.
+- **Broker unavailable**: The monitor keeps retrying through Paho's network loop. Entities show unavailable while the monitor is disconnected because the MQTT Last Will publishes `offline`.

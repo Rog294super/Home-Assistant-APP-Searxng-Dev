@@ -29,3 +29,4 @@ Thumbs.db
 
 **/test_*
 **/*_test.py
+!searxng/test_monitor.py

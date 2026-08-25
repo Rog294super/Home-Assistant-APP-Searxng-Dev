@@ -5,8 +5,14 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 ## 1.2.0
 
 ### Added
-- **Home Assistant Entity Registration**: Automatic registration of SearXNG statistics as Home Assistant entities (sensor platforms).
-  - New `enable_stats_entities` configuration option to enable/disable entity registration (default: enabled).
+- **MQTT Discovery**: Statistics sensors are published with retained discovery and state messages.
+  - Added configurable broker host, port, credentials, discovery prefix, and state topic prefix.
+  - Added MQTT availability with an `online` state and retained Last Will `offline` state.
+  - Per-engine discovery topics are stable and stale engine configurations are cleared.
+  - **Home Assistant Entity Registration**: Automatic registration of SearXNG statistics as 
+    Home Assistant entities (sensor platforms).
+  - New `enable_stats_entities` configuration option to enable/disable entity registration 
+    (default: enabled).
   - Entities created include: total requests, average response time, engine count, and per-engine
     statistics.
   - Entity monitor runs as a background service alongside SearXNG, similar to other HA integrations.
@@ -20,9 +26,9 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 
 
 ### Changed
-- Modified `run.sh` to start both SearXNG and the entity monitor service.
-- Entity registration currently uses the Home Assistant Core API.
-  MQTT Discovery is not implemented in this version.
+- Modified `run.sh` to start both SearXNG and the MQTT statistics monitor service.
+- Removed direct Home Assistant Core API entity registration; 
+  MQTT Discovery is now the primary and only registration path.
 - Entity polling uses a fixed 60-second interval; dashboard and Recorder
   refresh behavior remains controlled by Home Assistant.
 - `run.sh` now uses `disabled_engines` only when the list is non-empty.
@@ -30,7 +36,8 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   compatibility and is used when `disabled_engines` is empty or absent.
 - The legacy `engines` configuration will not be considered for deprecation
   before version 1.4.0.
-
+- `Icon.png` changed to size: 128 x 128.
+- `Logo.png` added with size 256 x 256
 ## 1.1.0
 
 ### Fixed

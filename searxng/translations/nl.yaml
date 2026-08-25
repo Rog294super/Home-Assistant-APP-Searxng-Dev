@@ -42,6 +42,34 @@ configuration:
     name: inschakelen statistieken entiteit.
     description: Schakel dit in voor sensors met statistieken over de searxng app.
 
+  enable_mqtt_discovery:
+    name: MQTT Discovery inschakelen
+    description: Registreer statistieksensors via MQTT Discovery. Een MQTT-broker is vereist.
+
+  mqtt_host:
+    name: MQTT-brokerhost
+    description: Hostnaam of IP-adres van de MQTT-broker.
+
+  mqtt_port:
+    name: MQTT-brokerpoort
+    description: Poort van de MQTT-broker.
+
+  mqtt_username:
+    name: MQTT-gebruikersnaam
+    description: Optionele MQTT-gebruikersnaam.
+
+  mqtt_password:
+    name: MQTT-wachtwoord
+    description: Optioneel MQTT-wachtwoord.
+
+  mqtt_discovery_prefix:
+    name: MQTT Discovery-prefix
+    description: MQTT Discovery-prefix van Home Assistant, normaal homeassistant.
+
+  mqtt_base_topic:
+    name: MQTT-state-topicprefix
+    description: Prefix voor SearXNG state-, attributen- en beschikbaarheidstopics.
+
   disabled_engines:
     name: Uitgeschakelde Zoekmachines
     description: >

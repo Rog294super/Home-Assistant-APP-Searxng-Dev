@@ -40,6 +40,34 @@ configuration:
     name: Enable entity stats.
     description: Enable this for sensors with stats about the searxng app.
 
+  enable_mqtt_discovery:
+    name: Enable MQTT Discovery
+    description: Register statistics sensors through MQTT Discovery. An MQTT broker is required.
+
+  mqtt_host:
+    name: MQTT broker host
+    description: Hostname or IP address of the MQTT broker.
+
+  mqtt_port:
+    name: MQTT broker port
+    description: Port of the MQTT broker.
+
+  mqtt_username:
+    name: MQTT username
+    description: Optional MQTT username.
+
+  mqtt_password:
+    name: MQTT password
+    description: Optional MQTT password.
+
+  mqtt_discovery_prefix:
+    name: MQTT Discovery prefix
+    description: Home Assistant MQTT Discovery prefix, normally homeassistant.
+
+  mqtt_base_topic:
+    name: MQTT state topic prefix
+    description: Prefix for SearXNG state, attributes, and availability topics.
+
   disabled_engines:
     name: Disabled Engines
     description: >
