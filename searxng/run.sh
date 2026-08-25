@@ -177,10 +177,16 @@ if command -v python3 >/dev/null 2>&1 || command -v "$PYTHON" >/dev/null 2>&1; t
         PYTHON_BIN="python3"
     fi
     
-    # Start monitor in background
-    "$PYTHON_BIN" /monitor.py &
+    # Keep the monitor available if it exits unexpectedly.
+    (
+        while true; do
+            "$PYTHON_BIN" /monitor.py || \
+                echo "[searxng-app] Entity monitor exited; restarting in 5s"
+            sleep 5
+        done
+    ) &
     MONITOR_PID=$!
-    echo "[searxng-app] Monitor started with PID $MONITOR_PID"
+    echo "[searxng-app] Monitor supervisor started with PID $MONITOR_PID"
 else
     echo "[searxng-app] Python not found, skipping entity monitor"
     MONITOR_PID=""

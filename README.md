@@ -50,8 +50,8 @@ Common configuration options include:
 * Base URL
 * Instance name
 * Search engine configuration
+* **Enable Metrics** — Enable the authenticated metrics endpoint used by the SearXNG statistics monitor (default: enabled)
 * **Enable Stats Entities** — Enable automatic registration of SearXNG statistics as Home Assistant entities (default: enabled)
-* **Entity Update Interval** — How often to update statistics in Home Assistant, in seconds (default: 60)
 
 For detailed information about entity registration and usage examples, see the [DOCS.md](searxng/DOCS.md#home-assistant-entity-registration) file.
 

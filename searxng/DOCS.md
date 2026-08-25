@@ -43,7 +43,7 @@ or use the built-in **Open Web UI** option from the app page.
 
 ### Important note about `.local`
 
-Windows clients often treat `.local` as a reserved multicast name suffix and may try to resolve it via mDNS or LLMNR before consulting your DNS server. This can make `searxng.local` unreliable on some machines. If you run into issues, `searxng.lan` is usually the more dependable choice.
+Windows clients often treat `.local` as a reserved multicast name suffix and may try to resolve it via mDNS or LLMNR before consulting your DNS server. This can make `searxng.local` unreliable on some machines. If you run into issues, `searxng.lan` is usually the more dependable choice, Except edge will see `searxng.lan` as a search querry and won't go to the domain.
 
 For more background, see this article: [Why using .local as a domain name extension is a bad idea](https://community.veeam.com/blogs-and-podcasts-57/why-using-local-as-your-domain-name-extension-is-a-bad-idea-4828).
 
@@ -154,7 +154,8 @@ template:
 
 To disable entity registration:
 1. Open the app configuration
-2. Set **Enable Stats Entities** to `off`
+2. Set **Enable Stats Entities** to `off`, Also set **enable metrics** to `off`, 
+   This should be done for security reasons around the metrics endpoint <host>:<port>/metrics.
 3. Restart the app
 
 The entity monitor process will not start if this option is disabled, saving system resources.
