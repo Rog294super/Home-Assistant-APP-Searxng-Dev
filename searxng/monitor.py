@@ -194,8 +194,6 @@ class SearXNGMonitor:
             "average_response_time": round(stats.get("average_response_time", 0), 2),
             "engine_count": len(stats.get("engines", {})),
         }
-        if "uptime" in stats:
-            metrics["uptime_seconds"] = stats["uptime"]
 
         entities = []
 
@@ -212,8 +210,6 @@ class SearXNGMonitor:
                 attributes["unit_of_measurement"] = "ms"
             elif metric_name == "requests":
                 attributes["unit_of_measurement"] = "count"
-            elif metric_name == "uptime_seconds":
-                attributes["unit_of_measurement"] = "s"
 
             entities.append((entity_id, value, attributes))
 

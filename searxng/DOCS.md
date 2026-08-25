@@ -106,7 +106,6 @@ Once enabled, the following entities will be automatically created in Home Assis
 - `sensor.searxng_requests` - Total number of search requests
 - `sensor.searxng_average_response_time` - Average response time in milliseconds
 - `sensor.searxng_engine_count` - Number of active search engines
-- `sensor.searxng_uptime_seconds` - App uptime in seconds
 - `sensor.searxng_engine_*` - Per-engine statistics (one sensor per enabled engine)
 
 ### Using Entities in Home Assistant
@@ -118,7 +117,6 @@ type: entities
 entities:
   - entity: sensor.searxng_requests
   - entity: sensor.searxng_average_response_time
-  - entity: sensor.searxng_uptime_seconds
 ```
 
 #### In Automations

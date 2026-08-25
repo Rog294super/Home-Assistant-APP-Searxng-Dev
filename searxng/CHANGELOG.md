@@ -7,7 +7,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 ### Added
 - **Home Assistant Entity Registration**: Automatic registration of SearXNG statistics as Home Assistant entities (sensor platforms).
   - New `enable_stats_entities` configuration option to enable/disable entity registration (default: enabled).
-  - Entities created include: total requests, average response time, engine count, uptime, and per-engine
+  - Entities created include: total requests, average response time, engine count, and per-engine
     statistics.
   - Entity monitor runs as a background service alongside SearXNG, similar to other HA integrations.
   - Entities can be used in Home Assistant automations, dashboards, and templates.
