@@ -88,7 +88,7 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery. MQT
 
 1. Install and configure the Mosquitto broker app with a user and password.
 2. Make sure the MQTT integration is configured in Home Assistant.
-3. Install or restart SearXNG. The `mqtt:need` service automatically supplies the broker host, port, username, and password.
+3. Install or restart SearXNG. The app reads the broker host, port, username, and password from the Supervisor MQTT service granted by `mqtt:need`.
 4. Keep **Enable Stats Entities** and **Enable Metrics Endpoint** enabled.
 
 No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS `mqtt:need` service. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.

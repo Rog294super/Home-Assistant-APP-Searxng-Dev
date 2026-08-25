@@ -45,6 +45,51 @@ if [ ! -f "$METRICS_SECRET_FILE" ]; then
 fi
 
 # ---------------------------------------------------------
+# Get the MQTT service configuration from Home Assistant Supervisor.
+# `services: mqtt:need` grants access to this endpoint; it does not inject
+# MQTT_* variables into the container automatically.
+# ---------------------------------------------------------
+
+MQTT_ENV_FILE="/tmp/searxng-mqtt.env"
+if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
+    SUPERVISOR_TOKEN="$SUPERVISOR_TOKEN" "$PYTHON" - "$MQTT_ENV_FILE" <<'PYEOF'
+import json
+import os
+import shlex
+import sys
+import urllib.error
+import urllib.request
+
+env_path = sys.argv[1]
+request = urllib.request.Request(
+    "http://supervisor/services/mqtt",
+    headers={"Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"},
+)
+try:
+    with urllib.request.urlopen(request, timeout=10) as response:
+        service = json.loads(response.read().decode("utf-8"))
+    values = {
+        "MQTT_HOST": service.get("host", ""),
+        "MQTT_PORT": service.get("port", "1883"),
+        "MQTT_USER": service.get("username", ""),
+        "MQTT_PASSWORD": service.get("password", ""),
+    }
+    with open(env_path, "w") as env_file:
+        for key, value in values.items():
+            env_file.write(f"export {key}={shlex.quote(str(value))}\n")
+    print("[searxng-app] Loaded MQTT service configuration from Supervisor")
+except (OSError, urllib.error.URLError, json.JSONDecodeError, KeyError) as error:
+    print(f"[searxng-app] WARNING: Could not load MQTT service configuration: {error}")
+PYEOF
+fi
+
+if [ -f "$MQTT_ENV_FILE" ]; then
+    . "$MQTT_ENV_FILE"
+else
+    echo "[searxng-app] WARNING: MQTT service configuration is unavailable"
+fi
+
+# ---------------------------------------------------------
 # Build settings.yml as a single Python dict -> YAML dump.
 #
 # This replaces the old sed-template + cat-append approach, which produced
