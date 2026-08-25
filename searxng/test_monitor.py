@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import types
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -104,6 +105,21 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         self.monitor._process_stats = MagicMock()
         self.monitor._on_mqtt_connect(self.monitor.mqtt_client, None, {}, 0)
         self.monitor._process_stats.assert_called_once_with(self.monitor._last_stats)
+
+    def test_mqtt_client_uses_callback_api_v2(self):
+        mqtt_module = types.ModuleType("paho.mqtt.client")
+        mqtt_module.CallbackAPIVersion = types.SimpleNamespace(VERSION2="version2")
+        mqtt_module.Client = MagicMock(return_value=self.monitor.mqtt_client)
+        mqtt_package = types.ModuleType("paho.mqtt")
+        mqtt_package.client = mqtt_module
+        paho_package = types.ModuleType("paho")
+        paho_package.mqtt = mqtt_package
+        self.monitor.options = {}
+        with patch.dict("sys.modules", {"paho": paho_package, "paho.mqtt": mqtt_package, "paho.mqtt.client": mqtt_module}), patch.dict("os.environ", {"MQTT_HOST": "core-mosquitto"}, clear=False):
+            self.monitor._connect_mqtt()
+        mqtt_module.Client.assert_called_once_with(
+            callback_api_version="version2", client_id="searxng-searxng"
+        )
 
 if __name__ == "__main__":
     unittest.main()

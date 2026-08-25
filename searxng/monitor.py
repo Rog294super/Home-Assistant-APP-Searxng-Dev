@@ -156,7 +156,10 @@ class SearXNGMonitor:
         try:
             import paho.mqtt.client as mqtt  # type: ignore
 
-            client = mqtt.Client(client_id=f"searxng-{self.instance_name.lower().replace(' ', '-')}")
+            client = mqtt.Client(
+                callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+                client_id=f"searxng-{self.instance_name.lower().replace(' ', '-')}"
+            )
             username = os.environ.get("MQTT_USER") or os.environ.get("MQTT_USERNAME")
             if username:
                 password = os.environ.get("MQTT_PASSWORD", "")
