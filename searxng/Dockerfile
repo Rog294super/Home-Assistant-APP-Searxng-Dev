@@ -4,7 +4,8 @@
 # manifest, so the same FROM line resolves correctly on amd64/aarch64 hosts.
 FROM searxng/searxng:2026.8.17-374939b88
 
-RUN /usr/local/searxng/.venv/bin/pip install --no-cache-dir paho-mqtt
+RUN /usr/local/searxng/.venv/bin/python -m ensurepip --upgrade && \
+    /usr/local/searxng/.venv/bin/python -m pip install --no-cache-dir paho-mqtt
 
 COPY run.sh /run.sh
 COPY monitor.py /monitor.py
