@@ -105,6 +105,12 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         self.monitor._on_mqtt_connect(self.monitor.mqtt_client, None, {}, 0)
         self.monitor._process_stats.assert_called_once_with(self.monitor._last_stats)
 
+    @patch.dict("os.environ", {"MQTT_HOST": "mosquitto", "MQTT_PORT": "1884"}, clear=False)
+    def test_haos_mqtt_service_values_override_options(self):
+        self.monitor.options = {"mqtt_host": "legacy-host", "mqtt_port": 1883}
+        self.assertEqual(self.monitor._mqtt_option("mqtt_host", "MQTT_HOST", "core-mosquitto"), "mosquitto")
+        self.assertEqual(self.monitor._mqtt_option("mqtt_port", "MQTT_PORT", "1883"), "1884")
+
 
 if __name__ == "__main__":
     unittest.main()

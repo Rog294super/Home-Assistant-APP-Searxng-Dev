@@ -39,7 +39,8 @@ https://github.com/Rog294super/Home-Assistant-APP-Searxng
 2. Add this repository as a custom repository.
 3. Install **SearXNG**.
 4. Configure the app.
-5. Start the app.
+5. For entities also install a MQTT broker like MQTT Mosquitto broker and configure.
+6. Start the app.
 
 ## Configuration
 

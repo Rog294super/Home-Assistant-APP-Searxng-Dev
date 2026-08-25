@@ -6,9 +6,11 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 
 ### Added
 - **MQTT Discovery**: Statistics sensors are published with retained discovery and state messages.
-  - Added configurable broker host, port, credentials, discovery prefix, and state topic prefix.
+  - Added configurable discovery prefix and state topic prefix; broker host, port, 
+    and credentials are supplied automatically by HAOS.
   - Added MQTT availability with an `online` state and retained Last Will `offline` state.
   - Per-engine discovery topics are stable and stale engine configurations are cleared.
+  - MQTT broker connection details are obtained automatically from the HAOS `mqtt:need` service.
   - **Home Assistant Entity Registration**: Automatic registration of SearXNG statistics as 
     Home Assistant entities (sensor platforms).
   - New `enable_stats_entities` configuration option to enable/disable entity registration 

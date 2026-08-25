@@ -86,10 +86,12 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery. MQT
 
 ### Enabling MQTT Discovery
 
-1. Configure an MQTT integration and broker in Home Assistant.
-2. Open the app configuration and set **Enable MQTT Discovery** to `on`.
-3. Set the broker host, port, and optional credentials. The default broker host is `core-mosquitto`.
-4. Keep **Enable Metrics Endpoint** enabled and restart the app.
+1. Install and configure the Mosquitto broker app.
+2. Make sure the MQTT integration is configured in Home Assistant.
+3. Install or restart SearXNG. The `mqtt:need` service automatically supplies the broker host, port, username, and password.
+4. Keep **Enable Stats Entities** and **Enable Metrics Endpoint** enabled.
+
+No MQTT username, password, host, or port needs to be entered in the SearXNG app configuration. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
 metrics endpoint** enabled when MQTT Discovery is enabled. The app stores
@@ -153,7 +155,7 @@ template:
 
 ### Disabling MQTT Discovery
 
-To disable the monitor, set **Enable Stats Entities** to `off` and restart the app. To keep the monitor but stop MQTT entities, set **Enable MQTT Discovery** to `off`. Existing MQTT entities remain in Home Assistant until their discovery entries are removed manually.
+To disable the monitor, set **Enable Stats Entities** to `off` and restart the app. MQTT Discovery is enabled automatically whenever the statistics monitor is enabled. Existing MQTT entities remain in Home Assistant until their discovery entries are removed manually.
 
 The entity monitor process will not start if this option is disabled, saving system resources.
 
