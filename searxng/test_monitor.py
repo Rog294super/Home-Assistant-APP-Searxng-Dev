@@ -79,6 +79,8 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         discovery = next(publication[1] for publication in publications if publication[0] == "homeassistant/sensor/requests/config")
         payload = json.loads(discovery)
         self.assertEqual(payload["unique_id"], "searxng_requests")
+        self.assertEqual(payload["object_id"], "searxng_requests")
+        self.assertEqual(payload["default_entity_id"], "sensor.searxng_requests")
         self.assertEqual(payload["availability_topic"], "searxng/status")
         self.assertEqual(payload["state_class"], "total_increasing")
 
@@ -88,6 +90,7 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         self.monitor.mqtt_client.publish.assert_not_called()
 
     def test_availability_changes_with_broker_connection(self):
+        self.monitor._last_stats = None
         self.monitor._on_mqtt_connect(self.monitor.mqtt_client, None, {}, 0)
         self.assertTrue(self.monitor.mqtt_connected)
         self.monitor._on_mqtt_disconnect(self.monitor.mqtt_client, None, None, 1)
@@ -95,6 +98,12 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         availability = [call.args for call in self.monitor.mqtt_client.publish.call_args_list]
         self.assertEqual(availability[0][0], "searxng/status")
         self.assertEqual(availability[0][1], "online")
+
+    def test_reconnect_republishes_last_stats(self):
+        self.monitor._last_stats = {"requests": 3, "average_response_time": 10, "engines": {}}
+        self.monitor._process_stats = MagicMock()
+        self.monitor._on_mqtt_connect(self.monitor.mqtt_client, None, {}, 0)
+        self.monitor._process_stats.assert_called_once_with(self.monitor._last_stats)
 
 
 if __name__ == "__main__":

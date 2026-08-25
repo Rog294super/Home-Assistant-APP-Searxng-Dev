@@ -48,6 +48,7 @@ class SearXNGMonitor:
         self.discovery_prefix = self.options.get("mqtt_discovery_prefix", "homeassistant")
         self.mqtt_base_topic = self.options.get("mqtt_base_topic", "searxng").strip("/")
         self._published_engines: Set[str] = self._load_published_engines()
+        self._last_stats: Optional[Dict[str, Any]] = None
         
         logger.info(f"Initialized SearXNG Monitor for {self.instance_name}")
         if self.mqtt_enabled:
@@ -174,6 +175,8 @@ class SearXNGMonitor:
             return
         self.mqtt_connected = True
         self._publish_mqtt(self._availability_topic(), "online", retain=True, qos=1)
+        if self._last_stats:
+            self._process_stats(self._last_stats)
         logger.info("Connected to MQTT broker")
 
     def _on_mqtt_disconnect(self, client: Any, userdata: Any, disconnect_flags: Any = None, reason_code: Any = None, properties: Any = None) -> None:
@@ -195,6 +198,8 @@ class SearXNGMonitor:
         discovery_topic = f"{self.discovery_prefix}/sensor/{key}/config"
         payload: Dict[str, Any] = {
             "unique_id": f"searxng_{key}",
+            "object_id": f"searxng_{key}",
+            "default_entity_id": f"sensor.searxng_{key}",
             "name": name,
             "state_topic": state_topic,
             "json_attributes_topic": f"{self.mqtt_base_topic}/sensor/{key}/attributes",
@@ -221,6 +226,7 @@ class SearXNGMonitor:
 
     def _process_stats(self, stats: Dict[str, Any]) -> bool:
         """Process and register stats as entities"""
+        self._last_stats = stats
         # Extract key metrics
         metrics = {
             "requests": stats.get("requests", 0),

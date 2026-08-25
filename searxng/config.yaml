@@ -22,6 +22,8 @@ webui: "[PROTO:http]://[HOST]:[PORT:18080]"
 
 boot: auto
 startup: services
+services:
+  - mqtt:need
 
 # /data and the app's own config directory are the persistent storage
 # HA gives every app. We use /data to remember the auto-generated
