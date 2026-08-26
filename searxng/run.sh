@@ -103,7 +103,7 @@ else
     echo "[searxng-app] WARNING: SUPERVISOR_TOKEN is missing; cannot query MQTT service"
 fi
 
-if [ -f "$MQTT_ENV_FILE" ]; then
+if [ -f "$MQTT_ENV_FILE" ] && [ -n "$MQTT_SERVICE_LOADED" ]; then
     . "$MQTT_ENV_FILE"
 else
     echo "[searxng-app] WARNING: MQTT service configuration is unavailable"
