@@ -104,6 +104,8 @@ else
 fi
 
 if [ -f "$MQTT_ENV_FILE" ] && [ -n "$MQTT_SERVICE_LOADED" ]; then
+    # shellcheck disable=SC1090  # path is dynamic (Supervisor-provided), 
+    # not a static file ShellCheck can resolve
     . "$MQTT_ENV_FILE"
 else
     echo "[searxng-app] WARNING: MQTT service configuration is unavailable"
