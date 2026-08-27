@@ -44,22 +44,6 @@ configuration:
     name: Enable MQTT Discovery
     description: Register statistics sensors through MQTT Discovery. An MQTT broker is required.
 
-  mqtt_host:
-    name: MQTT broker host
-    description: Hostname or IP address of the MQTT broker.
-
-  mqtt_port:
-    name: MQTT broker port
-    description: Port of the MQTT broker.
-
-  mqtt_username:
-    name: MQTT username
-    description: Optional MQTT username.
-
-  mqtt_password:
-    name: MQTT password
-    description: Optional MQTT password.
-
   mqtt_discovery_prefix:
     name: MQTT Discovery prefix
     description: Home Assistant MQTT Discovery prefix, normally homeassistant.
@@ -72,7 +56,7 @@ configuration:
     name: Disabled Engines
     description: >
       search engines here noted shall be disabled at default for users. 
-      Users can enable through prefferences in the browser.
+      Users can enable through preferences in the browser.
       search engines noted here should not be enabled by Search Engines which is below this option.
       Search engines options shall be deprecated at earliest on version 1.4.0
 

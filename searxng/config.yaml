@@ -54,6 +54,7 @@ options:
 
   # MQTT Discovery is configured automatically through the HAOS MQTT service.
   # The service supplies broker host, port, username, and password.
+  enable_mqtt_discovery: true
   mqtt_discovery_prefix: "homeassistant"
   mqtt_base_topic: "searxng"
 
@@ -88,6 +89,8 @@ schema:
   enable_metrics: bool
 
   enable_stats_entities: bool
+  
+  enable_mqtt_discovery: bool
   mqtt_discovery_prefix: str
   mqtt_base_topic: str
 
