@@ -4,11 +4,11 @@ This app installs SearXNG as a self-hosted search engine for Home Assistant OS o
 
 ## What this app provides
 
-- Direct access at your Home Assistant host IP and port, without the usual Home Assistant ingress path
-- Simple on/off toggles for individual search engines
-- A local, privacy-friendly alternative to public search services
-- Compatibility with a custom DNS setup or reverse proxy for cleaner URLs
-- Optional MQTT Discovery sensors for SearXNG statistics
+- Direct access at your Home Assistant host IP and port, without the usual Home Assistant ingress path.
+- Simple on/off toggles for individual search engines, Will be replaced with a configurable list of engines to be disabled.
+- A local, privacy-friendly alternative to public search services.
+- Compatibility with a custom DNS setup or reverse proxy for cleaner URLs.
+- Optional MQTT Discovery sensors for SearXNG statistics, Dependant on a MQTT Broker like `Mosquitto broker`.
 
 ## Installation
 
@@ -25,9 +25,9 @@ The first installation may take some time because the image is built on the devi
 
 This app does not create hostnames for you. It runs on the host network, but you still need DNS or local name resolution to make names like `searxng.lan` or `searxng.local` point to your Home Assistant host.
 
-### Using AdGuard Home as DNS
+### Using AdGuard Home or equivalant as DNS
 
-If you already run AdGuard Home, the easiest option is to add DNS rewrites:
+If you already run AdGuard Home or equivalant, the easiest option is to add DNS rewrites:
 
 1. Open **AdGuard Home**.
 2. Go to **Filters → DNS rewrites**.
@@ -51,9 +51,15 @@ For more background, see this article: [Why using .local as a domain name extens
 
 The SearXNG container listens internally on port `18080`, and the app exposes that directly through the host network. Because of that, the URL usually includes a port unless you place it behind a reverse proxy.
 
-If you want a cleaner URL such as `http://searxng.lan/`, consider using a reverse proxy such as Nginx or Caddy and forward traffic to your Home Assistant host IP and the SearXNG port.
+If you want a cleaner URL such as `http://searxng.lan/`, consider using a reverse proxy such as `Nginx Proxy manager` or Caddy and forward traffic to your Home Assistant host IP and the SearXNG port.
 
-## Configuring search engines
+## Configuring disabled search engines
+
+When you want a engine to be not enabled by default for clients, Enter the search engine name in the field and click ENTER.
+Don't forget to save the changes.
+For available engines check: `[Link](https://docs.searxng.org/user/configured_engines.html)`.
+
+## DEPRECATED Configuring search engines
 
 Each engine toggle in the app configuration must match the engine name used by SearXNG exactly. Some names contain spaces and are case-sensitive, so the value must be an exact match.
 
@@ -86,7 +92,7 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery. MQT
 
 ### Enabling MQTT Discovery
 
-1. Install and configure the Mosquitto broker app with a user and password.
+1. Install and configure the Mosquitto broker app with a user(searxng) and password.
 2. Make sure the MQTT integration is configured in Home Assistant.
 3. Install or restart SearXNG. The app reads the broker host, port, username, and password from the Supervisor MQTT service granted by `mqtt:need`.
 4. Keep **Enable Stats Entities** and **Enable Metrics Endpoint** enabled.
