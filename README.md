@@ -1,5 +1,12 @@
 # SearXNG Home Assistant app
 
+[![GitHub Release][releases-shield]][releases]
+[![License][license-shield]](LICENSE.md)
+
+[![Github Actions][github-actions-shield]][github-actions]
+![Project Maintenance][maintenance-shield]
+[![GitHub Activity][commits-shield]][commits]
+
 [![Open your Home Assistant instance and show the add app repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FRog294super%2FHome-Assistant-APP-Searxng)
 
 A Home Assistant OS app that runs the official [**SearXNG**](https://github.com/searxng/searxng) metasearch engine while staying as close as possible to the upstream project.
