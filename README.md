@@ -86,3 +86,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-production%20ready-brightgreen.svg
 [license-shield]: https://img.shields.io/github/license/Rog294super/Home-Assistant-APP-Searxng.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
+[releases]: https://github.com/Rog294super/Home-Assistant-APP-Searxng/releases
