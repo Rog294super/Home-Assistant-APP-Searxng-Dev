@@ -116,6 +116,12 @@ Once enabled and connected to the broker, the following entities will be automat
 - `sensor.searxng_average_response_time` - Average response time in milliseconds
 - `sensor.searxng_engine_count` - Number of active search engines
 - `sensor.searxng_engine_*` - Per-engine statistics (one sensor per enabled engine)
+- `sensor.searxng_last_checked` - Time of the last metrics poll
+
+Each sensor also has a `last_checked` attribute containing the UTC time of the
+last metrics poll. The monitor polls every 60 seconds, so this attribute keeps
+updating even when no new search has been performed and the metric values stay
+the same.
 
 ### Using Entities in Home Assistant
 

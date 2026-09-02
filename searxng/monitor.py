@@ -13,6 +13,7 @@ import urllib.request
 import urllib.error
 import base64
 import re
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Set
 
 # Setup logging
@@ -232,6 +233,7 @@ class SearXNGMonitor:
     def _process_stats(self, stats: Dict[str, Any]) -> bool:
         """Process and register stats as entities"""
         self._last_stats = stats
+        checked_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         # Extract key metrics
         metrics = {
             "requests": stats.get("requests", 0),
@@ -244,9 +246,10 @@ class SearXNGMonitor:
             "requests": ("SearXNG Requests", metrics["requests"], "count", "total_increasing", None),
             "average_response_time": ("SearXNG Average Response Time", metrics["average_response_time"], "ms", "measurement", "duration"),
             "engine_count": ("SearXNG Engine Count", metrics["engine_count"], None, "measurement", None),
+            "last_checked": ("SearXNG Last Metrics Check", checked_at, None, None, "timestamp"),
         }
         for key, (name, value, unit, state_class, device_class) in definitions.items():
-            if self._publish_discovery(key, name, value, {}, unit, state_class, device_class):
+            if self._publish_discovery(key, name, value, {"last_checked": checked_at}, unit, state_class, device_class):
                 success_count += 1
 
         current_engines: Set[str] = set()
@@ -256,6 +259,7 @@ class SearXNGMonitor:
             attributes = {
                 "requests": engine_stats.get("total", 0),
                 "avg_response_time": round(engine_stats.get("avg_response_time", 0), 2),
+                "last_checked": checked_at,
             }
             if self._publish_discovery(key, f"SearXNG Engine {engine_name}", engine_stats.get("total", 0), attributes, "count", "total_increasing"):
                 success_count += 1

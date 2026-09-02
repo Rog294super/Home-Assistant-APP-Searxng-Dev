@@ -75,6 +75,7 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         topics = {publication[0] for publication in publications}
         self.assertIn("homeassistant/sensor/requests/config", topics)
         self.assertIn("searxng/sensor/requests/state", topics)
+        self.assertIn("searxng/sensor/last_checked/state", topics)
         self.assertIn("searxng/sensor/engine_google_news/state", topics)
 
         discovery = next(publication[1] for publication in publications if publication[0] == "homeassistant/sensor/requests/config")
@@ -84,6 +85,20 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         self.assertEqual(payload["default_entity_id"], "sensor.searxng_requests")
         self.assertEqual(payload["availability_topic"], "searxng/status")
         self.assertEqual(payload["state_class"], "total_increasing")
+
+        last_checked_discovery = next(
+            publication[1]
+            for publication in publications
+            if publication[0] == "homeassistant/sensor/last_checked/config"
+        )
+        self.assertEqual(json.loads(last_checked_discovery)["device_class"], "timestamp")
+
+        attributes = next(
+            publication[1]
+            for publication in publications
+            if publication[0] == "searxng/sensor/requests/attributes"
+        )
+        self.assertRegex(json.loads(attributes)["last_checked"], r"^20\d\d-\d\d-\d\dT.*\+00:00$")
 
     def test_publish_mqtt_is_noop_when_disabled(self):
         self.monitor.mqtt_enabled = False
