@@ -84,7 +84,11 @@ try:
         "MQTT_USER": service.get("username", ""),
         "MQTT_PASSWORD": service.get("password", ""),
     }
-    with open(env_path, "w") as env_file:
+    # Create the file with 0600 permissions from the moment it exists,
+    # instead of writing it with the default umask and chmod'ing after —
+    # that would leave a brief window where it's world-readable.
+    fd = os.open(env_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as env_file:
         for key, value in values.items():
             env_file.write(f"export {key}={shlex.quote(str(value))}\n")
     print("[searxng-app] Loaded MQTT service configuration from Supervisor")
