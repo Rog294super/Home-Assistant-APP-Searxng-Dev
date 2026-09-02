@@ -1,5 +1,5 @@
 name: "SearXNG"
-version: "1.2.0"
+version: "1.2.1"
 slug: "searxng"
 description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
 url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng"
