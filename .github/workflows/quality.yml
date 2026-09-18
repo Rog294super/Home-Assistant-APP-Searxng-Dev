@@ -33,5 +33,20 @@ jobs:
       - name: Validate YAML and tests
         shell: bash
         run: |
-          python -c "import yaml; [yaml.safe_load(open(path)) for path in ['searxng/config.yaml', 'searxng/translations/en.yaml', 'searxng/translations/nl.yaml']]"
-          python -m unittest discover -s searxng -p 'test*.py' -v
+          python - <<'PY'
+          import yaml
+          for path in [
+              'searxng/config.yaml',
+              'searxng/translations/en.yaml',
+              'searxng/translations/nl.yaml',
+          ]:
+              with open(path, 'r', encoding='utf-8') as handle:
+                  yaml.safe_load(handle)
+          print('YAML validation passed')
+          PY
+
+          if find searxng -maxdepth 2 -name 'test*.py' | grep -q .; then
+            python -m unittest discover -s searxng -p 'test*.py' -v
+          else
+            echo 'No Python tests found under searxng; skipping unittest discovery.'
+          fi
