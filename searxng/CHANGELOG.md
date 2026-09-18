@@ -2,6 +2,23 @@
 
 All notable changes to this Home Assistant SearXNG App are documented here.
 
+## 1.2.1
+
+### Message DEV
+**LEGACY ENGINES**: It has been decided that the legacy `engines` configuration will be removed earlier than 1.4.0. 
+    Possibly already by the next big update which as major update will be named V1.3.0. 
+    If there is no next big update but enough small updates, To the level that the app will reach V1.3.0 because incrementations, 
+    it will also be removed. If the removal happens earlier this will possibly be announced one update before.
+
+### Added
+
+### CHanged
+  - Instead of writing the file /tmp/searxng-mqtt.env with `open(env_path, "w")`, 
+    it now gets created with restrictive rights as extra hardening.
+    File was kept safely withing container boundaries before and still will be.
+
+### Fixed issues
+
 ## 1.2.0
 
 ### Added
