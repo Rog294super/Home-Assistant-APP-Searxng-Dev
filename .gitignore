@@ -26,7 +26,3 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-
-**/test_*
-**/*_test.py
-test_monitor.py
