@@ -34,4 +34,4 @@ jobs:
         shell: bash
         run: |
           python -c "import yaml; [yaml.safe_load(open(path)) for path in ['searxng/config.yaml', 'searxng/translations/en.yaml', 'searxng/translations/nl.yaml']]"
-          python -m unittest discover -s searxng -v
+          python -m unittest discover -s searxng -p 'test*.py' -v
