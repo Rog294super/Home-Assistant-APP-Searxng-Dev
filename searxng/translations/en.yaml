@@ -2,8 +2,9 @@ configuration:
   base_url:
     name: Base URL
     description: >
-      The public URL where your SearXNG instance can be reached.
-      Example: https://searxng.local
+      Full public URL where SearXNG is reachable, including the scheme.
+      Use http:// or https:// and a valid hostname, for example:
+      https://searxng.local/
 
   instance_name:
     name: Instance name
@@ -57,8 +58,9 @@ configuration:
     description: >
       search engines here noted shall be disabled at default for users. 
       Users can enable through preferences in the browser.
-      search engines noted here should not be enabled by Search Engines which is below this option.
-      Search engines options shall be deprecated at earliest on version 1.4.0
+      If this list is not empty, it is used exclusively, and the individual toggles under 'Search engines' below are completely ignored. 
+      Leave this list empty if you prefer to use the toggles.
+      `Search engines` options shall be deprecated at earliest on version 1.3.0.
 
   engines:
     name: Search engines

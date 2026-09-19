@@ -15,8 +15,13 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 ### CHanged
   - Instead of writing the file /tmp/searxng-mqtt.env with `open(env_path, "w")`, 
     it now gets created with restrictive rights as extra hardening.
-    File was kept safely withing container boundaries before and still will be.
-
+    File was kept safely withing container boundaries before and still will be.  
+  
+  - Added a startup sanity check for the `base_url` option. Values without an
+    `http://` or `https://` prefix, or with a malformed double-slash path,
+    are now rejected with a clear warning in the logs instead of silently
+    starting SearXNG with a broken base URL that can trigger CSRF and redirect
+    issues in the browser.
 ### Fixed issues
 
 ## 1.2.0

@@ -2,8 +2,9 @@ configuration:
   base_url:
     name: Basis-URL
     description: >
-      De openbare URL waarop je SearXNG-instantie bereikbaar is.
-      Voorbeeld: https://searxng.local
+      Volledige openbare URL waarop SearXNG bereikbaar is, inclusief het schema.
+      Gebruik http:// of https:// en een geldige hostnaam, bijvoorbeeld:
+      https://searxng.local/
 
   instance_name:
     name: Naam van de instantie
@@ -59,8 +60,9 @@ configuration:
     description: >
       De hier vermelde zoekmachines zijn standaard uitgeschakeld voor gebruikers. 
       Gebruikers kunnen ze inschakelen via de voorkeuren knop in de browser.
-      De hier vermelde zoekmachines mogen niet worden ingeschakeld bij optie zoekmachines, die onder deze optie staat.
-      De zoekmachine-opties worden op zijn vroegst in versie 1.4.0 afgeschaft.
+      Wanneer deze lijst niet leeg is, wordt hij exclusief gebruikt en worden de losse schakelaars bij 'Search engines' hieronder volledig genegeerd. 
+      Laat deze lijst leeg als je liever de schakelaars gebruikt.
+      De `zoekmachine`-opties worden op zijn vroegst in versie 1.3.0 afgeschaft.
 
   engines:
     name: Zoekmachines
