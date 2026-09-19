@@ -83,7 +83,7 @@ schema:
   instance_name: str
   port: int(1024,65535)
 
-  autocomplete: str
+  autocomplete: list(360search|baidu|brave|dbpedia|duckduckgo|google|yandex|mwmbl|naver|seznam|sogou|startpage|stract|swisscows|quark|qwant|wikipedia)
   safesearch: int(0,2)
   image_proxy: bool
   enable_metrics: bool
