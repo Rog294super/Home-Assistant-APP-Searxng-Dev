@@ -11,9 +11,11 @@ RUN /usr/local/searxng/.venv/bin/python -m ensurepip --upgrade && \
 
 COPY run.sh /run.sh
 COPY monitor.py /monitor.py
+COPY validate_base_url.py /validate_base_url.py
 
 RUN sed -i 's/\r$//' /run.sh && \
     chmod 755 /run.sh && \
-    chmod 755 /monitor.py
+    chmod 755 /monitor.py && \
+    chmod 755 /validate_base_url.py
 
 ENTRYPOINT ["/bin/sh", "/run.sh"]

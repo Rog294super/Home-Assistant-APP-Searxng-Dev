@@ -145,12 +145,26 @@ import sys
 
 import yaml
 
+from validate_base_url import validate_base_url
+
 options_path, settings_path = sys.argv[1], sys.argv[2]
 
 with open(options_path) as f:
     options = json.load(f)
 
 secret_key = os.environ["SECRET_KEY"]
+base_url = options.get("base_url") or ""
+
+if base_url:
+    try:
+        base_url = validate_base_url(base_url)
+    except ValueError as exc:
+        print(f"[searxng-app] WARNING: Invalid base_url '{base_url}'. {exc}")
+        print(
+            "[searxng-app] WARNING: SearXNG will continue without a configured "
+            "base_url to avoid broken redirects and CSRF errors."
+        )
+        base_url = ""
 
 settings = {
     "use_default_settings": True,
@@ -161,7 +175,7 @@ settings = {
     },
     "server": {
         "secret_key": secret_key,
-        "base_url": options.get("base_url") or "",
+        "base_url": base_url,
         "image_proxy": bool(options.get("image_proxy", True)),
         "port": int(options.get("port", 18080)),
     },
