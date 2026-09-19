@@ -23,6 +23,7 @@ fi
 
 PORT=$("$PYTHON" -c "import json; print(json.load(open('$OPTIONS_FILE')).get('port', 18080))")
 SECRET_KEY=$("$PYTHON" -c "import json; print(json.load(open('$OPTIONS_FILE')).get('secret_key') or '')")
+ENABLE_MQTT_DISCOVERY=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_mqtt_discovery', True))).lower())")
 
 # ---------------------------------------------------------
 # Persistent secret key — keep it stable across restarts
@@ -51,7 +52,10 @@ fi
 # ---------------------------------------------------------
 
 MQTT_ENV_FILE="/tmp/searxng-mqtt.env"
-if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
+if [ "$ENABLE_MQTT_DISCOVERY" = "false" ]; then
+    echo "[searxng-app] MQTT discovery is disabled in config; skipping Supervisor MQTT lookup"
+    MQTT_SERVICE_LOADED=""
+elif [ -n "${SUPERVISOR_TOKEN:-}" ]; then
     MQTT_SERVICE_LOADED=""
     MQTT_ATTEMPT=1
     while [ "$MQTT_ATTEMPT" -le 12 ]; do
