@@ -59,47 +59,43 @@ configuration:
       Prefix voor SearXNG state-, attributen- en beschikbaarheidstopics. 
       Meestal niet nodig om aan te passen.
       
-  engine_groups:
-    name: Zoekmachinecategorieën
-    description: >
-      Schakel brede typen zoekbronnen in of uit. Deze schakelaars zijn een
-      gebruiksvriendelijk alternatief voor handmatig typen van engine-namen.
-
-  engine_groups.general:
+  engine_general:
     name: Algemeen
 
-  engine_groups.images:
+  engine_images:
     name: Afbeeldingen
 
-  engine_groups.videos:
+  engine_videos:
     name: Video's
 
-  engine_groups.news:
+  engine_news:
     name: Nieuws
 
-  engine_groups.maps:
+  engine_maps:
     name: Kaarten
 
-  engine_groups.music:
+  engine_music:
     name: Muziek
 
-  engine_groups.it:
+  engine_it:
     name: IT
 
-  engine_groups.science:
+  engine_science:
     name: Wetenschap
 
-  engine_groups.files:
+  engine_files:
     name: Bestanden
+
+  engine_social:
+    name: Sociale media
 
   disabled_engines:
     name: Uitgeschakelde Zoekmachines
     description: >
-      De hier vermelde zoekmachines zijn standaard uitgeschakeld voor gebruikers. 
-      Gebruikers kunnen ze inschakelen via de voorkeuren knop in de browser.
-      Wanneer deze lijst niet leeg is, wordt hij exclusief gebruikt en worden de losse schakelaars bij 'Search engines' hieronder volledig genegeerd. 
-      Laat deze lijst leeg als je liever de schakelaars gebruikt.
-      De `zoekmachine`-opties worden op zijn vroegst in versie 1.3.0 afgeschaft.
+      Kies de zoekmachines die standaard uitgeschakeld moeten zijn.
+      Gebruikers kunnen deze later opnieuw inschakelen via de voorkeuren in de browser.
+      Als deze lijst niet leeg is, geldt deze als expliciete filter en worden de
+      oudere per-engine schakelaars hieronder genegeerd.
 
   engines:
     name: Zoekmachines

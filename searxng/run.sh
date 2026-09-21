@@ -196,29 +196,29 @@ autocomplete = options.get("autocomplete")
 if autocomplete:
     settings["search"]["autocomplete"] = autocomplete
 
-engine_groups = options.get("engine_groups") or {}
 engine_group_map = {
-    "general": ["google", "bing", "duckduckgo", "startpage", "qwant", "wikipedia", "brave"],
-    "images": ["google", "bing", "duckduckgo", "wikipedia"],
-    "videos": ["youtube"],
-    "news": ["google", "bing", "wikipedia"],
-    "maps": ["google", "bing"],
-    "music": ["youtube"],
-    "it": ["github", "stackoverflow"],
-    "science": ["wikipedia", "wolframalpha"],
-    "files": ["github"],
-    "social": ["reddit", "youtube"],
+    "engine_general": ["google", "bing", "duckduckgo", "startpage", "qwant", "wikipedia", "brave"],
+    "engine_images": ["google", "bing", "duckduckgo", "wikipedia"],
+    "engine_videos": ["youtube"],
+    "engine_news": ["google", "bing", "wikipedia"],
+    "engine_maps": ["google", "bing"],
+    "engine_music": ["youtube"],
+    "engine_it": ["github", "stackoverflow"],
+    "engine_science": ["wikipedia", "wolframalpha"],
+    "engine_files": ["github"],
+    "engine_social": ["reddit", "youtube"],
 }
 disabled_engines = []
 
-if isinstance(engine_groups, dict):
-    for category, enabled in engine_groups.items():
-        if not bool(enabled):
-            disabled_engines.extend(engine_group_map.get(category, []))
+for key, enabled in options.items():
+    if key.startswith("engine_") and isinstance(enabled, bool) and not enabled:
+        disabled_engines.extend(engine_group_map.get(key, []))
 
 manual_disabled = options.get("disabled_engines")
 if isinstance(manual_disabled, list):
     disabled_engines.extend(manual_disabled)
+elif manual_disabled:
+    disabled_engines.append(str(manual_disabled))
 
 disabled_engines = [str(name) for name in disabled_engines if name]
 

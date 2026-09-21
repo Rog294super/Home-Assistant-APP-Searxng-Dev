@@ -57,50 +57,43 @@ configuration:
       Prefix for SearXNG state, attributes, and availability topics.
       Most of the time no need to be changed.
 
-  engine_groups:
-    name: Engine categories
-    description: >
-      Enable or disable broad types of search sources. These toggles work
-      as a user-friendly alternative to typing engine names manually.
-
-  engine_groups.general:
+  engine_general:
     name: General
 
-  engine_groups.images:
+  engine_images:
     name: Images
 
-  engine_groups.videos:
+  engine_videos:
     name: Videos
 
-  engine_groups.news:
+  engine_news:
     name: News
 
-  engine_groups.maps:
+  engine_maps:
     name: Maps
 
-  engine_groups.music:
+  engine_music:
     name: Music
 
-  engine_groups.it:
+  engine_it:
     name: IT
 
-  engine_groups.science:
+  engine_science:
     name: Science
 
-  engine_groups.files:
+  engine_files:
     name: Files
 
-  engine_groups.social:
+  engine_social:
     name: Social media
 
   disabled_engines:
     name: Disabled Engines
     description: >
-      search engines here noted shall be disabled at default for users. 
-      Users can enable through preferences in the browser.
-      If this list is not empty, it is used exclusively, and the individual toggles under 'Search engines' below are completely ignored. 
-      Leave this list empty if you prefer to use the toggles.
-      `Search engines` options shall be deprecated at earliest on version 1.3.0.
+      Select one or more search engines that should be disabled by default.
+      Users can still enable them again from the browser preferences.
+      If this list is not empty, it is applied as an explicit filter and the
+      legacy per-engine toggles below are ignored.
 
   engines:
     name: Search engines
