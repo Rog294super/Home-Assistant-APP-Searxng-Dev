@@ -137,6 +137,11 @@ fi
 # maintain or forget to update.
 # ---------------------------------------------------------
 
+# Ensure the helper module remains importable even when Python starts in a
+# non-root working directory. The addon copies it to /validate_base_url.py,
+# and the container does not always keep the current directory at /.
+export PYTHONPATH="/:${PYTHONPATH:-}"
+
 SECRET_KEY="$SECRET_KEY" METRICS_SECRET="$(cat "$METRICS_SECRET_FILE")" \
     "$PYTHON" - "$OPTIONS_FILE" "$SETTINGS_FILE" <<'PYEOF'
 import json
@@ -144,6 +149,8 @@ import os
 import sys
 
 import yaml
+
+sys.path.insert(0, "/")
 
 from validate_base_url import validate_base_url
 
