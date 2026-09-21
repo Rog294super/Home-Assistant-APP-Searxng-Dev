@@ -63,65 +63,94 @@ configuration:
     name: Uitgeschakelde zoekmachines - Algemeen
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de algemene categorie, bijvoorbeeld: google, bing, wikipedia.
+      in de algemene categorie. Geldige namen: searchmysite, wiby, openlibrary, currency, dictzone, lingva, 
+      mozhi, mymemory translated, bing, brave, duckduckgo, google, google cse, mojeek, qwant, startpage, yahoo, 
+      seznam, naver, wikipedia, wikibooks, wikiquote, wikisource, wikispecies, wikiversity, wikivoyage, ayo, 
+      boardreader, crowdview, ddg definitions, duckduckgo web, encyclosearch, fastbot, fireball, fynd, gabanza, 
+      gmx, infospace, mwmbl, privacywall, resulthunter, searchtoday, tineye, tusksearch, vuhuv, wikidata, 
+      wolframalpha, yacy, yandex, yep, zapmeta, searchch, bpb, reloado, tagesschau, wikimini, abcnyheter, 
+      360search, baidu, quark, sogou.
 
   disabled_engines_images:
     name: Uitgeschakelde zoekmachines - Afbeeldingen
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de afbeeldingscategorie, bijvoorbeeld: google images, bing images.
+      in de afbeeldingscategorie. Geldige namen: devicons, flaticon, lucide, material icons, selfhst icons, 
+      uxwing, bing images, brave.images, google cse images, google images, mojeek images, qwant images, 
+      startpage images, 1x, 500px, adobe stock, artic, artstation, cara, duckduckgo images, 
+      findfiles images, findthatmeme, flickr, frinkiac, giphy, imgur, ipernity, library of congress, 
+      magnific, openverse, pexels, picjumbo, pinterest, pixabay images, privacywall images, 
+      public domain image archive, resulthunter images, shopify stock, sogou images, stocksnap, 
+      tusksearch images, unsplash, vuhuv images, wikicommons.images, yacy images, yandex images, naver images, 
+      baidu images, quark images.
 
   disabled_engines_videos:
     name: Uitgeschakelde zoekmachines - Video's
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de videocategorie, bijvoorbeeld: youtube, vimeo.
+      in de videocategorie. Geldige namen: bing videos, brave.videos, google videos, qwant videos, 
+      360search videos, adobe stock video, bilibili, bitchute, dailymotion, duckduckgo videos, 
+      findfiles videos, fireball videos, google play movies, media.ccc.de, odysee, peertube, pixabay videos, 
+      privacywall videos, rumble, sepiasearch, tusksearch videos, vimeo, vuhuv videos, wikicommons.videos, 
+      youtube, mediathekviewweb, ina, niconico, naver videos, acfun, iqiyi, sogou videos.
 
   disabled_engines_news:
     name: Uitgeschakelde zoekmachines - Nieuws
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de nieuwscategorie.
+      in de nieuwscategorie. Geldige namen: google news, bing news, brave news, duckduckgo news, 
+      mojeek news, naver news, qwant news, startpage news, sogou wechat, wikinews, wikimedia, reuters, 
+      tagesschau, ansa, il post, fireball news, tusksearch news, wikimedia.
 
   disabled_engines_maps:
     name: Uitgeschakelde zoekmachines - Kaarten
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de kaartencategorie.
+      in de kaartencategorie. Geldige namen: apple maps, openstreetmap, photon.
 
   disabled_engines_music:
     name: Uitgeschakelde zoekmachines - Muziek
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de muziekkategorie.
+      in de muziekkategorie. Geldige namen: genius, radio browser, adobe stock audio, bandcamp, deezer, 
+      findfiles music, mixcloud, soundcloud, wikicommons.audio, yandex music, youtube.
 
   disabled_engines_it:
     name: Uitgeschakelde zoekmachines - IT
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de IT-categorie.
+      in de IT-categorie. Geldige namen: alpine linux packages, cachy os packages, crates.io, docker hub, 
+      hex, hoogle, lib.rs, metacpan, npm, packagist, pkg.go.dev, pub.dev, pypi, rubygems, voidlinux, 
+      askubuntu, caddy.community, discuss.python, pi-hole.community, stackoverflow, superuser, bitbucket, 
+      codeberg, gitea.com, github, gitlab, huggingface, huggingface datasets, huggingface spaces, ollama, 
+      sourcehut, arch linux wiki, free software directory, gentoo, nixos wiki, anaconda, habrahabr, 
+      hackernews, lobste.rs, mankier, mdn, microsoft learn, national vulnerability database, baidu kaifa.
 
   disabled_engines_science:
     name: Uitgeschakelde zoekmachines - Wetenschap
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de wetenschapscategorie.
+      in de wetenschapscategorie. Geldige namen: arxiv, crossref, google scholar, openalex, pubmed, 
+      semantic scholar, wikispecies, openairedatasets, openairepublications, pdbe.
 
   disabled_engines_files:
     name: Uitgeschakelde zoekmachines - Bestanden
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de bestanden-categorie.
+      in de bestanden-categorie. Geldige namen: apk_mirror, apple_app_store, fdroid, google_play_apps.
 
   disabled_engines_social:
     name: Uitgeschakelde zoekmachines - Sociaal
     description: >
-      Komma-gescheiden SearXNG-engine-names die standaard uitgeschakeld worden
-      in de sociale categorie.
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de sociale categorie. Geldige namen: 9gag, boardreader, lemmy comments, lemmy communities, 
+      lemmy posts, lemmy users, mastodon hashtags, mastodon users, tootfinder.
 
   disabled_engines:
     name: Uitgeschakelde zoekmachines (legacy)
-    description: Verouderd compatibiliteitsveld met komma-gescheiden namen. Gebruik bij voorkeur de per-categorievelden hierboven.
+    description: > 
+      Verouderd compatibiliteitsveld met komma-gescheiden namen. 
+      Gebruik bij voorkeur de per-categorievelden hierboven.
 
   engines:
     name: Zoekmachines
