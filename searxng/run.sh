@@ -197,22 +197,43 @@ if autocomplete:
     settings["search"]["autocomplete"] = autocomplete
 
 engine_group_map = {
-    "engine_general": ["google", "bing", "duckduckgo", "startpage", "qwant", "wikipedia", "brave"],
-    "engine_images": ["google", "bing", "duckduckgo", "wikipedia"],
-    "engine_videos": ["youtube"],
-    "engine_news": ["google", "bing", "wikipedia"],
-    "engine_maps": ["google", "bing"],
-    "engine_music": ["youtube"],
-    "engine_it": ["github", "stackoverflow"],
-    "engine_science": ["wikipedia", "wolframalpha"],
-    "engine_files": ["github"],
-    "engine_social": ["reddit", "youtube"],
+    "engine_general": [
+        "searchmysite", "wiby", "openlibrary", "currency", "dictzone", "lingva", "mozhi",
+        "mymemory translated", "bing", "brave", "duckduckgo", "google", "google cse",
+        "mojeek", "qwant", "startpage", "yahoo", "seznam", "naver", "wikipedia",
+        "wikibooks", "wikiquote", "wikisource", "wikispecies", "wikiversity",
+        "wikivoyage", "ayo", "boardreader", "crowdview", "ddg definitions",
+        "duckduckgo web", "encyclosearch", "fastbot", "fireball", "fynd", "gabanza",
+        "gmx", "infospace", "mwmbl", "privacywall", "resulthunter", "searchtoday",
+        "tineye", "tusksearch", "vuhuv", "wikidata", "wolframalpha", "yacy", "yandex",
+        "yep", "zapmeta", "searchch", "bpb", "reloado", "tagesschau", "wikimini",
+        "abcnyheter", "360search", "baidu", "quark", "sogou"
+    ],
+    "engine_images": ["devicons", "flaticon", "lucide", "material icons", "selfhst icons", "uxwing", "bing images", "brave.images", "google cse images", "google images", "mojeek images", "qwant images", "startpage images", "1x", "500px", "adobe stock", "artic", "artstation", "cara", "duckduckgo images", "findfiles images", "findthatmeme", "flickr", "frinkiac", "giphy", "imgur", "ipernity", "library of congress", "magnific", "openverse", "pexels", "picjumbo", "pinterest", "pixabay images", "privacywall images", "public domain image archive", "resulthunter images", "shopify stock", "sogou images", "stocksnap", "tusksearch images", "unsplash", "vuhuv images", "wikicommons.images", "yacy images", "yandex images", "naver images", "baidu images", "quark images"],
+    "engine_videos": ["bing videos", "brave.videos", "google videos", "qwant videos", "360search videos", "adobe stock video", "bilibili", "bitchute", "dailymotion", "duckduckgo videos", "findfiles videos", "fireball videos", "google play movies", "media.ccc.de", "odysee", "peertube", "pixabay videos", "privacywall videos", "rumble", "sepiasearch", "tusksearch videos", "vimeo", "vuhuv videos", "wikicommons.videos", "youtube", "mediathekviewweb", "ina", "niconico", "naver videos", "acfun", "iqiyi", "sogou videos"],
+    "engine_news": ["google news", "bing news", "brave news", "duckduckgo news", "mojeek news", "naver news", "qwant news", "startpage news", "sogou wechat", "wikinews", "wikimedia", "reuters", "tagesschau", "ansa", "il post", "fireball news", "tusksearch news"],
+    "engine_maps": ["apple maps", "openstreetmap", "photon"],
+    "engine_music": ["genius", "radio browser", "adobe stock audio", "bandcamp", "deezer", "findfiles music", "mixcloud", "soundcloud", "wikicommons.audio", "yandex music", "youtube"],
+    "engine_it": ["alpine linux packages", "cachy os packages", "crates.io", "docker hub", "hex", "hoogle", "lib.rs", "metacpan", "npm", "packagist", "pkg.go.dev", "pub.dev", "pypi", "rubygems", "voidlinux", "askubuntu", "caddy.community", "discuss.python", "pi-hole.community", "stackoverflow", "superuser", "bitbucket", "codeberg", "gitea.com", "github", "gitlab", "huggingface", "huggingface datasets", "huggingface spaces", "ollama", "sourcehut", "arch linux wiki", "free software directory", "gentoo", "nixos wiki", "anaconda", "habrahabr", "hackernews", "lobste.rs", "mankier", "mdn", "microsoft learn", "national vulnerability database", "baidu kaifa"],
+    "engine_science": ["arxiv", "crossref", "google scholar", "openalex", "pubmed", "semantic scholar", "wikispecies", "openairedatasets", "openairepublications", "pdbe"],
+    "engine_files": ["apk_mirror", "apple_app_store", "fdroid", "google_play_apps"],
+    "engine_social": ["9gag", "boardreader", "lemmy comments", "lemmy communities", "lemmy posts", "lemmy users", "mastodon hashtags", "mastodon users", "tootfinder"],
 }
 disabled_engines = []
 
-for key, enabled in options.items():
-    if key.startswith("engine_") and isinstance(enabled, bool) and not enabled:
-        disabled_engines.extend(engine_group_map.get(key, []))
+for key, value in options.items():
+    if key.startswith("engine_") and isinstance(value, str):
+        selected = value.strip().lower()
+        if not selected or selected == "enabled":
+            continue
+        group_values = engine_group_map.get(key, [])
+        if selected == "disabled":
+            disabled_engines.extend(str(engine) for engine in group_values)
+            continue
+        if selected in {str(engine).lower() for engine in group_values}:
+            for engine in group_values:
+                if str(engine).lower() != selected:
+                    disabled_engines.append(str(engine))
 
 manual_disabled = options.get("disabled_engines")
 if isinstance(manual_disabled, list):

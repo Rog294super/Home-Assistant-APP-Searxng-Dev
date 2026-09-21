@@ -62,16 +62,16 @@ options:
   # broad search groups without having to type individual engine names.
   # All categories default to true so the app behaves like the upstream
   # defaults unless the user intentionally disables a group.
-  engine_general: true
-  engine_images: true
-  engine_videos: true
-  engine_news: true
-  engine_maps: true
-  engine_music: true
-  engine_it: true
-  engine_science: true
-  engine_files: true
-  engine_social: true
+  engine_general: "enabled"
+  engine_images: "enabled"
+  engine_videos: "enabled"
+  engine_news: "enabled"
+  engine_maps: "enabled"
+  engine_music: "enabled"
+  engine_it: "enabled"
+  engine_science: "enabled"
+  engine_files: "enabled"
+  engine_social: "enabled"
 
   # Explicitly disabled engines. An empty list preserves the legacy
   # engines configuration below for existing installations.
@@ -109,18 +109,18 @@ schema:
   mqtt_discovery_prefix: str
   mqtt_base_topic: str
 
-  engine_general: bool
-  engine_images: bool
-  engine_videos: bool
-  engine_news: bool
-  engine_maps: bool
-  engine_music: bool
-  engine_it: bool
-  engine_science: bool
-  engine_files: bool
-  engine_social: bool
+  engine_general: list(enabled|disabled|searchmysite|wiby|openlibrary|currency|dictzone|lingva|mozhi|mymemory translated|bing|brave|duckduckgo|google|google cse|mojeek|qwant|startpage|yahoo|seznam|naver|wikipedia|wikibooks|wikiquote|wikisource|wikispecies|wikiversity|wikivoyage|ayo|boardreader|crowdview|ddg definitions|duckduckgo web|encyclosearch|fastbot|fireball|fynd|gabanza|gmx|infospace|mwmbl|privacywall|resulthunter|searchtoday|tineye|tusksearch|vuhuv|wikidata|wolframalpha|yacy|yandex|yep|zapmeta|searchch|bpb|reloado|tagesschau|wikimini|abcnyheter|360search|baidu|quark|sogou)
+  engine_images: list(enabled|disabled|devicons|flaticon|lucide|material icons|selfhst icons|uxwing|bing images|brave.images|google cse images|google images|mojeek images|qwant images|startpage images|1x|500px|adobe stock|artic|artstation|cara|duckduckgo images|findfiles images|findthatmeme|flickr|frinkiac|giphy|imgur|ipernity|library of congress|magnific|openverse|pexels|picjumbo|pinterest|pixabay images|privacywall images|public domain image archive|resulthunter images|shopify stock|sogou images|stocksnap|tusksearch images|unsplash|vuhuv images|wikicommons.images|yacy images|yandex images|naver images|baidu images|quark images)
+  engine_videos: list(enabled|disabled|bing videos|brave.videos|google videos|qwant videos|360search videos|adobe stock video|bilibili|bitchute|dailymotion|duckduckgo videos|findfiles videos|fireball videos|google play movies|media.ccc.de|odysee|peertube|pixabay videos|privacywall videos|rumble|sepiasearch|tusksearch videos|vimeo|vuhuv videos|wikicommons.videos|youtube|mediathekviewweb|ina|niconico|naver videos|acfun|iqiyi|sogou videos)
+  engine_news: list(enabled|disabled|google news|bing news|brave news|duckduckgo news|mojeek news|naver news|qwant news|startpage news|sogou wechat|wikinews|wikimedia|reuters|tagesschau|ansa|il post|fireball news|tusksearch news|wikimedia)
+  engine_maps: list(enabled|disabled|apple maps|openstreetmap|photon)
+  engine_music: list(enabled|disabled|genius|radio browser|adobe stock audio|bandcamp|deezer|findfiles music|mixcloud|soundcloud|wikicommons.audio|yandex music|youtube)
+  engine_it: list(enabled|disabled|alpine linux packages|cachy os packages|crates.io|docker hub|hex|hoogle|lib.rs|metacpan|npm|packagist|pkg.go.dev|pub.dev|pypi|rubygems|voidlinux|askubuntu|caddy.community|discuss.python|pi-hole.community|stackoverflow|superuser|bitbucket|codeberg|gitea.com|github|gitlab|huggingface|huggingface datasets|huggingface spaces|ollama|sourcehut|arch linux wiki|free software directory|gentoo|nixos wiki|anaconda|habrahabr|hackernews|lobste.rs|mankier|mdn|microsoft learn|national vulnerability database|baidu kaifa)
+  engine_science: list(enabled|disabled|arxiv|crossref|google scholar|openalex|pubmed|semantic scholar|wikispecies|openairedatasets|openairepublications|pdbe)
+  engine_files: list(enabled|disabled|apk_mirror|apple_app_store|fdroid|google_play_apps)
+  engine_social: list(enabled|disabled|9gag|boardreader|lemmy comments|lemmy communities|lemmy posts|lemmy users|mastodon hashtags|mastodon users|tootfinder)
 
-  disabled_engines: list(google|bing|duckduckgo|startpage|qwant|wikipedia|github|youtube|reddit|stackoverflow|wolframalpha)
+  disabled_engines: list(searchmysite|wiby|openlibrary|currency|dictzone|lingva|mozhi|mymemory translated|bing|brave|duckduckgo|google|google cse|mojeek|qwant|startpage|yahoo|seznam|naver|wikipedia|wikibooks|wikiquote|wikisource|wikispecies|wikiversity|wikivoyage|ayo|boardreader|crowdview|ddg definitions|duckduckgo web|encyclosearch|fastbot|fireball|fynd|gabanza|gmx|infospace|mwmbl|privacywall|resulthunter|searchtoday|tineye|tusksearch|vuhuv|wikidata|wolframalpha|yacy|yandex|yep|zapmeta|searchch|bpb|reloado|tagesschau|wikimini|abcnyheter|360search|baidu|quark|sogou|google news|bing news|brave news|duckduckgo news|mojeek news|naver news|qwant news|startpage news|sogou wechat|wikinews|wikimedia|reuters|ansa|il post|fireball news|tusksearch news|devicons|flaticon|lucide|material icons|selfhst icons|uxwing|bing images|brave.images|google cse images|google images|mojeek images|qwant images|startpage images|1x|500px|adobe stock|artic|artstation|cara|duckduckgo images|findfiles images|findthatmeme|flickr|frinkiac|giphy|imgur|ipernity|library of congress|magnific|openverse|pexels|picjumbo|pinterest|pixabay images|privacywall images|public domain image archive|resulthunter images|shopify stock|sogou images|stocksnap|tusksearch images|unsplash|vuhuv images|wikicommons.images|yacy images|yandex images|naver images|baidu images|quark images|bing videos|brave.videos|google videos|qwant videos|360search videos|adobe stock video|bilibili|bitchute|dailymotion|duckduckgo videos|findfiles videos|fireball videos|google play movies|media.ccc.de|odysee|peertube|pixabay videos|privacywall videos|rumble|sepiasearch|tusksearch videos|vimeo|wikicommons.videos|youtube|mediathekviewweb|ina|niconico|naver videos|acfun|iqiyi|sogou videos|apple maps|openstreetmap|photon|genius|radio browser|adobe stock audio|bandcamp|deezer|findfiles music|mixcloud|soundcloud|wikicommons.audio|yandex music|github|stackoverflow|alpine linux packages|cachy os packages|crates.io|docker hub|hex|hoogle|lib.rs|metacpan|npm|packagist|pkg.go.dev|pub.dev|pypi|rubygems|voidlinux|askubuntu|caddy.community|discuss.python|pi-hole.community|superuser|bitbucket|codeberg|gitea.com|gitlab|huggingface|huggingface datasets|huggingface spaces|ollama|sourcehut|arch linux wiki|free software directory|gentoo|nixos wiki|anaconda|habrahabr|hackernews|lobste.rs|mankier|mdn|microsoft learn|national vulnerability database|baidu kaifa|arxiv|crossref|google scholar|openalex|pubmed|semantic scholar|wikispecies|openairedatasets|openairepublications|pdbe|9gag|lemmy comments|lemmy communities|lemmy posts|lemmy users|mastodon hashtags|mastodon users|tootfinder)
 
   engines:
     google: bool
