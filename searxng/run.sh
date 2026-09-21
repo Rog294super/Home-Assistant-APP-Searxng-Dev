@@ -241,6 +241,24 @@ if isinstance(manual_disabled, list):
 elif manual_disabled:
     disabled_engines.append(str(manual_disabled))
 
+for key in (
+    "disabled_engines_general",
+    "disabled_engines_images",
+    "disabled_engines_videos",
+    "disabled_engines_news",
+    "disabled_engines_maps",
+    "disabled_engines_music",
+    "disabled_engines_it",
+    "disabled_engines_science",
+    "disabled_engines_files",
+    "disabled_engines_social",
+):
+    category_disabled = options.get(key)
+    if isinstance(category_disabled, list):
+        disabled_engines.extend(category_disabled)
+    elif category_disabled:
+        disabled_engines.append(str(category_disabled))
+
 disabled_engines = [str(name) for name in disabled_engines if name]
 
 disabled_engines = list(dict.fromkeys(disabled_engines))

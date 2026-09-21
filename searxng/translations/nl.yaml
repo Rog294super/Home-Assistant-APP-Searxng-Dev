@@ -97,6 +97,36 @@ configuration:
       Als deze lijst niet leeg is, geldt deze als expliciete filter en worden de
       oudere per-engine schakelaars hieronder genegeerd.
 
+  disabled_engines_general:
+    name: Uitgeschakelde algemene zoekmachines
+
+  disabled_engines_images:
+    name: Uitgeschakelde afbeeldingszoekmachines
+
+  disabled_engines_videos:
+    name: Uitgeschakelde videozoekmachines
+
+  disabled_engines_news:
+    name: Uitgeschakelde nieuwszoekmachines
+
+  disabled_engines_maps:
+    name: Uitgeschakelde kaartzoekmachines
+
+  disabled_engines_music:
+    name: Uitgeschakelde muziekzoekmachines
+
+  disabled_engines_it:
+    name: Uitgeschakelde IT-zoekmachines
+
+  disabled_engines_science:
+    name: Uitgeschakelde wetenschapszoekmachines
+
+  disabled_engines_files:
+    name: Uitgeschakelde bestandszoekmachines
+
+  disabled_engines_social:
+    name: Uitgeschakelde sociale zoekmachines
+
   engines:
     name: Zoekmachines
     description: >

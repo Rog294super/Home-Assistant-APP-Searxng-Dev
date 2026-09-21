@@ -95,6 +95,36 @@ configuration:
       If this list is not empty, it is applied as an explicit filter and the
       legacy per-engine toggles below are ignored.
 
+  disabled_engines_general:
+    name: Disabled general engines
+
+  disabled_engines_images:
+    name: Disabled image engines
+
+  disabled_engines_videos:
+    name: Disabled video engines
+
+  disabled_engines_news:
+    name: Disabled news engines
+
+  disabled_engines_maps:
+    name: Disabled map engines
+
+  disabled_engines_music:
+    name: Disabled music engines
+
+  disabled_engines_it:
+    name: Disabled IT engines
+
+  disabled_engines_science:
+    name: Disabled science engines
+
+  disabled_engines_files:
+    name: Disabled file engines
+
+  disabled_engines_social:
+    name: Disabled social engines
+
   engines:
     name: Search engines
     description: >

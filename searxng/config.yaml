@@ -58,24 +58,19 @@ options:
   mqtt_discovery_prefix: "homeassistant"
   mqtt_base_topic: "searxng"
 
-  # Engine categories provide a safer, user-friendly way to enable or disable
-  # broad search groups without having to type individual engine names.
-  # All categories default to true so the app behaves like the upstream
-  # defaults unless the user intentionally disables a group.
-  engine_general: "enabled"
-  engine_images: "enabled"
-  engine_videos: "enabled"
-  engine_news: "enabled"
-  engine_maps: "enabled"
-  engine_music: "enabled"
-  engine_it: "enabled"
-  engine_science: "enabled"
-  engine_files: "enabled"
-  engine_social: "enabled"
-
-  # Explicitly disabled engines. An empty list preserves the legacy
-  # engines configuration below for existing installations.
-  disabled_engines: []
+  # Per-category engine blacklists. Each list contains the engines that should
+  # be disabled by default for that category, while any engine not listed will
+  # continue to use SearXNG's upstream default behavior.
+  disabled_engines_general: []
+  disabled_engines_images: []
+  disabled_engines_videos: []
+  disabled_engines_news: []
+  disabled_engines_maps: []
+  disabled_engines_music: []
+  disabled_engines_it: []
+  disabled_engines_science: []
+  disabled_engines_files: []
+  disabled_engines_social: []
 
   # Legacy configuration retained for backwards compatibility.
   engines:
@@ -109,22 +104,16 @@ schema:
   mqtt_discovery_prefix: str
   mqtt_base_topic: str
 
-  # These are single-select values that may be either an explicit engine name
-  # or the special keywords "enabled" / "disabled". Using `str` avoids the
-  # Home Assistant validation bug where the dropdown rejects those special
-  # values even though the runtime logic handles them correctly.
-  engine_general: str
-  engine_images: str
-  engine_videos: str
-  engine_news: str
-  engine_maps: str
-  engine_music: str
-  engine_it: str
-  engine_science: str
-  engine_files: str
-  engine_social: str
-
-  disabled_engines: list(searchmysite|wiby|openlibrary|currency|dictzone|lingva|mozhi|mymemory translated|bing|brave|duckduckgo|google|google cse|mojeek|qwant|startpage|yahoo|seznam|naver|wikipedia|wikibooks|wikiquote|wikisource|wikispecies|wikiversity|wikivoyage|ayo|boardreader|crowdview|ddg definitions|duckduckgo web|encyclosearch|fastbot|fireball|fynd|gabanza|gmx|infospace|mwmbl|privacywall|resulthunter|searchtoday|tineye|tusksearch|vuhuv|wikidata|wolframalpha|yacy|yandex|yep|zapmeta|searchch|bpb|reloado|tagesschau|wikimini|abcnyheter|360search|baidu|quark|sogou|google news|bing news|brave news|duckduckgo news|mojeek news|naver news|qwant news|startpage news|sogou wechat|wikinews|wikimedia|reuters|ansa|il post|fireball news|tusksearch news|devicons|flaticon|lucide|material icons|selfhst icons|uxwing|bing images|brave.images|google cse images|google images|mojeek images|qwant images|startpage images|1x|500px|adobe stock|artic|artstation|cara|duckduckgo images|findfiles images|findthatmeme|flickr|frinkiac|giphy|imgur|ipernity|library of congress|magnific|openverse|pexels|picjumbo|pinterest|pixabay images|privacywall images|public domain image archive|resulthunter images|shopify stock|sogou images|stocksnap|tusksearch images|unsplash|vuhuv images|wikicommons.images|yacy images|yandex images|naver images|baidu images|quark images|bing videos|brave.videos|google videos|qwant videos|360search videos|adobe stock video|bilibili|bitchute|dailymotion|duckduckgo videos|findfiles videos|fireball videos|google play movies|media.ccc.de|odysee|peertube|pixabay videos|privacywall videos|rumble|sepiasearch|tusksearch videos|vimeo|wikicommons.videos|youtube|mediathekviewweb|ina|niconico|naver videos|acfun|iqiyi|sogou videos|apple maps|openstreetmap|photon|genius|radio browser|adobe stock audio|bandcamp|deezer|findfiles music|mixcloud|soundcloud|wikicommons.audio|yandex music|github|stackoverflow|alpine linux packages|cachy os packages|crates.io|docker hub|hex|hoogle|lib.rs|metacpan|npm|packagist|pkg.go.dev|pub.dev|pypi|rubygems|voidlinux|askubuntu|caddy.community|discuss.python|pi-hole.community|superuser|bitbucket|codeberg|gitea.com|gitlab|huggingface|huggingface datasets|huggingface spaces|ollama|sourcehut|arch linux wiki|free software directory|gentoo|nixos wiki|anaconda|habrahabr|hackernews|lobste.rs|mankier|mdn|microsoft learn|national vulnerability database|baidu kaifa|arxiv|crossref|google scholar|openalex|pubmed|semantic scholar|wikispecies|openairedatasets|openairepublications|pdbe|9gag|lemmy comments|lemmy communities|lemmy posts|lemmy users|mastodon hashtags|mastodon users|tootfinder)
+  disabled_engines_general: list(searchmysite|wiby|openlibrary|currency|dictzone|lingva|mozhi|mymemory translated|bing|brave|duckduckgo|google|google cse|mojeek|qwant|startpage|yahoo|seznam|naver|wikipedia|wikibooks|wikiquote|wikisource|wikispecies|wikiversity|wikivoyage|ayo|boardreader|crowdview|ddg definitions|duckduckgo web|encyclosearch|fastbot|fireball|fynd|gabanza|gmx|infospace|mwmbl|privacywall|resulthunter|searchtoday|tineye|tusksearch|vuhuv|wikidata|wolframalpha|yacy|yandex|yep|zapmeta|searchch|bpb|reloado|tagesschau|wikimini|abcnyheter|360search|baidu|quark|sogou)
+  disabled_engines_images: list(devicons|flaticon|lucide|material icons|selfhst icons|uxwing|bing images|brave.images|google cse images|google images|mojeek images|qwant images|startpage images|1x|500px|adobe stock|artic|artstation|cara|duckduckgo images|findfiles images|findthatmeme|flickr|frinkiac|giphy|imgur|ipernity|library of congress|magnific|openverse|pexels|picjumbo|pinterest|pixabay images|privacywall images|public domain image archive|resulthunter images|shopify stock|sogou images|stocksnap|tusksearch images|unsplash|vuhuv images|wikicommons.images|yacy images|yandex images|naver images|baidu images|quark images)
+  disabled_engines_videos: list(bing videos|brave.videos|google videos|qwant videos|360search videos|adobe stock video|bilibili|bitchute|dailymotion|duckduckgo videos|findfiles videos|fireball videos|google play movies|media.ccc.de|odysee|peertube|pixabay videos|privacywall videos|rumble|sepiasearch|tusksearch videos|vimeo|vuhuv videos|wikicommons.videos|youtube|mediathekviewweb|ina|niconico|naver videos|acfun|iqiyi|sogou videos)
+  disabled_engines_news: list(google news|bing news|brave news|duckduckgo news|mojeek news|naver news|qwant news|startpage news|sogou wechat|wikinews|wikimedia|reuters|tagesschau|ansa|il post|fireball news|tusksearch news)
+  disabled_engines_maps: list(apple maps|openstreetmap|photon)
+  disabled_engines_music: list(genius|radio browser|adobe stock audio|bandcamp|deezer|findfiles music|mixcloud|soundcloud|wikicommons.audio|yandex music|youtube)
+  disabled_engines_it: list(alpine linux packages|cachy os packages|crates.io|docker hub|hex|hoogle|lib.rs|metacpan|npm|packagist|pkg.go.dev|pub.dev|pypi|rubygems|voidlinux|askubuntu|caddy.community|discuss.python|pi-hole.community|stackoverflow|superuser|bitbucket|codeberg|gitea.com|github|gitlab|huggingface|huggingface datasets|huggingface spaces|ollama|sourcehut|arch linux wiki|free software directory|gentoo|nixos wiki|anaconda|habrahabr|hackernews|lobste.rs|mankier|mdn|microsoft learn|national vulnerability database|baidu kaifa)
+  disabled_engines_science: list(arxiv|crossref|google scholar|openalex|pubmed|semantic scholar|wikispecies|openairedatasets|openairepublications|pdbe)
+  disabled_engines_files: list(apk_mirror|apple_app_store|fdroid|google_play_apps)
+  disabled_engines_social: list(9gag|boardreader|lemmy comments|lemmy communities|lemmy posts|lemmy users|mastodon hashtags|mastodon users|tootfinder)
 
   engines:
     google: bool
