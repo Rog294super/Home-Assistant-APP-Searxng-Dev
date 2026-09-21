@@ -59,6 +59,39 @@ configuration:
       Prefix voor SearXNG state-, attributen- en beschikbaarheidstopics. 
       Meestal niet nodig om aan te passen.
       
+  engine_groups:
+    name: Zoekmachinecategorieën
+    description: >
+      Schakel brede typen zoekbronnen in of uit. Deze schakelaars zijn een
+      gebruiksvriendelijk alternatief voor handmatig typen van engine-namen.
+
+  engine_groups.general:
+    name: Algemeen
+
+  engine_groups.images:
+    name: Afbeeldingen
+
+  engine_groups.videos:
+    name: Video's
+
+  engine_groups.news:
+    name: Nieuws
+
+  engine_groups.maps:
+    name: Kaarten
+
+  engine_groups.music:
+    name: Muziek
+
+  engine_groups.it:
+    name: IT
+
+  engine_groups.science:
+    name: Wetenschap
+
+  engine_groups.files:
+    name: Bestanden
+
   disabled_engines:
     name: Uitgeschakelde Zoekmachines
     description: >

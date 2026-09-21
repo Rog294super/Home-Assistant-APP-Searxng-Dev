@@ -57,6 +57,42 @@ configuration:
       Prefix for SearXNG state, attributes, and availability topics.
       Most of the time no need to be changed.
 
+  engine_groups:
+    name: Engine categories
+    description: >
+      Enable or disable broad types of search sources. These toggles work
+      as a user-friendly alternative to typing engine names manually.
+
+  engine_groups.general:
+    name: General
+
+  engine_groups.images:
+    name: Images
+
+  engine_groups.videos:
+    name: Videos
+
+  engine_groups.news:
+    name: News
+
+  engine_groups.maps:
+    name: Maps
+
+  engine_groups.music:
+    name: Music
+
+  engine_groups.it:
+    name: IT
+
+  engine_groups.science:
+    name: Science
+
+  engine_groups.files:
+    name: Files
+
+  engine_groups.social:
+    name: Social media
+
   disabled_engines:
     name: Disabled Engines
     description: >

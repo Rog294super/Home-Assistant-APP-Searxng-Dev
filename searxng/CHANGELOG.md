@@ -12,7 +12,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 
 ### Added
 
-### CHanged
+### Changed
   - Instead of writing the file /tmp/searxng-mqtt.env with `open(env_path, "w")`, 
     it now gets created with restrictive rights as extra hardening.
     File was kept safely withing container boundaries before and still will be.  
@@ -23,7 +23,12 @@ All notable changes to this Home Assistant SearXNG App are documented here.
     issues in the browser.
   - Instead of needing to type the full engine for `autocomplete`, 
     It's now a dropdown menu to prevent typing errors.
-  - Translations changed for `mqtt_discovery_prefix`, `mqtt_base_topic`, `base_url` and `disabled_engines`.
+  - Added category-based `engine_groups` toggles for general web searches,
+    images, videos, news, maps, music, IT, science, files, and social
+    searches. These provide a safer, no-typing way to disable broader engine
+    families while keeping the default behavior as all-enabled unless the user
+    changes it.
+  - Translations changed for `mqtt_discovery_prefix`, `mqtt_base_topic`, `base_url`, `disabled_engines` and the new `engine_groups` labels.
 ### Fixed issues
 
 ## 1.2.0

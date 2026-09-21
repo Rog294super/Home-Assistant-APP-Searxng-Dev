@@ -196,10 +196,36 @@ autocomplete = options.get("autocomplete")
 if autocomplete:
     settings["search"]["autocomplete"] = autocomplete
 
-disabled_engines = options.get("disabled_engines")
+engine_groups = options.get("engine_groups") or {}
+engine_group_map = {
+    "general": ["google", "bing", "duckduckgo", "startpage", "qwant", "wikipedia", "brave"],
+    "images": ["google", "bing", "duckduckgo", "wikipedia"],
+    "videos": ["youtube"],
+    "news": ["google", "bing", "wikipedia"],
+    "maps": ["google", "bing"],
+    "music": ["youtube"],
+    "it": ["github", "stackoverflow"],
+    "science": ["wikipedia", "wolframalpha"],
+    "files": ["github"],
+    "social": ["reddit", "youtube"],
+}
+disabled_engines = []
 
-if isinstance(disabled_engines, list) and disabled_engines:
-    print("[searxng-app] Using new disabled_engines configuration")
+if isinstance(engine_groups, dict):
+    for category, enabled in engine_groups.items():
+        if not bool(enabled):
+            disabled_engines.extend(engine_group_map.get(category, []))
+
+manual_disabled = options.get("disabled_engines")
+if isinstance(manual_disabled, list):
+    disabled_engines.extend(manual_disabled)
+
+disabled_engines = [str(name) for name in disabled_engines if name]
+
+disabled_engines = list(dict.fromkeys(disabled_engines))
+
+if disabled_engines:
+    print("[searxng-app] Using explicit engine filtering configuration")
     settings["engines"] = [
         {"name": str(name), "disabled": True}
         for name in disabled_engines

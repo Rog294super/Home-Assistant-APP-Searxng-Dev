@@ -58,6 +58,22 @@ options:
   mqtt_discovery_prefix: "homeassistant"
   mqtt_base_topic: "searxng"
 
+  # Engine categories provide a safer, user-friendly way to enable or disable
+  # broad search groups without having to type individual engine names.
+  # All categories default to true so the app behaves like the upstream
+  # defaults unless the user intentionally disables a group.
+  engine_groups:
+    general: true
+    images: true
+    videos: true
+    news: true
+    maps: true
+    music: true
+    it: true
+    science: true
+    files: true
+    social: true
+
   # Explicitly disabled engines. An empty list preserves the legacy
   # engines configuration below for existing installations.
   disabled_engines: []
@@ -93,6 +109,18 @@ schema:
   enable_mqtt_discovery: bool
   mqtt_discovery_prefix: str
   mqtt_base_topic: str
+
+  engine_groups:
+    general: bool
+    images: bool
+    videos: bool
+    news: bool
+    maps: bool
+    music: bool
+    it: bool
+    science: bool
+    files: bool
+    social: bool
 
   disabled_engines:
     - str
