@@ -58,22 +58,21 @@ options:
   mqtt_discovery_prefix: "homeassistant"
   mqtt_base_topic: "searxng"
 
-  # Per-category default-disabled engines. These can contain multiple engine
-  # names per category, while keeping all other SearXNG engines in their
-  # normal upstream default state.
-  disabled_engines_general: []
-  disabled_engines_images: []
-  disabled_engines_videos: []
-  disabled_engines_news: []
-  disabled_engines_maps: []
-  disabled_engines_music: []
-  disabled_engines_it: []
-  disabled_engines_science: []
-  disabled_engines_files: []
-  disabled_engines_social: []
+  # Per-category default-disabled engines. Use a comma-separated list of exact
+  # SearXNG engine names, for example: google, bing, wikipedia.
+  disabled_engines_general: ""
+  disabled_engines_images: ""
+  disabled_engines_videos: ""
+  disabled_engines_news: ""
+  disabled_engines_maps: ""
+  disabled_engines_music: ""
+  disabled_engines_it: ""
+  disabled_engines_science: ""
+  disabled_engines_files: ""
+  disabled_engines_social: ""
 
   # Deprecated global compatibility field kept for older installs.
-  disabled_engines: []
+  disabled_engines: ""
 
   # Legacy configuration retained for backwards compatibility.
   engines:
@@ -107,20 +106,19 @@ schema:
   mqtt_discovery_prefix: str
   mqtt_base_topic: str
 
-  disabled_engines_general: list(str)
-  disabled_engines_images: list(str)
-  disabled_engines_videos: list(str)
-  disabled_engines_news: list(str)
-  disabled_engines_maps: list(str)
-  disabled_engines_music: list(str)
-  disabled_engines_it: list(str)
-  disabled_engines_science: list(str)
-  disabled_engines_files: list(str)
-  disabled_engines_social: list(str)
+  disabled_engines_general: str
+  disabled_engines_images: str
+  disabled_engines_videos: str
+  disabled_engines_news: str
+  disabled_engines_maps: str
+  disabled_engines_music: str
+  disabled_engines_it: str
+  disabled_engines_science: str
+  disabled_engines_files: str
+  disabled_engines_social: str
 
   # Deprecated compatibility field.
-  disabled_engines:
-    - str
+  disabled_engines: str
 
   engines:
     google: bool

@@ -61,47 +61,67 @@ configuration:
       
   disabled_engines_general:
     name: Uitgeschakelde zoekmachines - Algemeen
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de algemene categorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de algemene categorie, bijvoorbeeld: google, bing, wikipedia.
 
   disabled_engines_images:
     name: Uitgeschakelde zoekmachines - Afbeeldingen
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de afbeeldingscategorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de afbeeldingscategorie, bijvoorbeeld: google images, bing images.
 
   disabled_engines_videos:
     name: Uitgeschakelde zoekmachines - Video's
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de videocategorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de videocategorie, bijvoorbeeld: youtube, vimeo.
 
   disabled_engines_news:
     name: Uitgeschakelde zoekmachines - Nieuws
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de nieuwscategorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de nieuwscategorie.
 
   disabled_engines_maps:
     name: Uitgeschakelde zoekmachines - Kaarten
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de kaartencategorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de kaartencategorie.
 
   disabled_engines_music:
     name: Uitgeschakelde zoekmachines - Muziek
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de muziekkategorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de muziekkategorie.
 
   disabled_engines_it:
     name: Uitgeschakelde zoekmachines - IT
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de IT-categorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de IT-categorie.
 
   disabled_engines_science:
     name: Uitgeschakelde zoekmachines - Wetenschap
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de wetenschapscategorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de wetenschapscategorie.
 
   disabled_engines_files:
     name: Uitgeschakelde zoekmachines - Bestanden
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de bestanden-categorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
+      in de bestanden-categorie.
 
   disabled_engines_social:
     name: Uitgeschakelde zoekmachines - Sociaal
-    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de sociale categorie.
+    description: >
+      Komma-gescheiden SearXNG-engine-names die standaard uitgeschakeld worden
+      in de sociale categorie.
 
   disabled_engines:
     name: Uitgeschakelde zoekmachines (legacy)
-    description: Verouderde compatibiliteitslijst; gebruik bij voorkeur de per-categorievelden hierboven.
+    description: Verouderd compatibiliteitsveld met komma-gescheiden namen. Gebruik bij voorkeur de per-categorievelden hierboven.
 
   engines:
     name: Zoekmachines

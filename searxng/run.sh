@@ -209,13 +209,24 @@ disabled_engine_keys = [
     "disabled_engines_social",
 ]
 
+def parse_engine_names(values):
+    if isinstance(values, str):
+        return [
+            part.strip()
+            for part in values.split(",")
+            if part and part.strip()
+        ]
+    if isinstance(values, list):
+        return [
+            str(value).strip()
+            for value in values if str(value).strip()
+        ]
+    return []
+
+
 disabled_engine_names = []
 for key in disabled_engine_keys:
-    values = options.get(key, [])
-    if isinstance(values, list):
-        disabled_engine_names.extend(
-            str(value).strip() for value in values if str(value).strip()
-        )
+    disabled_engine_names.extend(parse_engine_names(options.get(key, "")))
 
 if disabled_engine_names:
     print("[searxng-app] Using per-category disabled_engines configuration")
@@ -225,13 +236,13 @@ if disabled_engine_names:
     ]
 else:
     disabled_engines = options.get("disabled_engines")
+    parsed_legacy = parse_engine_names(disabled_engines)
 
-    if isinstance(disabled_engines, list) and disabled_engines:
+    if parsed_legacy:
         print("[searxng-app] Using legacy disabled_engines configuration")
         settings["engines"] = [
             {"name": str(name), "disabled": True}
-            for name in disabled_engines
-            if name
+            for name in dict.fromkeys(parsed_legacy)
         ]
     else:
         legacy_engines = options.get("engines")

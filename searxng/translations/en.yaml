@@ -59,47 +59,67 @@ configuration:
 
   disabled_engines_general:
     name: Disabled engines - General
-    description: Exact SearXNG engine names to disable by default in the general category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the general
+      category, for example: google, bing, wikipedia.
 
   disabled_engines_images:
     name: Disabled engines - Images
-    description: Exact SearXNG engine names to disable by default in the image category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the image
+      category, for example: google images, bing images.
 
   disabled_engines_videos:
     name: Disabled engines - Videos
-    description: Exact SearXNG engine names to disable by default in the video category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the video
+      category, for example: youtube, vimeo.
 
   disabled_engines_news:
     name: Disabled engines - News
-    description: Exact SearXNG engine names to disable by default in the news category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the news
+      category.
 
   disabled_engines_maps:
     name: Disabled engines - Maps
-    description: Exact SearXNG engine names to disable by default in the maps category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the maps
+      category.
 
   disabled_engines_music:
     name: Disabled engines - Music
-    description: Exact SearXNG engine names to disable by default in the music category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the music
+      category.
 
   disabled_engines_it:
     name: Disabled engines - IT
-    description: Exact SearXNG engine names to disable by default in the IT category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the IT
+      category.
 
   disabled_engines_science:
     name: Disabled engines - Science
-    description: Exact SearXNG engine names to disable by default in the science category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the science
+      category.
 
   disabled_engines_files:
     name: Disabled engines - Files
-    description: Exact SearXNG engine names to disable by default in the files category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the files
+      category.
 
   disabled_engines_social:
     name: Disabled engines - Social
-    description: Exact SearXNG engine names to disable by default in the social category.
+    description: >
+      Comma-separated SearXNG engine names to disable by default in the social
+      category.
 
   disabled_engines:
     name: Disabled Engines (legacy)
-    description: Deprecated compatibility list; use the per-category fields above when possible.
+    description: Deprecated comma-separated compatibility field. Use the per-category fields above when possible.
 
   engines:
     name: Search engines
