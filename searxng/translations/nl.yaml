@@ -59,73 +59,49 @@ configuration:
       Prefix voor SearXNG state-, attributen- en beschikbaarheidstopics. 
       Meestal niet nodig om aan te passen.
       
-  engine_general:
-    name: Algemeen
-
-  engine_images:
-    name: Afbeeldingen
-
-  engine_videos:
-    name: Video's
-
-  engine_news:
-    name: Nieuws
-
-  engine_maps:
-    name: Kaarten
-
-  engine_music:
-    name: Muziek
-
-  engine_it:
-    name: IT
-
-  engine_science:
-    name: Wetenschap
-
-  engine_files:
-    name: Bestanden
-
-  engine_social:
-    name: Sociale media
-
-  disabled_engines:
-    name: Uitgeschakelde Zoekmachines
-    description: >
-      Kies de zoekmachines die standaard uitgeschakeld moeten zijn.
-      Gebruikers kunnen deze later opnieuw inschakelen via de voorkeuren in de browser.
-      Als deze lijst niet leeg is, geldt deze als expliciete filter en worden de
-      oudere per-engine schakelaars hieronder genegeerd.
-
   disabled_engines_general:
-    name: Uitgeschakelde algemene zoekmachines
+    name: Uitgeschakelde zoekmachines - Algemeen
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de algemene categorie.
 
   disabled_engines_images:
-    name: Uitgeschakelde afbeeldingszoekmachines
+    name: Uitgeschakelde zoekmachines - Afbeeldingen
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de afbeeldingscategorie.
 
   disabled_engines_videos:
-    name: Uitgeschakelde videozoekmachines
+    name: Uitgeschakelde zoekmachines - Video's
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de videocategorie.
 
   disabled_engines_news:
-    name: Uitgeschakelde nieuwszoekmachines
+    name: Uitgeschakelde zoekmachines - Nieuws
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de nieuwscategorie.
 
   disabled_engines_maps:
-    name: Uitgeschakelde kaartzoekmachines
+    name: Uitgeschakelde zoekmachines - Kaarten
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de kaartencategorie.
 
   disabled_engines_music:
-    name: Uitgeschakelde muziekzoekmachines
+    name: Uitgeschakelde zoekmachines - Muziek
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de muziekkategorie.
 
   disabled_engines_it:
-    name: Uitgeschakelde IT-zoekmachines
+    name: Uitgeschakelde zoekmachines - IT
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de IT-categorie.
 
   disabled_engines_science:
-    name: Uitgeschakelde wetenschapszoekmachines
+    name: Uitgeschakelde zoekmachines - Wetenschap
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de wetenschapscategorie.
 
   disabled_engines_files:
-    name: Uitgeschakelde bestandszoekmachines
+    name: Uitgeschakelde zoekmachines - Bestanden
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de bestanden-categorie.
 
   disabled_engines_social:
-    name: Uitgeschakelde sociale zoekmachines
+    name: Uitgeschakelde zoekmachines - Sociaal
+    description: Exacte SearXNG-engine-namen die standaard uitgeschakeld worden in de sociale categorie.
+
+  disabled_engines:
+    name: Uitgeschakelde zoekmachines (legacy)
+    description: Verouderde compatibiliteitslijst; gebruik bij voorkeur de per-categorievelden hierboven.
 
   engines:
     name: Zoekmachines

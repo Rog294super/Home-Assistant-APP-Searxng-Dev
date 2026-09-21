@@ -57,73 +57,49 @@ configuration:
       Prefix for SearXNG state, attributes, and availability topics.
       Most of the time no need to be changed.
 
-  engine_general:
-    name: General
-
-  engine_images:
-    name: Images
-
-  engine_videos:
-    name: Videos
-
-  engine_news:
-    name: News
-
-  engine_maps:
-    name: Maps
-
-  engine_music:
-    name: Music
-
-  engine_it:
-    name: IT
-
-  engine_science:
-    name: Science
-
-  engine_files:
-    name: Files
-
-  engine_social:
-    name: Social media
-
-  disabled_engines:
-    name: Disabled Engines
-    description: >
-      Select one or more search engines that should be disabled by default.
-      Users can still enable them again from the browser preferences.
-      If this list is not empty, it is applied as an explicit filter and the
-      legacy per-engine toggles below are ignored.
-
   disabled_engines_general:
-    name: Disabled general engines
+    name: Disabled engines - General
+    description: Exact SearXNG engine names to disable by default in the general category.
 
   disabled_engines_images:
-    name: Disabled image engines
+    name: Disabled engines - Images
+    description: Exact SearXNG engine names to disable by default in the image category.
 
   disabled_engines_videos:
-    name: Disabled video engines
+    name: Disabled engines - Videos
+    description: Exact SearXNG engine names to disable by default in the video category.
 
   disabled_engines_news:
-    name: Disabled news engines
+    name: Disabled engines - News
+    description: Exact SearXNG engine names to disable by default in the news category.
 
   disabled_engines_maps:
-    name: Disabled map engines
+    name: Disabled engines - Maps
+    description: Exact SearXNG engine names to disable by default in the maps category.
 
   disabled_engines_music:
-    name: Disabled music engines
+    name: Disabled engines - Music
+    description: Exact SearXNG engine names to disable by default in the music category.
 
   disabled_engines_it:
-    name: Disabled IT engines
+    name: Disabled engines - IT
+    description: Exact SearXNG engine names to disable by default in the IT category.
 
   disabled_engines_science:
-    name: Disabled science engines
+    name: Disabled engines - Science
+    description: Exact SearXNG engine names to disable by default in the science category.
 
   disabled_engines_files:
-    name: Disabled file engines
+    name: Disabled engines - Files
+    description: Exact SearXNG engine names to disable by default in the files category.
 
   disabled_engines_social:
-    name: Disabled social engines
+    name: Disabled engines - Social
+    description: Exact SearXNG engine names to disable by default in the social category.
+
+  disabled_engines:
+    name: Disabled Engines (legacy)
+    description: Deprecated compatibility list; use the per-category fields above when possible.
 
   engines:
     name: Search engines

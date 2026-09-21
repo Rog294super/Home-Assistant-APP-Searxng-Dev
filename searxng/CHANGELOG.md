@@ -23,18 +23,6 @@ All notable changes to this Home Assistant SearXNG App are documented here.
     issues in the browser.
   - Instead of needing to type the full engine for `autocomplete`,
     it is now a dropdown menu to prevent typing errors.
-  - Added per-category default-disabled engine lists for general web searches,
-    images, videos, news, maps, music, IT, science, files, and social
-    searches. Each category now exposes a list field such as
-    `disabled_engines_general`, `disabled_engines_images`,
-    `disabled_engines_videos`, `disabled_engines_news`, `disabled_engines_maps`,
-    `disabled_engines_music`, `disabled_engines_it`,
-    `disabled_engines_science`, `disabled_engines_files`, and
-    `disabled_engines_social`. These values are plain lists, so multiple
-    engines per category can be disabled while leaving all other engines to
-    keep SearXNG's upstream defaults.
-  - Translations changed for `mqtt_discovery_prefix`, `mqtt_base_topic`,
-    `base_url`, `disabled_engines`, and the new category labels.
 ### Fixed issues
 
 ## 1.2.0

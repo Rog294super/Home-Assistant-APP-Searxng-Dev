@@ -1,14 +1,14 @@
 # SearXNG for Home Assistant
 
-This app installs SearXNG as a self-hosted search engine for Home Assistant OS or Supervised installations. It is designed to run directly on your host network, let the server owner set category-specific default-disabled engines, and be reached through your own local domain names such as `searxng.lan` or `searxng.local` rather than through Home Assistant ingress.
+This app installs SearXNG as a self-hosted search engine for Home Assistant OS or Supervised installations. It is designed to run directly on your host network, expose per-engine switches in the app configuration UI, and be reached through your own local domain names such as `searxng.lan` or `searxng.local` rather than through Home Assistant ingress.
 
 ## What this app provides
 
 - Direct access at your Home Assistant host IP and port, without the usual Home Assistant ingress path.
-- Per-category engine blacklists that disable selected engines by default while leaving all other engines to keep SearXNG's upstream defaults.
+- Simple on/off toggles for individual search engines, Will be replaced with a configurable list of engines to be disabled.
 - A local, privacy-friendly alternative to public search services.
 - Compatibility with a custom DNS setup or reverse proxy for cleaner URLs.
-- Optional MQTT Discovery sensors for SearXNG statistics, depending on an MQTT broker like `Mosquitto broker`.
+- Optional MQTT Discovery sensors for SearXNG statistics, Dependant on a MQTT Broker like `Mosquitto broker`.
 
 ## Installation
 
@@ -16,7 +16,7 @@ This app installs SearXNG as a self-hosted search engine for Home Assistant OS o
    `https://github.com/Rog294super/Home-Assistant-APP-Searxng`
 2. Open Home Assistant and go to **Settings → apps → app Store**.
 3. Use **Check for updates**, then look for **SearXNG** under **Local apps**.
-4. Install the app, configure the per-category default-disabled engine lists under **Configuration**, and then click **Start**.
+4. Install the app, configure the engine switches under **Configuration**, and then click **Start**.
 5. Open the **Log** tab to confirm that the generated `settings.yml` was created correctly.
 
 The first installation may take some time because the image is built on the device from the included Dockerfile.
@@ -53,47 +53,17 @@ The SearXNG container listens internally on port `18080`, and the app exposes th
 
 If you want a cleaner URL such as `http://searxng.lan/`, consider using a reverse proxy such as `Nginx Proxy manager` or Caddy and forward traffic to your Home Assistant host IP and the SearXNG port.
 
-## Configuring default-disabled engines per category
+## Configuring disabled search engines
 
-The app exposes per-category lists that let the server owner disable selected engines by default for each SearXNG category while leaving all other engines untouched.
+When you want a engine to be not enabled by default for clients, Enter the search engine name in the field and click ENTER.
+Don't forget to save the changes.
+For available engines check: `[Link](https://docs.searxng.org/user/configured_engines.html)`.
 
-Available fields in the Home Assistant configuration are:
+## DEPRECATED Configuring search engines
 
-- `disabled_engines_general`
-- `disabled_engines_images`
-- `disabled_engines_videos`
-- `disabled_engines_news`
-- `disabled_engines_maps`
-- `disabled_engines_music`
-- `disabled_engines_it`
-- `disabled_engines_science`
-- `disabled_engines_files`
-- `disabled_engines_social`
+Each engine toggle in the app configuration must match the engine name used by SearXNG exactly. Some names contain spaces and are case-sensitive, so the value must be an exact match.
 
-Each field is a list of SearXNG engine names. If an engine is not listed in that category, SearXNG keeps using its upstream default behavior for that engine.
-
-Example:
-
-```yaml
-disabled_engines_general:
-  - google
-  - bing
-  - duckduckgo
-
-disabled_engines_images:
-  - google images
-  - bing images
-```
-
-You can add multiple engine names to the same category list. Engine names must match the names used by SearXNG exactly, including spaces where applicable.
-
-For the full list of engines supported by SearXNG, see: [Configured engines](https://docs.searxng.org/user/configured_engines.html).
-
-## Deprecated engine toggles
-
-Older versions used per-engine type fields such as `engine_general` or `engine_images` with `enabled`/`disabled` style values. Those are deprecated in the current configuration model. The active model is the list-based default-disable approach described above.
-
-Examples of valid engine names include:
+Examples that are commonly safe to use include:
 
 - `google`
 - `bing`
@@ -103,13 +73,10 @@ Examples of valid engine names include:
 - `youtube`
 - `reddit`
 - `stackoverflow`
-- `apple maps`
-- `openstreetmap`
-- `google_play_apps`
 
 Names such as `startpage`, `qwant`, and `wolframalpha` should be double-checked before relying on them.
 
-Engines not listed in a category remain enabled according to the upstream SearXNG defaults.
+Engines not named in config.yaml but used by searxng default settings.yml will use their default value.
 
 ## Troubleshooting
 
@@ -149,12 +116,6 @@ Once enabled and connected to the broker, the following entities will be automat
 - `sensor.searxng_average_response_time` - Average response time in milliseconds
 - `sensor.searxng_engine_count` - Number of active search engines
 - `sensor.searxng_engine_*` - Per-engine statistics (one sensor per enabled engine)
-- `sensor.searxng_last_checked` - Time of the last metrics poll
-
-Each sensor also has a `last_checked` attribute containing the UTC time of the
-last metrics poll. The monitor polls every 60 seconds, so this attribute keeps
-updating even when no new search has been performed and the metric values stay
-the same.
 
 ### Using Entities in Home Assistant
 
