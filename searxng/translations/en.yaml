@@ -145,7 +145,7 @@ configuration:
       category. Valid names: apk_mirror, apple_app_store, fdroid,
       google_play_apps.
 
-  disabled_engines_social:
+  disabled_engines_social_media:
     name: Disabled engines - Social media
     description: >
       Comma-separated SearXNG engine names to disable by default in the social media

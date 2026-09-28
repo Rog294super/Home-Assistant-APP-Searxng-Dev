@@ -134,7 +134,7 @@ configuration:
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
       in de bestanden-categorie. Geldige namen: apk_mirror, apple_app_store, fdroid, google_play_apps.
 
-  disabled_engines_social:
+  disabled_engines_social_media:
     name: Uitgeschakelde zoekmachines - Sociale media
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
