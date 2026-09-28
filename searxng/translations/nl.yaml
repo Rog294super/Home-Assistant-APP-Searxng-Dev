@@ -146,12 +146,14 @@ configuration:
     description: > 
       Verouderd compatibiliteitsveld met komma-gescheiden namen. 
       Gebruik bij voorkeur de per-categorievelden hierboven.
+      Wordt verwijderd in versie 1.3.0.
 
   engines:
-    name: Zoekmachines
+    name: Zoekmachines (legacy)
     description: >
       Engines die hier niet staan maar wel worden gebruikt door searxng settings.yml, 
       gebruiken default van searxng image.
+      Wordt verwijderd in versie 1.3.0.
 
   engines.google:
     name: Google
