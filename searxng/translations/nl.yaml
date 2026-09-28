@@ -18,12 +18,7 @@ configuration:
 
   autocomplete:
     name: Autocompleteprovider
-    description: >
-      Provider die wordt gebruikt voor zoeksuggesties.
-      Beschikbare autocomplete-backends zijn:
-      "360search", "baidu", "brave", "dbpedia", "duckduckgo", "google",
-      "yandex", "mwmbl", "naver", "seznam", "sogou", "startpage",
-      "stract", "swisscows", "quark", "qwant" en "wikipedia".
+    description: Provider die wordt gebruikt voor zoeksuggesties.
 
   safesearch:
     name: SafeSearch
@@ -140,10 +135,10 @@ configuration:
       in de bestanden-categorie. Geldige namen: apk_mirror, apple_app_store, fdroid, google_play_apps.
 
   disabled_engines_social:
-    name: Uitgeschakelde zoekmachines - Sociaal
+    name: Uitgeschakelde zoekmachines - Sociale media
     description: >
       Komma-gescheiden SearXNG-engine-namen die standaard uitgeschakeld worden
-      in de sociale categorie. Geldige namen: 9gag, boardreader, lemmy comments, lemmy communities, 
+      in de sociale media categorie. Geldige namen: 9gag, boardreader, lemmy comments, lemmy communities, 
       lemmy posts, lemmy users, mastodon hashtags, mastodon users, tootfinder.
 
   disabled_engines:

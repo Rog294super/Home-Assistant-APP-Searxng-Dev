@@ -206,7 +206,7 @@ disabled_engine_keys = [
     "disabled_engines_it",
     "disabled_engines_science",
     "disabled_engines_files",
-    "disabled_engines_social",
+    "disabled_engines_social_media",
 ]
 
 def parse_engine_names(values):

@@ -18,12 +18,7 @@ configuration:
   
   autocomplete:
     name: Autocomplete provider
-    description: > 
-      Provider used for search suggestions.
-      Existing autocomplete backends: 
-      "360search", "baidu", "brave", "dbpedia", "duckduckgo", "google", 
-      "yandex","mwmbl", "naver", "seznam", "sogou", "startpage", 
-      "stract", "swisscows", "quark", "qwant", "wikipedia"
+    description: Provider used for search suggestions.
   
   safesearch:
     name: SafeSearch
@@ -151,9 +146,9 @@ configuration:
       google_play_apps.
 
   disabled_engines_social:
-    name: Disabled engines - Social
+    name: Disabled engines - Social media
     description: >
-      Comma-separated SearXNG engine names to disable by default in the social
+      Comma-separated SearXNG engine names to disable by default in the social media
       category. Valid names: 9gag, boardreader, lemmy comments, lemmy communities,
       lemmy posts, lemmy users, mastodon hashtags, mastodon users, tootfinder.
 
@@ -162,12 +157,14 @@ configuration:
     description: >
       Deprecated comma-separated compatibility field. 
       Use the per-category fields above when possible.
+      Will be removed version 1.3.0
 
   engines:
-    name: Search engines
+    name: Search engines (legacy)
     description: >
       Engines which are not noted here but are used in the searxng setting.yml, 
-      are using default set by Searxng image
+      are using default set by Searxng image.
+      Will be removed version 1.3.0
 
   engines.google:
     name: Google

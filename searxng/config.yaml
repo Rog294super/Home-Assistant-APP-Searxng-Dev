@@ -69,7 +69,7 @@ options:
   disabled_engines_it: ""
   disabled_engines_science: ""
   disabled_engines_files: ""
-  disabled_engines_social: ""
+  disabled_engines_social_media: ""
 
   # Deprecated global compatibility field kept for older installs.
   disabled_engines: ""
@@ -115,7 +115,7 @@ schema:
   disabled_engines_it: str
   disabled_engines_science: str
   disabled_engines_files: str
-  disabled_engines_social: str
+  disabled_engines_social_media: str
 
   # Deprecated compatibility field.
   disabled_engines: str
