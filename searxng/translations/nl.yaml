@@ -2,9 +2,8 @@ configuration:
   base_url:
     name: Basis-URL
     description: >
-      Volledige openbare URL waarop SearXNG bereikbaar is, inclusief het schema.
-      Gebruik http:// of https:// en een geldige hostnaam, bijvoorbeeld:
-      https://searxng.local/
+      Optionele openbare URL waarop SearXNG bereikbaar is, inclusief het schema.
+      Laat leeg tenzij SearXNG links met een vast adres moet genereren.
 
   instance_name:
     name: Naam van de instantie
@@ -32,7 +31,7 @@ configuration:
 
   enable_metrics:
     name: Metrics-eindpunt inschakelen
-    description: Schakel het beveiligde metrics-eindpunt in dat door statistiekentiteiten wordt gebruikt.
+    description: Schakel het beveiligde metrics-eindpunt in dat statistiekentiteiten nodig hebben.
 
   enable_stats_entities:
     name: inschakelen statistieken entiteit.
@@ -146,14 +145,14 @@ configuration:
     description: > 
       Verouderd compatibiliteitsveld met komma-gescheiden namen. 
       Gebruik bij voorkeur de per-categorievelden hierboven.
-      Wordt verwijderd in versie 1.3.0.
+      Wordt verwijderd in versie 1.4.0.
 
   engines:
     name: Zoekmachines (legacy)
     description: >
       Engines die hier niet staan maar wel worden gebruikt door searxng settings.yml, 
       gebruiken default van searxng image.
-      Wordt verwijderd in versie 1.3.0.
+      Wordt verwijderd in versie 1.4.0.
 
   engines.google:
     name: Google

@@ -2,9 +2,8 @@ configuration:
   base_url:
     name: Base URL
     description: >
-      Full public URL where SearXNG is reachable, including the scheme.
-      Use http:// or https:// and a valid hostname, for example:
-      https://searxng.local/
+      Optional public URL where SearXNG is reachable, including the scheme.
+      Leave empty unless you need SearXNG to generate links using a fixed URL.
 
   instance_name:
     name: Instance name
@@ -30,7 +29,7 @@ configuration:
 
   enable_metrics:
     name: Enable metrics endpoint
-    description: Enable the authenticated metrics endpoint used by statistics entities.
+    description: Enable the authenticated metrics endpoint required by stats entities.
 
   enable_stats_entities:
     name: Enable entity stats.
@@ -157,14 +156,14 @@ configuration:
     description: >
       Deprecated comma-separated compatibility field. 
       Use the per-category fields above when possible.
-      Will be removed version 1.3.0
+      Will be removed version 1.4.0
 
   engines:
     name: Search engines (legacy)
     description: >
       Engines which are not noted here but are used in the searxng setting.yml, 
       are using default set by Searxng image.
-      Will be removed version 1.3.0
+      Will be removed version 1.4.0
 
   engines.google:
     name: Google
