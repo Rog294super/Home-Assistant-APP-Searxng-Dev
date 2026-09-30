@@ -81,7 +81,7 @@ fi
 echo "[searxng-app] Starting SearXNG on port $PORT via Granian"
 
 # Start SearXNG in the background
-SUPERVISOR_TOKEN= "$GRANIAN" \
+SUPERVISOR_TOKEN='' "$GRANIAN" \
     --interface wsgi \
     --host 0.0.0.0 \
     --port "$PORT" \
@@ -119,6 +119,7 @@ fi
 # Stop both child processes promptly when Supervisor stops the app.
 # ---------------------------------------------------------
 
+# shellcheck disable=SC2317
 shutdown() {
     trap - TERM INT
     kill "$GRANIAN_PID" 2>/dev/null || true
@@ -141,6 +142,5 @@ if [ -n "$MONITOR_PID" ]; then
     kill "$MONITOR_PID" 2>/dev/null || true
     wait "$MONITOR_PID" 2>/dev/null || true
 fi
-exit "$GRANIAN_STATUS"
-
 echo "[searxng-app] SearXNG service stopped"
+exit "$GRANIAN_STATUS"
