@@ -119,7 +119,7 @@ fi
 # Stop both child processes promptly when Supervisor stops the app.
 # ---------------------------------------------------------
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 shutdown() {
     trap - TERM INT
     kill "$GRANIAN_PID" 2>/dev/null || true
