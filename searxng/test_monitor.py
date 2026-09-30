@@ -2,6 +2,7 @@ import importlib.util
 import json
 import types
 import unittest
+from threading import Event
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -50,25 +51,25 @@ searxng_engines_request_count_total{engine_name="bing"} 3
             {
                 "requests": 10,
                 "engines": {
-                    "google": {"total": 7, "avg_response_time": 420.0},
+                    "google": {"total": 7, "median_response_time": 420.0},
                     "bing": {"total": 3},
                 },
-                "average_response_time": 420.0,
+                "median_response_time": 420.0,
             },
         )
 
     def test_get_stats_rejects_non_json_html(self):
         self.assertEqual(
             self.monitor._parse_metrics("<html>Service unavailable</html>"),
-            {"requests": 0, "average_response_time": 0, "engines": {}},
+            {"requests": 0, "median_response_time": 0, "engines": {}},
         )
 
     def test_process_stats_publishes_discovery_and_state_topics(self):
         self.monitor._save_published_engines = MagicMock()
         self.assertTrue(self.monitor._process_stats({
             "requests": 10,
-            "average_response_time": 42.5,
-            "engines": {"Google News": {"total": 7, "avg_response_time": 12.0}},
+            "median_response_time": 42.5,
+            "engines": {"Google News": {"total": 7, "median_response_time": 12.0}},
         }))
 
         publications = [call.args for call in self.monitor.mqtt_client.publish.call_args_list]
@@ -81,10 +82,12 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         discovery = next(publication[1] for publication in publications if publication[0] == "homeassistant/sensor/requests/config")
         payload = json.loads(discovery)
         self.assertEqual(payload["unique_id"], "searxng_requests")
-        self.assertEqual(payload["object_id"], "searxng_requests")
+        self.assertNotIn("object_id", payload)
         self.assertEqual(payload["default_entity_id"], "sensor.searxng_requests")
         self.assertEqual(payload["availability_topic"], "searxng/status")
         self.assertEqual(payload["state_class"], "total_increasing")
+        self.assertEqual(payload["entity_category"], "diagnostic")
+        self.assertEqual(payload["expire_after"], 180)
 
         last_checked_discovery = next(
             publication[1]
@@ -100,10 +103,39 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         )
         self.assertRegex(json.loads(attributes)["last_checked"], r"^20\d\d-\d\d-\d\dT.*\+00:00$")
 
+        engine_discovery = next(
+            publication[1]
+            for publication in publications
+            if publication[0] == "homeassistant/sensor/engine_google_news/config"
+        )
+        self.assertFalse(json.loads(engine_discovery)["enabled_by_default"])
+
     def test_publish_mqtt_is_noop_when_disabled(self):
         self.monitor.mqtt_enabled = False
         self.assertFalse(self.monitor._publish_mqtt("test/topic", "payload"))
         self.monitor.mqtt_client.publish.assert_not_called()
+
+    def test_stop_publishes_retained_offline_status(self):
+        self.monitor.stop_event = Event()
+        self.monitor.mqtt_connected = True
+        self.monitor.mqtt_client.publish.return_value.rc = 0
+
+        self.monitor.stop()
+
+        self.monitor.mqtt_client.publish.assert_called_once_with(
+            "searxng/status", "offline", qos=1, retain=True
+        )
+        self.monitor.mqtt_client.disconnect.assert_called_once()
+        self.monitor.mqtt_client.loop_stop.assert_called_once()
+        self.assertTrue(self.monitor.stop_event.is_set())
+
+    def test_disabled_monitor_returns_without_polling(self):
+        self.monitor.enabled = False
+        self.monitor._get_stats = MagicMock()
+
+        self.monitor.run()
+
+        self.monitor._get_stats.assert_not_called()
 
     def test_availability_changes_with_broker_connection(self):
         self.monitor._last_stats = None
@@ -116,7 +148,7 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         self.assertEqual(availability[0][1], "online")
 
     def test_reconnect_republishes_last_stats(self):
-        self.monitor._last_stats = {"requests": 3, "average_response_time": 10, "engines": {}}
+        self.monitor._last_stats = {"requests": 3, "median_response_time": 10, "engines": {}}
         self.monitor._process_stats = MagicMock()
         self.monitor._on_mqtt_connect(self.monitor.mqtt_client, None, {}, 0)
         self.monitor._process_stats.assert_called_once_with(self.monitor._last_stats)
@@ -130,11 +162,33 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         paho_package = types.ModuleType("paho")
         paho_package.mqtt = mqtt_package
         self.monitor.options = {}
-        with patch.dict("sys.modules", {"paho": paho_package, "paho.mqtt": mqtt_package, "paho.mqtt.client": mqtt_module}), patch.dict("os.environ", {"MQTT_HOST": "core-mosquitto"}, clear=False):
-            self.monitor._connect_mqtt()
+        with patch.dict("sys.modules", {"paho": paho_package, "paho.mqtt": mqtt_package, "paho.mqtt.client": mqtt_module}):
+            self.monitor._connect_mqtt({"host": "core-mosquitto", "port": 1883})
         mqtt_module.Client.assert_called_once_with(
             callback_api_version="version2", client_id="searxng-searxng"
         )
+
+    def test_mqtt_service_config_uses_supervisor_token_and_retries(self):
+        response = FakeResponse(
+            json.dumps({
+                "data": {
+                    "host": "core-mosquitto",
+                    "port": 1883,
+                    "username": "searxng",
+                    "password": "secret",
+                }
+            }).encode()
+        )
+        with patch.dict("os.environ", {"SUPERVISOR_TOKEN": "token"}), patch.object(
+            monitor_module.urllib.request, "urlopen", return_value=response
+        ) as urlopen:
+            service = self.monitor._get_mqtt_service_config()
+
+        self.assertEqual(service["host"], "core-mosquitto")
+        self.assertEqual(service["password"], "secret")
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.full_url, "http://supervisor/services/mqtt")
+        self.assertEqual(request.get_header("Authorization"), "Bearer token")
 
 if __name__ == "__main__":
     unittest.main()
