@@ -7,7 +7,9 @@ Monitors SearXNG stats and registers them as Home Assistant entities
 import json
 import logging
 import os
+import signal
 import sys
+from threading import Event
 import time
 import urllib.request
 import urllib.error
@@ -32,6 +34,9 @@ class SearXNGMonitor:
     def __init__(self, options_file: str):
         self.options_file = options_file
         self.options = self._load_options()
+        self.stop_event = Event()
+        self.mqtt_client = None
+        self.mqtt_connected = False
         self.metrics_enabled = self.options.get("enable_metrics", True)
         
         # Check if entity registration is enabled
@@ -44,8 +49,6 @@ class SearXNGMonitor:
         self.instance_name = self.options.get("instance_name", "SearXNG")
         self.metrics_password = self._get_metrics_password()
         self.mqtt_enabled = self.options.get("enable_mqtt_discovery", True)
-        self.mqtt_client = None
-        self.mqtt_connected = False
         self.discovery_prefix = self.options.get("mqtt_discovery_prefix", "homeassistant")
         self.mqtt_base_topic = self.options.get("mqtt_base_topic", "searxng").strip("/")
         self._published_engines: Set[str] = self._load_published_engines()
@@ -53,7 +56,11 @@ class SearXNGMonitor:
         
         logger.info(f"Initialized SearXNG Monitor for {self.instance_name}")
         if self.mqtt_enabled:
-            self._connect_mqtt()
+            mqtt_service = self._get_mqtt_service_config()
+            if mqtt_service:
+                self._connect_mqtt(mqtt_service)
+            else:
+                self.mqtt_enabled = False
         logger.info(f"Update interval: {self.update_interval}s")
 
     def _load_options(self) -> Dict[str, Any]:
@@ -72,6 +79,44 @@ class SearXNGMonitor:
                 return secret_file.read().strip()
         except OSError:
             return ""
+
+    def _get_mqtt_service_config(self) -> Optional[Dict[str, Any]]:
+        """Fetch MQTT connection details from Supervisor without exporting them."""
+        token = os.environ.get("SUPERVISOR_TOKEN", "")
+        if not token:
+            logger.error("Cannot query Supervisor MQTT service: token is missing")
+            return None
+
+        for attempt in range(1, 13):
+            request = urllib.request.Request(
+                "http://supervisor/services/mqtt",
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "X-Supervisor-Token": token,
+                    "Accept": "application/json",
+                },
+            )
+            try:
+                with urllib.request.urlopen(request, timeout=10) as response:
+                    service = json.loads(response.read().decode("utf-8"))
+                    service = service.get("data", service)
+                    if isinstance(service, dict) and service.get("host"):
+                        logger.info("Loaded MQTT service configuration from Supervisor")
+                        return service
+                    raise ValueError("Supervisor returned no MQTT host")
+            except (
+                OSError,
+                urllib.error.URLError,
+                json.JSONDecodeError,
+                ValueError,
+            ) as error:
+                logger.warning(
+                    "Could not load MQTT service configuration "
+                    f"({attempt}/12): {error}"
+                )
+                if attempt < 12:
+                    time.sleep(5)
+        return None
 
     def _get_stats(self) -> Optional[Dict[str, Any]]:
         """Fetch engine metrics from SearXNG's authenticated metrics endpoint."""
@@ -114,16 +159,16 @@ class SearXNGMonitor:
             if "request_count" in metric_name:
                 engine["total"] = int(float(value))
             else:
-                engine["avg_response_time"] = round(float(value) * 1000, 2)
+                engine["median_response_time"] = round(float(value) * 1000, 2)
 
         response_times = [
-            engine["avg_response_time"]
+            engine["median_response_time"]
             for engine in engines.values()
-            if "avg_response_time" in engine
+            if "median_response_time" in engine
         ]
         return {
             "requests": sum(engine.get("total", 0) for engine in engines.values()),
-            "average_response_time": round(sum(response_times) / len(response_times), 2)
+            "median_response_time": round(sum(response_times) / len(response_times), 2)
             if response_times
             else 0,
             "engines": engines,
@@ -147,11 +192,11 @@ class SearXNGMonitor:
     def _availability_topic(self) -> str:
         return f"{self.mqtt_base_topic}/status"
 
-    def _connect_mqtt(self) -> None:
+    def _connect_mqtt(self, service: Dict[str, Any]) -> None:
         """Start Paho's network loop; it reconnects after broker outages."""
-        host = os.environ.get("MQTT_HOST", "").strip()
+        host = str(service.get("host", "")).strip()
         if not host:
-            logger.error("MQTT Discovery requires the HAOS mqtt:need service (MQTT_HOST is missing)")
+            logger.error("MQTT Discovery requires an available Supervisor MQTT service")
             self.mqtt_enabled = False
             return
         try:
@@ -161,14 +206,13 @@ class SearXNGMonitor:
                 callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
                 client_id=f"searxng-{self.instance_name.lower().replace(' ', '-')}"
             )
-            username = os.environ.get("MQTT_USER") or os.environ.get("MQTT_USERNAME")
+            username = service.get("username")
             if username:
-                password = os.environ.get("MQTT_PASSWORD", "")
-                client.username_pw_set(username, password)
+                client.username_pw_set(username, service.get("password", ""))
             client.will_set(self._availability_topic(), "offline", qos=1, retain=True)
             client.on_connect = self._on_mqtt_connect
             client.on_disconnect = self._on_mqtt_disconnect
-            port = int(os.environ.get("MQTT_PORT", "1883"))
+            port = int(service.get("port", 1883))
             client.connect_async(host, port, keepalive=60)
             self.mqtt_client = client
             client.loop_start()
@@ -199,12 +243,28 @@ class SearXNGMonitor:
             logger.warning(f"MQTT publish failed for {topic}: {error}")
             return False
 
-    def _publish_discovery(self, key: str, name: str, state: Any, attributes: Dict[str, Any], unit: Optional[str] = None, state_class: Optional[str] = None, device_class: Optional[str] = None) -> bool:
+    def stop(self) -> None:
+        """Publish retained offline status and stop the MQTT network loop."""
+        self.stop_event.set()
+        if not self.mqtt_client:
+            return
+        try:
+            if self.mqtt_connected:
+                message = self.mqtt_client.publish(
+                    self._availability_topic(), "offline", qos=1, retain=True
+                )
+                if message.rc == 0:
+                    message.wait_for_publish(timeout=5)
+            self.mqtt_client.disconnect()
+            self.mqtt_client.loop_stop()
+        except Exception as error:
+            logger.warning(f"Error while stopping MQTT monitor: {error}")
+
+    def _publish_discovery(self, key: str, name: str, state: Any, attributes: Dict[str, Any], unit: Optional[str] = None, state_class: Optional[str] = None, device_class: Optional[str] = None, enabled_by_default: bool = True) -> bool:
         state_topic = f"{self.mqtt_base_topic}/sensor/{key}/state"
         discovery_topic = f"{self.discovery_prefix}/sensor/{key}/config"
         payload: Dict[str, Any] = {
             "unique_id": f"searxng_{key}",
-            "object_id": f"searxng_{key}",
             "default_entity_id": f"sensor.searxng_{key}",
             "name": name,
             "state_topic": state_topic,
@@ -212,6 +272,9 @@ class SearXNGMonitor:
             "availability_topic": self._availability_topic(),
             "payload_available": "online",
             "payload_not_available": "offline",
+            "entity_category": "diagnostic",
+            "enabled_by_default": enabled_by_default,
+            "expire_after": self.update_interval * 3,
             "device": {
                 "identifiers": ["searxng"],
                 "name": self.instance_name,
@@ -237,14 +300,14 @@ class SearXNGMonitor:
         # Extract key metrics
         metrics = {
             "requests": stats.get("requests", 0),
-            "average_response_time": round(stats.get("average_response_time", 0), 2),
+            "median_response_time": round(stats.get("median_response_time", 0), 2),
             "engine_count": len(stats.get("engines", {})),
         }
 
         success_count = 0
         definitions = {
             "requests": ("SearXNG Requests", metrics["requests"], "count", "total_increasing", None),
-            "average_response_time": ("SearXNG Average Response Time", metrics["average_response_time"], "ms", "measurement", "duration"),
+            "average_response_time": ("SearXNG Median Response Time", metrics["median_response_time"], "ms", "measurement", "duration"),
             "engine_count": ("SearXNG Engine Count", metrics["engine_count"], None, "measurement", None),
             "last_checked": ("SearXNG Last Metrics Check", checked_at, None, None, "timestamp"),
         }
@@ -258,10 +321,10 @@ class SearXNGMonitor:
             current_engines.add(key)
             attributes = {
                 "requests": engine_stats.get("total", 0),
-                "avg_response_time": round(engine_stats.get("avg_response_time", 0), 2),
+                "median_response_time": round(engine_stats.get("median_response_time", 0), 2),
                 "last_checked": checked_at,
             }
-            if self._publish_discovery(key, f"SearXNG Engine {engine_name}", engine_stats.get("total", 0), attributes, "count", "total_increasing"):
+            if self._publish_discovery(key, f"SearXNG Engine {engine_name}", engine_stats.get("total", 0), attributes, "count", "total_increasing", enabled_by_default=False):
                 success_count += 1
 
         for removed_key in self._published_engines - current_engines:
@@ -282,7 +345,7 @@ class SearXNGMonitor:
         consecutive_failures = 0
         max_failures = 5
 
-        while True:
+        while not self.stop_event.is_set():
             try:
                 stats = self._get_stats()
                 if stats:
@@ -303,7 +366,7 @@ class SearXNGMonitor:
                 logger.error(f"Unexpected error in monitor loop: {e}")
                 consecutive_failures += 1
 
-            time.sleep(self.update_interval)
+            self.stop_event.wait(self.update_interval)
 
 
 if __name__ == "__main__":
@@ -314,8 +377,11 @@ if __name__ == "__main__":
     time.sleep(5)
 
     monitor = SearXNGMonitor(options_file)
+    signal.signal(signal.SIGTERM, lambda _signum, _frame: monitor.stop_event.set())
+    signal.signal(signal.SIGINT, lambda _signum, _frame: monitor.stop_event.set())
     try:
         monitor.run()
     except KeyboardInterrupt:
         logger.info("Monitor stopped by user")
-        sys.exit(0)
+    finally:
+        monitor.stop()

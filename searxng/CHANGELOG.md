@@ -2,32 +2,65 @@
 
 All notable changes to this Home Assistant SearXNG App are documented here.
 
-## 1.2.1
+## 1.3.0
 
 ### Message DEV
 **LEGACY ENGINES**: It has been decided that the legacy `engines` configuration will be removed earlier than
-    1.4.0. 
-    Possibly already by the next big update which as major update will be named V1.3.0. 
-    If there is no next big update but enough small updates, To the level that the app will reach V1.3.0 because incrementations, it will also be removed. 
-    If the removal happens earlier this will possibly be announced one update before.
+  1.4.0.
+  Possibly already by the next big update which as major update will be named V1.4.0.
+  If there is no next big update but enough small updates, To the level that the app will reach V1.4.0 because incrementations, it will also be removed.
+  If the removal happens earlier this will possibly be announced one update before.
 **LEGACY DISABLED_ENGINES**: With the addition of seperate category disabled engines, The following
     configuration `disabled_engines` will be removed at the same time as `engines`.
     Save your disabled engines in the specific category for the engines.
 
 ### Added
+- Added separate comma-separated disabled-engine fields for the general, images,
+  videos, news, maps, music, IT, science, files, and social media categories.
+  These are plain text fields in the Home Assistant configuration, and the
+  translations list the valid engine names for each category.
+- Engine settings generation now reads the per-category fields and removes
+  duplicate engine names. If none are configured, the existing global
+  `disabled_engines` option is used; if that is also empty, the legacy
+  `engines` options are used. With no engine overrides, SearXNG defaults apply.
+- Extracted settings generation into a separately tested Python module.
+- Added Dependabot updates for the Docker base image, Python dependencies, and
+  GitHub Actions.
 
 ### Changed
-  - Instead of writing the file /tmp/searxng-mqtt.env with `open(env_path, "w")`, 
-    it now gets created with restrictive rights as extra hardening.
-    File was kept safely withing container boundaries before and still will be.  
-  - Added a startup sanity check for the `base_url` option. Values without an
-    `http://` or `https://` prefix, or with a malformed double-slash path,
-    are now rejected with a clear warning in the logs instead of silently
-    starting SearXNG with a broken base URL that can trigger CSRF and redirect
-    issues in the browser.
-  - Instead of needing to type the full engine for `autocomplete`,
-    it is now a dropdown menu to prevent typing errors.
-### Fixed issues
+- Added a startup sanity check for the `base_url` option. Values without an
+  `http://` or `https://` prefix, or with a malformed double-slash path,
+  are now rejected with a clear warning in the logs instead of silently
+  starting SearXNG with a broken base URL that can trigger CSRF and redirect
+  issues in the browser.
+- The `autocomplete` provider is now selected from a dropdown.
+- The default `base_url` is now empty. When no engine overrides are set,
+  SearXNG uses its upstream engine defaults; legacy engine options remain
+  supported for compatibility.
+- MQTT service details are now fetched by the monitor with retries instead
+  of delaying SearXNG startup or exporting broker credentials to Granian.
+  MQTT is requested as an optional service.
+- MQTT statistics are marked as diagnostic; per-engine sensors are disabled
+  by default and expire after three polling intervals. The response-time
+  sensor is now named Median Response Time; its existing entity ID is kept.
+- Updated Home Assistant metadata with application startup, an MQTT `want`
+  dependency, and a health watchdog. Removed the unused writable configuration
+  mapping and unnecessary Supervisor API permission.
+- Pinned the SearXNG base image by multi-architecture digest and `paho-mqtt`
+  to version 2.1.0. Added the required Home Assistant Docker labels.
+- Pinned CI actions to commit SHAs, limited workflow permissions, and added
+  LF line endings for shell scripts. The redundant scheduled issue-comment
+  workflow was removed.
+
+### Fixed
+- Redacted `secret_key` and `open_metrics` from startup logs and restricted
+  permissions on generated secrets and settings files.
+- Fixed the monitor restart loop when stats entities are disabled and added
+  graceful SIGTERM/SIGINT cleanup, including retained MQTT offline status.
+- The app now rejects enabled stats entities when the metrics endpoint is
+  disabled, avoiding repeated failed metrics requests.
+- Added a warning in the documentation not to expose the unauthenticated search
+  service directly to the internet.
 
 ## 1.2.0
 

@@ -25,6 +25,8 @@ The first installation may take some time because the image is built on the devi
 
 This app does not create hostnames for you. It runs on the host network, but you still need DNS or local name resolution to make names like `searxng.lan` or `searxng.local` point to your Home Assistant host.
 
+SearXNG has no built-in user authentication in this app. Anyone who can reach its web port can use the search interface and API. Do not forward this port from the internet. For remote access, put it behind a reverse proxy that enforces authentication and TLS.
+
 ### Using AdGuard Home or equivalant as DNS
 
 If you already run AdGuard Home or equivalant, the easiest option is to add DNS rewrites:
@@ -94,26 +96,26 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery. MQT
 
 1. Install and configure the Mosquitto broker app with a user(searxng) and password.
 2. Make sure the MQTT integration is configured in Home Assistant.
-3. Install or restart SearXNG. The app reads the broker host, port, username, and password from the Supervisor MQTT service granted by `mqtt:need`.
+3. Install or restart SearXNG. When discovery is enabled, the monitor reads the broker host, port, username, and password from the optional Supervisor MQTT service requested by `mqtt:want`.
 4. Keep **Enable Stats Entities** and **Enable Metrics Endpoint** enabled.
 
-No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS `mqtt:need` service. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
+No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS MQTT service. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
 metrics endpoint** enabled when MQTT Discovery is enabled. The app stores
 the metrics password separately from SearXNG's `server.secret_key`; it is
 generated automatically and is not shown in the app configuration.
 
-Metrics can be disabled with **Enable metrics endpoint**, for example when
-entity registration is not needed. The endpoint is enabled by default for
-backwards compatibility.
+Metrics can be disabled with **Enable metrics endpoint** when stats entities
+are also disabled. The app rejects the combination of enabled stats entities
+and disabled metrics because the monitor requires the authenticated endpoint.
 
 ### Available Entities
 
 Once enabled and connected to the broker, the following entities will be automatically created in Home Assistant:
 
 - `sensor.searxng_requests` - Total number of search requests
-- `sensor.searxng_average_response_time` - Average response time in milliseconds
+- `sensor.searxng_average_response_time` - Median per-engine response time, averaged across engines, in milliseconds. The entity ID is retained for compatibility.
 - `sensor.searxng_engine_count` - Number of active search engines
 - `sensor.searxng_engine_*` - Per-engine statistics (one sensor per enabled engine)
 
@@ -163,7 +165,7 @@ template:
 
 To disable the monitor, set **Enable Stats Entities** to `off` and restart the app. MQTT Discovery is enabled automatically whenever the statistics monitor is enabled. Existing MQTT entities remain in Home Assistant until their discovery entries are removed manually.
 
-The entity monitor process will not start if this option is disabled, saving system resources.
+The entity monitor process will not start if stats entities or MQTT Discovery are disabled, saving system resources.
 
 ### Troubleshooting Entity Registration
 

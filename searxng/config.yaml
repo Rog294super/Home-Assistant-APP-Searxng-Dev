@@ -1,13 +1,11 @@
 name: "SearXNG"
-version: "1.2.1"
+version: "1.3.0"
 slug: "searxng"
 description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
 url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng"
 arch:
   - aarch64
   - amd64
-init: false
-hassio_api: true
 
 # host_network is the key setting that gets you away from the
 # "homeassistant.local:8123/api/hassio_ingress/xxxx/" style path.
@@ -22,22 +20,17 @@ host_network: true
 webui: "[PROTO:http]://[HOST]:[PORT:18080]"
 
 boot: auto
-startup: services
+startup: application
 services:
-  - mqtt:need
-
-# /data and the app's own config directory are the persistent storage
-# HA gives every app. We use /data to remember the auto-generated
-# secret_key across restarts and updates.
-map:
-  - type: app_config
-    read_only: false
-
-  - type: data
-    read_only: false
+  - mqtt:want
+watchdog: "http://[HOST]:[PORT:18080]/healthz"
+breaking_versions:
+  - "1.3.0"
+  - "1.4.0"
+  - "1.5.0"
 
 options:
-  base_url: "http://searxng.local/"
+  base_url: ""
   instance_name: "SearXNG"
   port: 18080
 
@@ -75,18 +68,7 @@ options:
   disabled_engines: ""
 
   # Legacy configuration retained for backwards compatibility.
-  engines:
-    google: true
-    bing: true
-    duckduckgo: true
-    startpage: false
-    qwant: false
-    wikipedia: true
-    github: true
-    youtube: true
-    reddit: false
-    stackoverflow: true
-    wolframalpha: false
+  engines: {}
 
 
 # Visible part with type in HAOS
@@ -121,14 +103,14 @@ schema:
   disabled_engines: str
 
   engines:
-    google: bool
-    bing: bool
-    duckduckgo: bool
-    startpage: bool
-    qwant: bool
-    wikipedia: bool
-    github: bool
-    youtube: bool
-    reddit: bool
-    stackoverflow: bool
-    wolframalpha: bool
+    google: "bool?"
+    bing: "bool?"
+    duckduckgo: "bool?"
+    startpage: "bool?"
+    qwant: "bool?"
+    wikipedia: "bool?"
+    github: "bool?"
+    youtube: "bool?"
+    reddit: "bool?"
+    stackoverflow: "bool?"
+    wolframalpha: "bool?"

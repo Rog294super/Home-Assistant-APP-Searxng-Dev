@@ -4,18 +4,28 @@
 # manifest, so the same FROM line resolves correctly on amd64/aarch64 hosts.
 # This image version should be updated with every version increase of the project. 
 # https://docs.searxng.org/#
-FROM searxng/searxng:2026.9.18-1f7711ef1
+FROM searxng/searxng:2026.9.30-a9d990033@sha256:a07a5cd2da2c63d66e559f9e4d3a3db106cfc6c32fb0ac70abe91cc28bcd7350
 
+ARG BUILD_ARCH
+ARG BUILD_VERSION
+LABEL io.hass.version="${BUILD_VERSION}" \
+    io.hass.type="app" \
+    io.hass.arch="${BUILD_ARCH}"
+
+COPY requirements.txt /tmp/searxng-requirements.txt
 RUN /usr/local/searxng/.venv/bin/python -m ensurepip --upgrade && \
-    /usr/local/searxng/.venv/bin/python -m pip install --no-cache-dir paho-mqtt
+    /usr/local/searxng/.venv/bin/python -m pip install --no-cache-dir -r /tmp/searxng-requirements.txt && \
+    rm /tmp/searxng-requirements.txt
 
 COPY run.sh /run.sh
 COPY monitor.py /monitor.py
+COPY generate_settings.py /generate_settings.py
 COPY validate_base_url.py /validate_base_url.py
 
 RUN sed -i 's/\r$//' /run.sh && \
     chmod 755 /run.sh && \
     chmod 755 /monitor.py && \
+    chmod 755 /generate_settings.py && \
     chmod 755 /validate_base_url.py
 
 ENTRYPOINT ["/bin/sh", "/run.sh"]
