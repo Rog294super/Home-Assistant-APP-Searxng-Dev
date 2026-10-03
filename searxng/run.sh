@@ -27,11 +27,6 @@ ENABLE_MQTT_DISCOVERY=$("$PYTHON" -c "import json; print(str(bool(json.load(open
 ENABLE_STATS_ENTITIES=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_stats_entities', True))).lower())")
 ENABLE_METRICS=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_metrics', True))).lower())")
 
-if [ "$ENABLE_STATS_ENTITIES" = "true" ] && [ "$ENABLE_METRICS" = "false" ]; then
-    echo "[searxng-app] ERROR: Enable Metrics must be enabled when stats entities are enabled."
-    exit 1
-fi
-
 # ---------------------------------------------------------
 # Persistent secret key — keep it stable across restarts
 # instead of regenerating (and invalidating sessions) every boot.
@@ -96,7 +91,8 @@ echo "[searxng-app] SearXNG started with PID $GRANIAN_PID"
 # ---------------------------------------------------------
 
 MONITOR_PID=""
-if [ "$ENABLE_STATS_ENTITIES" = "true" ] && [ "$ENABLE_MQTT_DISCOVERY" = "true" ] && \
+if [ "$ENABLE_STATS_ENTITIES" = "true" ] && [ "$ENABLE_METRICS" = "true" ] && \
+    [ "$ENABLE_MQTT_DISCOVERY" = "true" ] && \
     { command -v python3 >/dev/null 2>&1 || command -v "$PYTHON" >/dev/null 2>&1; }; then
     export OPTIONS_FILE="$OPTIONS_FILE"
     
@@ -111,7 +107,15 @@ if [ "$ENABLE_STATS_ENTITIES" = "true" ] && [ "$ENABLE_MQTT_DISCOVERY" = "true" 
     MONITOR_PID=$!
     echo "[searxng-app] Monitor supervisor started with PID $MONITOR_PID"
 else
-    echo "[searxng-app] Python not found, skipping entity monitor"
+    if [ "$ENABLE_STATS_ENTITIES" != "true" ]; then
+        echo "[searxng-app] Stats entities are disabled; skipping entity monitor"
+    elif [ "$ENABLE_METRICS" != "true" ]; then
+        echo "[searxng-app] WARNING: Metrics are disabled; skipping entity monitor while keeping SearXNG running"
+    elif [ "$ENABLE_MQTT_DISCOVERY" != "true" ]; then
+        echo "[searxng-app] MQTT Discovery is disabled; skipping entity monitor"
+    else
+        echo "[searxng-app] Python not found, skipping entity monitor"
+    fi
     MONITOR_PID=""
 fi
 

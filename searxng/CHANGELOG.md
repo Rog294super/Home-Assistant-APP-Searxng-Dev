@@ -15,15 +15,9 @@ All notable changes to this Home Assistant SearXNG App are documented here.
     Save your disabled engines in the specific category for the engines.
 
 ### Added
-- Added separate comma-separated disabled-engine fields for the general, images,
-  videos, news, maps, music, IT, science, files, and social media categories.
-  These are plain text fields in the Home Assistant configuration, and the
-  translations list the valid engine names for each category.
-- Engine settings generation now reads the per-category fields and removes
-  duplicate engine names. If none are configured, the existing global
-  `disabled_engines` option is used; if that is also empty, the legacy
-  `engines` options are used. With no engine overrides, SearXNG defaults apply.
-- Extracted settings generation into a separately tested Python module.
+- Extracted complete SearXNG settings generation from `run.sh` into a tested
+  Python module, including coverage for legacy settings and the single `search`
+  mapping.
 - Added Dependabot updates for the Docker base image, Python dependencies, and
   GitHub Actions.
 
@@ -34,33 +28,37 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   starting SearXNG with a broken base URL that can trigger CSRF and redirect
   issues in the browser.
 - The `autocomplete` provider is now selected from a dropdown.
-- The default `base_url` is now empty. When no engine overrides are set,
-  SearXNG uses its upstream engine defaults; legacy engine options remain
-  supported for compatibility.
-- MQTT service details are now fetched by the monitor with retries instead
-  of delaying SearXNG startup or exporting broker credentials to Granian.
-  MQTT is requested as an optional service.
+- The default `base_url` is now empty. New installations use SearXNG's upstream
+  engine defaults; saved legacy engine settings remain available when no
+  category override is set.
+- MQTT credentials are fetched by the monitor directly from Supervisor with
+  retries. SearXNG starts without waiting for MQTT, and the credentials are no
+  longer exported into the Granian process. MQTT is requested as optional.
 - MQTT statistics are marked as diagnostic; per-engine sensors are disabled
   by default and expire after three polling intervals. The response-time
-  sensor is now named Median Response Time; its existing entity ID is kept.
+  sensor is now named Median Response Time, obsolete discovery `object_id` is
+  removed, and the existing entity ID is retained.
 - Updated Home Assistant metadata with application startup, an MQTT `want`
   dependency, and a health watchdog. Removed the unused writable configuration
   mapping and unnecessary Supervisor API permission.
 - Pinned the SearXNG base image by multi-architecture digest and `paho-mqtt`
   to version 2.1.0. Added the required Home Assistant Docker labels.
-- Pinned CI actions to commit SHAs, limited workflow permissions, and added
-  LF line endings for shell scripts. The redundant scheduled issue-comment
-  workflow was removed.
+- Added LF line endings for shell scripts.
 
 ### Fixed
 - Redacted `secret_key` and `open_metrics` from startup logs and restricted
   permissions on generated secrets and settings files.
-- Fixed the monitor restart loop when stats entities are disabled and added
-  graceful SIGTERM/SIGINT cleanup, including retained MQTT offline status.
-- The app now rejects enabled stats entities when the metrics endpoint is
-  disabled, avoiding repeated failed metrics requests.
+- Added graceful SIGTERM/SIGINT cleanup, including retained MQTT offline status.
 - Added a warning in the documentation not to expose the unauthenticated search
   service directly to the internet.
+
+### Upgrade notes
+- Version 1.3.0 is marked as breaking and requires a manual update. If metrics
+  are disabled, SearXNG still starts; stats entities remain unavailable until
+  the metrics endpoint is enabled again.
+- The legacy `engines` and `disabled_engines` options remain supported for now,
+  but are planned for removal in 1.4.0. Move saved engine choices to the
+  category fields before that release.
 
 ## 1.2.1
 

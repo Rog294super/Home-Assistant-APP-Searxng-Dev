@@ -102,13 +102,15 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery. MQT
 No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS MQTT service. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
-metrics endpoint** enabled when MQTT Discovery is enabled. The app stores
+metrics endpoint** enabled to receive stats entities. If metrics are disabled,
+the app keeps SearXNG running and skips the statistics monitor until metrics
+are enabled again. The app stores
 the metrics password separately from SearXNG's `server.secret_key`; it is
 generated automatically and is not shown in the app configuration.
 
-Metrics can be disabled with **Enable metrics endpoint** when stats entities
-are also disabled. The app rejects the combination of enabled stats entities
-and disabled metrics because the monitor requires the authenticated endpoint.
+Metrics can be disabled with **Enable metrics endpoint** even when stats
+entities remain enabled. Those entities will not update until metrics are
+enabled again; the search service remains available.
 
 ### Available Entities
 
