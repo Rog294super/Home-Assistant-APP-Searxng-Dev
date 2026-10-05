@@ -2,6 +2,18 @@
 
 All notable changes to this Home Assistant SearXNG App are documented here.
 
+## 1.3.1
+
+### Added
+- Added Home Assistant app metadata validation and a non-publishing BuildKit
+  image build for `amd64` to CI. The image-build check currently covers only
+  `amd64`.
+
+### Changed
+
+### Fixed
+
+
 ## 1.3.0
 
 ### Message DEV
@@ -11,8 +23,8 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   If there is no next big update but enough small updates, To the level that the app will reach V1.4.0 because incrementations, it will also be removed.
   If the removal happens earlier this will possibly be announced one update before.
 **LEGACY DISABLED_ENGINES**: With the addition of seperate category disabled engines, The following
-    configuration `disabled_engines` will be removed at the same time as `engines`.
-    Save your disabled engines in the specific category for the engines.
+  configuration `disabled_engines` will be removed at the same time as `engines`.
+  Save your disabled engines in the specific category for the engines.
 
 ### Added
 - Extracted complete SearXNG settings generation from `run.sh` into a tested
