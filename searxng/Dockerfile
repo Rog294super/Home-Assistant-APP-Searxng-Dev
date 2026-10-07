@@ -14,7 +14,7 @@ LABEL io.hass.version="${BUILD_VERSION}" \
 
 COPY requirements.txt /tmp/searxng-requirements.txt
 RUN /usr/local/searxng/.venv/bin/python -m ensurepip --upgrade && \
-    /usr/local/searxng/.venv/bin/python -m pip install --no-cache-dir -r /tmp/searxng-requirements.txt && \
+    /usr/local/searxng/.venv/bin/python -m pip install --require-hashes --no-cache-dir -r /tmp/searxng-requirements.txt && \
     rm /tmp/searxng-requirements.txt
 
 COPY run.sh /run.sh

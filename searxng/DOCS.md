@@ -45,15 +45,19 @@ or use the built-in **Open Web UI** option from the app page.
 
 ### Important note about `.local`
 
-Windows clients often treat `.local` as a reserved multicast name suffix and may try to resolve it via mDNS or LLMNR before consulting your DNS server. This can make `searxng.local` unreliable on some machines. If you run into issues, `searxng.lan` is usually the more dependable choice, Except edge will see `searxng.lan` as a search querry and won't go to the domain.
+Windows clients often treat `.local` as a reserved multicast name suffix and may try to resolve it via mDNS or LLMNR before consulting your DNS server. This can make `searxng.local` unreliable on some machines. If you run into issues, `searxng.lan` is usually the more dependable choice.
 
 For more background, see this article: [Why using .local as a domain name extension is a bad idea](https://community.veeam.com/blogs-and-podcasts-57/why-using-local-as-your-domain-name-extension-is-a-bad-idea-4828).
 
 ## Port and URL notes
 
-The default SearXNG listening port is `18080`. The **Port** option changes the port SearXNG listens on; with host networking, that is also the port used on the Home Assistant host. The app's **Open Web UI** link and watchdog URL are currently fixed to port `18080`. If you configure a different port, open SearXNG directly at `http://<HOME_ASSISTANT_HOST>:<PORT>/`; the built-in link may be wrong and the watchdog may report the app as unhealthy or restart it.
+The app listens on the fixed internal port `18080`. Home Assistant uses the host-network interface directly, so the service is available on `http://<HOME_ASSISTANT_HOST>:18080/` unless you place a reverse proxy in front of it. The **Open Web UI** link and watchdog use the same fixed port, which keeps the app metadata and runtime behavior consistent.
 
-If you want a cleaner URL such as `http://searxng.lan/`, consider using a reverse proxy such as `Nginx Proxy manager` or Caddy and forward traffic to your Home Assistant host IP and the SearXNG port.
+If you want a cleaner URL such as `http://searxng.lan/`, consider using a reverse proxy such as Nginx Proxy Manager or Caddy and forward traffic to your Home Assistant host IP on port `18080`.
+
+## JSON search API
+
+The app enables both the HTML interface and JSON search API by default. Disable **Enable JSON API** when the service should expose only the HTML interface. The generated SearXNG settings are updated immediately when the option changes and the app is restarted.
 
 ## Configuring search engines
 
@@ -64,7 +68,7 @@ Engines not listed in these options keep their upstream SearXNG defaults. The le
 ## Troubleshooting
 
 - If the app starts but the web UI is not reachable, check your firewall rules and confirm that the host network setup is working.
-- If you changed the port from `18080`, use the configured port in the URL. The built-in **Open Web UI** link and watchdog still use `18080`; the link may be wrong and the watchdog may report the app as unhealthy or restart it.
+- The app always listens on port `18080`. Keep the reverse proxy or DNS entry aligned with that port.
 - If `searxng.local` does not resolve reliably, switch to `searxng.lan`.
 - If an engine does not appear as expected, verify that its name in the configuration exactly matches the engine name in SearXNG.
 - If something looks wrong, review the app logs, which print the generated settings on every boot.
@@ -82,7 +86,7 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery, whi
 
 The monitor starts only when all three options are enabled. **Enable Stats Entities** controls whether the monitor runs, **Enable Metrics Endpoint** enables the authenticated SearXNG endpoint it reads, and **Enable MQTT Discovery** allows it to publish entities. If any one is disabled, SearXNG itself continues running, but the monitor does not start.
 
-No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS MQTT service. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
+No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS MQTT service. When the Supervisor MQTT service requests SSL, the monitor enables TLS automatically. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
 metrics endpoint** enabled to receive stats entities. If metrics are disabled,

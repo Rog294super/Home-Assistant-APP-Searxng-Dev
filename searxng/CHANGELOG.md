@@ -8,11 +8,24 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 - Added Home Assistant app metadata validation and a non-publishing BuildKit
   image build for `amd64` to CI. The image-build check currently covers only
   `amd64`.
+- Added the `enable_json_api` option to allow the JSON search API to be
+  disabled while keeping the HTML interface available.
+- Added an MQTT TLS connection when the Supervisor MQTT service requests SSL.
 
 ### Changed
+- Removed the configurable runtime port and fixed the app's internal port at
+  `18080` to keep the Home Assistant UI link, watchdog, and generated
+  settings consistent.
+- Strengthened `base_url` validation to reject credentials, query strings,
+  fragments, malformed hosts, and double-slash paths.
+- Updated the documentation and translations to match the current app
+  configuration and options.
+- Made MQTT engine state writes atomic and cleaned up removed discovery and
+  state topics by publishing empty retained messages.
 
 ### Fixed
-
+- Fixed reproducible dependency installation by pinning the Python dependency
+  hashes used by CI and the image build.
 
 ## 1.3.0
 
