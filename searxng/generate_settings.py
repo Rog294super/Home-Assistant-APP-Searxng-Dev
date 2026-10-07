@@ -58,11 +58,11 @@ def generate_settings(
             "secret_key": secret_key,
             "base_url": base_url,
             "image_proxy": bool(options.get("image_proxy", True)),
-            "port": int(options.get("port", 18080)),
+            "port": 18080,
         },
         "search": {
             "safesearch": int(options.get("safesearch", 0)),
-            "formats": ["html", "json"],
+            "formats": ["html"] if not bool(options.get("enable_json_api", True)) else ["html", "json"],
         },
     }
 

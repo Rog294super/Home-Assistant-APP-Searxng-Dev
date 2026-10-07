@@ -53,6 +53,11 @@ class TestGenerateSettings(unittest.TestCase):
             ],
         )
 
+    def test_json_api_can_be_disabled(self):
+        settings = generate_settings({"enable_json_api": False}, "secret", "metrics")
+
+        self.assertEqual(settings["search"]["formats"], ["html"])
+
     def test_legacy_engine_overrides_remain_supported(self):
         settings = generate_settings(
             {"engines": {"google": True, "reddit": False}}, "secret", "metrics"

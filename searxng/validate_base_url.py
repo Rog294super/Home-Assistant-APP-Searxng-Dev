@@ -22,5 +22,11 @@ def validate_base_url(value):
 
     if parsed.path.startswith("//"):
         raise ValueError("base_url must not contain a double slash after the hostname")
+    if parsed.username or parsed.password:
+        raise ValueError("base_url must not contain credentials")
+    if parsed.query or parsed.fragment:
+        raise ValueError("base_url must not contain query strings or fragments")
+    if not parsed.hostname:
+        raise ValueError("base_url must include a valid hostname")
 
     return candidate

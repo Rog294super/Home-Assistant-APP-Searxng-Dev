@@ -183,9 +183,12 @@ class SearXNGMonitor:
             return set()
 
     def _save_published_engines(self) -> None:
+        state_path = getattr(self, "_state_path", "/data/searxng_mqtt_engines.json")
         try:
-            with open("/data/searxng_mqtt_engines.json", "w") as state_file:
+            temp_path = f"{state_path}.tmp"
+            with open(temp_path, "w", encoding="utf-8") as state_file:
                 json.dump(sorted(self._published_engines), state_file)
+            os.replace(temp_path, state_path)
         except OSError as error:
             logger.warning(f"Could not persist MQTT engine state: {error}")
 
@@ -209,6 +212,8 @@ class SearXNGMonitor:
             username = service.get("username")
             if username:
                 client.username_pw_set(username, service.get("password", ""))
+            if service.get("ssl"):
+                client.tls_set()
             client.will_set(self._availability_topic(), "offline", qos=1, retain=True)
             client.on_connect = self._on_mqtt_connect
             client.on_disconnect = self._on_mqtt_disconnect
@@ -329,6 +334,8 @@ class SearXNGMonitor:
 
         for removed_key in self._published_engines - current_engines:
             self._publish_mqtt(f"{self.discovery_prefix}/sensor/{removed_key}/config", "", retain=True)
+            self._publish_mqtt(f"{self.mqtt_base_topic}/sensor/{removed_key}/state", "", retain=True)
+            self._publish_mqtt(f"{self.mqtt_base_topic}/sensor/{removed_key}/attributes", "", retain=True)
         self._published_engines = current_engines
         self._save_published_engines()
         logger.info(f"Published {success_count} MQTT sensors")

@@ -21,6 +21,14 @@ class TestValidateBaseUrl(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_base_url("https://example.com//")
 
+    def test_rejects_credentials_and_query_string(self):
+        with self.assertRaises(ValueError):
+            validate_base_url("https://user:pass@example.com/searxng/?a=b")
+
+    def test_rejects_fragment(self):
+        with self.assertRaises(ValueError):
+            validate_base_url("https://example.com/searxng/#fragment")
+
 
 if __name__ == "__main__":
     unittest.main()
