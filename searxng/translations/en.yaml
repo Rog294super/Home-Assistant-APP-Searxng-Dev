@@ -8,13 +8,7 @@ configuration:
   instance_name:
     name: Instance name
     description: Name displayed by SearXNG.
-  
-  port: 
-    name: Port
-    description: >
-      External port SearXNG, 
-      Point reverse proxy to this port.
-  
+
   autocomplete:
     name: Autocomplete provider
     description: Provider used for search suggestions.
@@ -34,6 +28,10 @@ configuration:
   enable_stats_entities:
     name: Enable entity stats.
     description: Enable this for sensors with stats about the searxng app.
+
+  enable_json_api:
+    name: Enable JSON API
+    description: Allow the SearXNG JSON search API. Disable this when only the HTML interface should be exposed.
 
   enable_mqtt_discovery:
     name: Enable MQTT Discovery

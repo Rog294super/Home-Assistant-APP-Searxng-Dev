@@ -31,7 +31,6 @@ breaking_versions:
 options:
   base_url: ""
   instance_name: "SearXNG"
-  port: 18080
 
   autocomplete: google
   safesearch: 0
@@ -43,6 +42,9 @@ options:
 
   # Home Assistant entity registration options
   enable_stats_entities: true
+
+  # Allow the JSON search API. Disable it when the app should expose only the HTML interface.
+  enable_json_api: true
 
   # MQTT Discovery is configured automatically through the HAOS MQTT service.
   # The service supplies broker host, port, username, and password.
@@ -74,7 +76,6 @@ options:
 schema:
   base_url: str
   instance_name: str
-  port: int(1024,65535)
 
   autocomplete: list(360search|baidu|brave|dbpedia|duckduckgo|google|yandex|mwmbl|naver|seznam|sogou|startpage|stract|swisscows|quark|qwant|wikipedia)
   safesearch: int(0,2)
@@ -82,6 +83,7 @@ schema:
   enable_metrics: bool
 
   enable_stats_entities: bool
+  enable_json_api: bool
   
   enable_mqtt_discovery: bool
   mqtt_discovery_prefix: str

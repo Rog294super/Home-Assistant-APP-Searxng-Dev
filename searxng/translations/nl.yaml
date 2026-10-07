@@ -9,12 +9,6 @@ configuration:
     name: Naam van de instantie
     description: Naam die door SearXNG wordt weergegeven.
 
-  port:
-    name: Poort
-    description: >
-      Externe poort waarop SearXNG beschikbaar is.
-      Laat een reverse proxy naar deze poort verwijzen.
-
   autocomplete:
     name: Autocompleteprovider
     description: Provider die wordt gebruikt voor zoeksuggesties.
@@ -36,6 +30,10 @@ configuration:
   enable_stats_entities:
     name: inschakelen statistieken entiteit.
     description: Schakel dit in voor sensors met statistieken over de searxng app.
+
+  enable_json_api:
+    name: JSON-API inschakelen
+    description: Sta de SearXNG JSON-search API toe. Schakel dit uit wanneer alleen de HTML-interface beschikbaar moet zijn.
 
   enable_mqtt_discovery:
     name: MQTT Discovery inschakelen
