@@ -38,8 +38,8 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install YAML test dependency
-        run: python -m pip install --require-hashes -r searxng/requirements.txt PyYAML
+      - name: Install pinned test dependencies
+        run: python -m pip install --require-hashes -r searxng/requirements.txt
 
       - name: Validate YAML and tests
         shell: bash
