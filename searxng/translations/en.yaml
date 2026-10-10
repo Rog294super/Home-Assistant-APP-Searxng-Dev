@@ -11,7 +11,7 @@ configuration:
 
   autocomplete:
     name: Autocomplete provider
-    description: Provider used for search suggestions. Leave empty to disable autocomplete.
+    description: Select Disabled to turn off search suggestions, or choose a provider.
   
   safesearch:
     name: SafeSearch
