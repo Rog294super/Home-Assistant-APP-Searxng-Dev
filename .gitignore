@@ -13,6 +13,8 @@ logs/
 
 # Environment variables
 .env
+.env.*
+*.pem
 
 # Docker volumes
 db-data/
