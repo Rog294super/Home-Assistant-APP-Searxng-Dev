@@ -25,6 +25,7 @@ DISABLED_ENGINE_KEYS = (
 
 
 def parse_engine_names(values: Any) -> list[str]:
+    """Normalize comma-separated strings and lists of engine names."""
     if isinstance(values, str):
         return [part.strip() for part in values.split(",") if part.strip()]
     if isinstance(values, list):
@@ -35,12 +36,13 @@ def parse_engine_names(values: Any) -> list[str]:
 def generate_settings(
     options: dict[str, Any], secret_key: str, metrics_secret: str
 ) -> dict[str, Any]:
+    """Build SearXNG settings, applying app options and legacy engine fallbacks."""
     base_url = options.get("base_url") or ""
     if base_url:
         try:
             base_url = validate_base_url(base_url)
         except ValueError as error:
-            print(f"[searxng-app] WARNING: Invalid base_url '{base_url}'. {error}")
+            print(f"[searxng-app] WARNING: Invalid base_url. {error}")
             print(
                 "[searxng-app] WARNING: SearXNG will continue without a configured "
                 "base_url to avoid broken redirects and CSRF errors."
@@ -62,10 +64,12 @@ def generate_settings(
         },
         "search": {
             "safesearch": int(options.get("safesearch", 0)),
+            # Keep HTML available; this option controls whether JSON is also exposed.
             "formats": ["html"] if not bool(options.get("enable_json_api", True)) else ["html", "json"],
         },
     }
 
+    # Omitting the key preserves SearXNG's upstream behavior when no provider is selected.
     if options.get("autocomplete"):
         settings["search"]["autocomplete"] = options["autocomplete"]
 
@@ -75,6 +79,7 @@ def generate_settings(
         for name in parse_engine_names(options.get(key, ""))
     ]
     if disabled_engine_names:
+        # Category fields take precedence over the legacy global engine options.
         print("[searxng-app] Using per-category disabled_engines configuration")
         settings["engines"] = [
             {"name": name, "disabled": True}
@@ -82,6 +87,7 @@ def generate_settings(
         ]
         return settings
 
+    # Apply legacy values only when no category-specific engine list was supplied.
     parsed_legacy = parse_engine_names(options.get("disabled_engines"))
     if parsed_legacy:
         print("[searxng-app] Using legacy disabled_engines configuration")
@@ -109,6 +115,7 @@ def generate_settings(
 def write_settings(
     options_path: str, settings_path: str, secret_key: str, metrics_secret: str
 ) -> None:
+    """Load app options and serialize the generated settings as YAML."""
     with Path(options_path).open(encoding="utf-8") as options_file:
         options = json.load(options_file)
     settings = generate_settings(options, secret_key, metrics_secret)

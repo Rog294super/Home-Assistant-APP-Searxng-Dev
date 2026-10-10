@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import tempfile
 import types
 import unittest
 from threading import Event
@@ -39,6 +40,25 @@ class TestMonitor(unittest.TestCase):
         self.monitor.mqtt_client = MagicMock()
         self.monitor.mqtt_client.publish.return_value.rc = 0
         self.monitor._published_engines = set()
+
+    def test_legacy_port_option_does_not_change_metrics_port(self):
+        with tempfile.TemporaryDirectory() as directory:
+            options_path = Path(directory) / "options.json"
+            options_path.write_text(
+                json.dumps({
+                    "port": 12345,
+                    "enable_stats_entities": True,
+                    "enable_metrics": True,
+                    "enable_mqtt_discovery": False,
+                }),
+                encoding="utf-8",
+            )
+            with patch.object(
+                monitor_module.SearXNGMonitor, "_get_metrics_password", return_value="metrics"
+            ):
+                monitor = monitor_module.SearXNGMonitor(str(options_path))
+
+        self.assertEqual(monitor.port, 18080)
 
     def test_parse_metrics(self):
         payload = """\

@@ -32,6 +32,7 @@ class SearXNGMonitor:
     update_interval = 60
 
     def __init__(self, options_file: str):
+        """Load app settings and initialize metrics polling and optional MQTT."""
         self.options_file = options_file
         self.options = self._load_options()
         self.stop_event = Event()
@@ -45,7 +46,7 @@ class SearXNGMonitor:
             logger.info("Entity registration is disabled in config")
             return
         
-        self.port = self.options.get("port", 18080)
+        self.port = 18080
         self.instance_name = self.options.get("instance_name", "SearXNG")
         self.metrics_password = self._get_metrics_password()
         self.mqtt_enabled = self.options.get("enable_mqtt_discovery", True)
@@ -87,6 +88,7 @@ class SearXNGMonitor:
             logger.error("Cannot query Supervisor MQTT service: token is missing")
             return None
 
+        # Supervisor may expose the MQTT service shortly after this app starts.
         for attempt in range(1, 13):
             request = urllib.request.Request(
                 "http://supervisor/services/mqtt",
@@ -125,6 +127,7 @@ class SearXNGMonitor:
         url = f"http://localhost:{self.port}/metrics"
         try:
             request = urllib.request.Request(url)
+            # SearXNG's metrics endpoint uses HTTP Basic Auth with an empty username.
             credentials = f":{getattr(self, 'metrics_password', '')}".encode("utf-8")
             request.add_header(
                 "Authorization",
@@ -146,6 +149,7 @@ class SearXNGMonitor:
     def _parse_metrics(self, text: str) -> Dict[str, Any]:
         """Convert SearXNG OpenMetrics output into the monitor's stats shape."""
         engines: Dict[str, Dict[str, Any]] = {}
+        # Parse only the per-engine counters this monitor publishes as sensors.
         pattern = re.compile(
             r"^searxng_engines_(request_count_total|response_time_total_seconds)"
             r'\{engine_name="([^"]+)"\}\s+([0-9.eE+-]+)$'
@@ -159,8 +163,10 @@ class SearXNGMonitor:
             if "request_count" in metric_name:
                 engine["total"] = int(float(value))
             else:
+                # The exported response-time value is in seconds; entities use ms.
                 engine["median_response_time"] = round(float(value) * 1000, 2)
 
+        # The aggregate sensor is the mean of engines that reported a response time.
         response_times = [
             engine["median_response_time"]
             for engine in engines.values()
@@ -180,9 +186,11 @@ class SearXNGMonitor:
             with open("/data/searxng_mqtt_engines.json") as state_file:
                 return set(json.load(state_file))
         except (OSError, TypeError, json.JSONDecodeError):
+            # A missing or damaged cache is safe; the next publish refreshes it.
             return set()
 
     def _save_published_engines(self) -> None:
+        """Atomically save engine IDs so interrupted writes do not corrupt state."""
         state_path = getattr(self, "_state_path", "/data/searxng_mqtt_engines.json")
         try:
             temp_path = f"{state_path}.tmp"
@@ -214,10 +222,12 @@ class SearXNGMonitor:
                 client.username_pw_set(username, service.get("password", ""))
             if service.get("ssl"):
                 client.tls_set()
+            # Retain offline status as the broker's Last Will if this process disconnects.
             client.will_set(self._availability_topic(), "offline", qos=1, retain=True)
             client.on_connect = self._on_mqtt_connect
             client.on_disconnect = self._on_mqtt_disconnect
             port = int(service.get("port", 1883))
+            # Connect asynchronously so a broker outage does not block app startup.
             client.connect_async(host, port, keepalive=60)
             self.mqtt_client = client
             client.loop_start()
@@ -225,6 +235,7 @@ class SearXNGMonitor:
             logger.error(f"MQTT broker connection failed ({host}): {error}")
 
     def _on_mqtt_connect(self, client: Any, userdata: Any, flags: Any, reason_code: Any, properties: Any = None) -> None:
+        """Mark MQTT available and republish cached stats after reconnecting."""
         if reason_code != 0:
             logger.error(f"MQTT broker rejected connection: {reason_code}")
             return
@@ -235,10 +246,12 @@ class SearXNGMonitor:
         logger.info("Connected to MQTT broker")
 
     def _on_mqtt_disconnect(self, client: Any, userdata: Any, disconnect_flags: Any = None, reason_code: Any = None, properties: Any = None) -> None:
+        """Mark MQTT unavailable until Paho reconnects to the broker."""
         self.mqtt_connected = False
         logger.warning("Disconnected from MQTT broker; waiting for reconnect")
 
     def _publish_mqtt(self, topic: str, payload: Any, retain: bool = False, qos: int = 0) -> bool:
+        """Publish only while connected and report whether the broker accepted it."""
         if not self.mqtt_enabled or not self.mqtt_client or not self.mqtt_connected:
             return False
         try:
@@ -266,6 +279,7 @@ class SearXNGMonitor:
             logger.warning(f"Error while stopping MQTT monitor: {error}")
 
     def _publish_discovery(self, key: str, name: str, state: Any, attributes: Dict[str, Any], unit: Optional[str] = None, state_class: Optional[str] = None, device_class: Optional[str] = None, enabled_by_default: bool = True) -> bool:
+        """Publish retained Home Assistant discovery, state, and attribute messages."""
         state_topic = f"{self.mqtt_base_topic}/sensor/{key}/state"
         discovery_topic = f"{self.discovery_prefix}/sensor/{key}/config"
         payload: Dict[str, Any] = {
@@ -293,13 +307,14 @@ class SearXNGMonitor:
             payload["state_class"] = state_class
         if device_class:
             payload["device_class"] = device_class
+        # Discovery and latest values stay available to Home Assistant between polls.
         configured = self._publish_mqtt(discovery_topic, payload, retain=True)
         published = self._publish_mqtt(state_topic, state, retain=True)
         published = self._publish_mqtt(f"{self.mqtt_base_topic}/sensor/{key}/attributes", attributes, retain=True) or published
         return configured and published
 
     def _process_stats(self, stats: Dict[str, Any]) -> bool:
-        """Process and register stats as entities"""
+        """Publish aggregate and per-engine stats, then clear removed engine topics."""
         self._last_stats = stats
         checked_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         # Extract key metrics
@@ -310,6 +325,7 @@ class SearXNGMonitor:
         }
 
         success_count = 0
+        # Each tuple supplies the sensor label, value, unit, state class, and device class.
         definitions = {
             "requests": ("SearXNG Requests", metrics["requests"], "count", "total_increasing", None),
             "average_response_time": ("SearXNG Median Response Time", metrics["median_response_time"], "ms", "measurement", "duration"),
@@ -322,6 +338,7 @@ class SearXNGMonitor:
 
         current_engines: Set[str] = set()
         for engine_name, engine_stats in stats.get("engines", {}).items():
+            # Normalize names so they form stable Home Assistant discovery IDs.
             key = "engine_" + re.sub(r"[^a-z0-9_]+", "_", engine_name.lower()).strip("_")
             current_engines.add(key)
             attributes = {
@@ -332,6 +349,7 @@ class SearXNGMonitor:
             if self._publish_discovery(key, f"SearXNG Engine {engine_name}", engine_stats.get("total", 0), attributes, "count", "total_increasing", enabled_by_default=False):
                 success_count += 1
 
+        # Empty retained payloads delete stale discovery and state from the broker.
         for removed_key in self._published_engines - current_engines:
             self._publish_mqtt(f"{self.discovery_prefix}/sensor/{removed_key}/config", "", retain=True)
             self._publish_mqtt(f"{self.mqtt_base_topic}/sensor/{removed_key}/state", "", retain=True)
@@ -342,13 +360,14 @@ class SearXNGMonitor:
         return success_count > 0
 
     def run(self) -> None:
-        """Main monitoring loop"""
+        """Poll metrics until stopped, tolerating temporary endpoint failures."""
         if not self.enabled:
             logger.info("Entity monitor is disabled, exiting")
             return
         
         logger.info(f"Starting monitor with {self.update_interval}s interval")
         
+        # Log repeated polling failures without stopping MQTT or the app process.
         consecutive_failures = 0
         max_failures = 5
 
