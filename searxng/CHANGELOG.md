@@ -9,7 +9,8 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   from appearing in app logs.
 - Enforced the fixed port `18080` in the startup script and statistics monitor,
   including when old installations retain a removed `port` option.
-- Disabled autocomplete by default; users can select a provider to enable it.
+- Added an explicit `Disabled` autocomplete option and made it the default;
+  users can select a provider to enable suggestions.
 
 ## 1.3.1
 

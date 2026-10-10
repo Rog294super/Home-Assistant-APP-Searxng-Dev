@@ -61,7 +61,7 @@ The app enables both the HTML interface and JSON search API by default. Disable 
 
 ## Autocomplete privacy
 
-Autocomplete is disabled by default. Select a provider in the app options to enable search suggestions; queries typed into the search box may then be sent to that provider. Leave the option empty to keep autocomplete disabled. Existing installations may retain a previously selected provider until the option is cleared.
+Autocomplete is disabled by default. Select **Disabled** to turn it off, or choose a provider to enable search suggestions; queries typed into the search box may then be sent to that provider. Existing installations may retain a previously selected provider until you select **Disabled**.
 
 ## Configuring search engines
 

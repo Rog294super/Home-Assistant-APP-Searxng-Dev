@@ -32,7 +32,7 @@ options:
   base_url: ""
   instance_name: "SearXNG"
 
-  autocomplete: ""
+  autocomplete: disabled
   safesearch: 0
   image_proxy: true
 
@@ -77,7 +77,7 @@ schema:
   base_url: str
   instance_name: str
 
-  autocomplete: "list(360search|baidu|brave|dbpedia|duckduckgo|google|yandex|mwmbl|naver|seznam|sogou|startpage|stract|swisscows|quark|qwant|wikipedia)?"
+  autocomplete: list(disabled|360search|baidu|brave|dbpedia|duckduckgo|google|yandex|mwmbl|naver|seznam|sogou|startpage|stract|swisscows|quark|qwant|wikipedia)
   safesearch: int(0,2)
   image_proxy: bool
   enable_metrics: bool
