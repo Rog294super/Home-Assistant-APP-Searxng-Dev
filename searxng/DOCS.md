@@ -59,6 +59,10 @@ If you want a cleaner URL such as `http://searxng.lan/`, consider using a revers
 
 The app enables both the HTML interface and JSON search API by default. Disable **Enable JSON API** when the service should expose only the HTML interface. The generated SearXNG settings are updated immediately when the option changes and the app is restarted.
 
+## Autocomplete privacy
+
+Autocomplete is disabled by default. Select a provider in the app options to enable search suggestions; queries typed into the search box may then be sent to that provider. Leave the option empty to keep autocomplete disabled. Existing installations may retain a previously selected provider until the option is cleared.
+
 ## Configuring search engines
 
 Use the `disabled_engines_<category>` options to disable engines by default in a category. Available categories are `general`, `images`, `videos`, `news`, `maps`, `music`, `it`, `science`, `files`, and `social_media`. Enter exact SearXNG engine names as a comma-separated list, for example `google, bing` in `disabled_engines_general`. Engine names can contain spaces and may be case-sensitive; use the names from the [SearXNG engine list](https://docs.searxng.org/user/configured_engines.html).

@@ -22,7 +22,8 @@ if [ ! -f "$OPTIONS_FILE" ]; then
     exit 1
 fi
 
-PORT=$("$PYTHON" -c "import json; print(json.load(open('$OPTIONS_FILE')).get('port', 18080))")
+# Keep the runtime port aligned with the app's web UI and watchdog metadata.
+PORT=18080
 ENABLE_MQTT_DISCOVERY=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_mqtt_discovery', True))).lower())")
 ENABLE_STATS_ENTITIES=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_stats_entities', True))).lower())")
 ENABLE_METRICS=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_metrics', True))).lower())")
@@ -35,6 +36,7 @@ ENABLE_METRICS=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTI
 if [ -f "$SECRET_FILE" ]; then
     SECRET_KEY=$(cat "$SECRET_FILE")
 else
+    # Hash random bytes to create a fixed-length key without storing raw entropy.
     SECRET_KEY=$(head -c 32 /dev/urandom | sha256sum | cut -d' ' -f1)
     echo "$SECRET_KEY" > "$SECRET_FILE"
     echo "[searxng-app] Generated and stored a new secret_key"
@@ -54,6 +56,7 @@ SECRET_KEY="$SECRET_KEY" METRICS_SECRET="$(cat "$METRICS_SECRET_FILE")" \
 chmod 600 "$SETTINGS_FILE"
 
 echo "[searxng-app] Generated settings:"
+# Settings contain credentials; mask them before writing the generated YAML to logs.
 sed -E 's/^([[:space:]]*(secret_key|open_metrics):).*/\1 "<redacted>"/' "$SETTINGS_FILE"
 
 export SEARXNG_SETTINGS_PATH="$SETTINGS_FILE"
@@ -76,6 +79,7 @@ fi
 echo "[searxng-app] Starting SearXNG on port $PORT via Granian"
 
 # Start SearXNG in the background
+# Clear the Supervisor token from the search process; only the monitor needs it.
 SUPERVISOR_TOKEN='' "$GRANIAN" \
     --interface wsgi \
     --host 0.0.0.0 \
@@ -125,6 +129,7 @@ fi
 
 # shellcheck disable=SC2317,SC2329
 shutdown() {
+    # Stop and reap both children so neither outlives the app container.
     trap - TERM INT
     kill "$GRANIAN_PID" 2>/dev/null || true
     if [ -n "$MONITOR_PID" ]; then
