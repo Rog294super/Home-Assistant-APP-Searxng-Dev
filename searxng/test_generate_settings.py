@@ -17,8 +17,8 @@ class TestGenerateSettings(unittest.TestCase):
         )
         run_script = Path(__file__).with_name("run.sh").read_text(encoding="utf-8")
 
-        self.assertEqual(config["options"]["autocomplete"], "")
-        self.assertTrue(config["schema"]["autocomplete"].endswith("?"))
+        self.assertEqual(config["options"]["autocomplete"], "disabled")
+        self.assertIn("disabled", config["schema"]["autocomplete"])
         self.assertNotIn("port", config["options"])
         self.assertIn("PORT=18080", run_script)
 
@@ -53,6 +53,13 @@ class TestGenerateSettings(unittest.TestCase):
 
     def test_autocomplete_is_omitted_when_empty(self):
         settings = generate_settings({"autocomplete": ""}, "secret", "metrics")
+
+        self.assertNotIn("autocomplete", settings["search"])
+
+    def test_autocomplete_disabled_option_is_omitted(self):
+        settings = generate_settings(
+            {"autocomplete": "disabled"}, "secret", "metrics"
+        )
 
         self.assertNotIn("autocomplete", settings["search"])
 

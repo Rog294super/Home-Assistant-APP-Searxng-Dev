@@ -70,7 +70,8 @@ def generate_settings(
     }
 
     # Omitting the key preserves SearXNG's upstream behavior when no provider is selected.
-    if options.get("autocomplete"):
+    autocomplete = options.get("autocomplete")
+    if autocomplete and autocomplete != "disabled":
         settings["search"]["autocomplete"] = options["autocomplete"]
 
     disabled_engine_names = [
