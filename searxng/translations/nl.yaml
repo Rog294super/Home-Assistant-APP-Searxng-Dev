@@ -42,14 +42,12 @@ configuration:
   mqtt_discovery_prefix:
     name: MQTT Discovery-prefix
     description: >
-      MQTT Discovery-prefix van Home Assistant, normaal homeassistant.
-      Meestal niet nodig om aan te passen.
+      Topicprefix met letters, cijfers, underscores, streepjes of schuine strepen.
 
   mqtt_base_topic:
     name: MQTT-state-topicprefix
     description: > 
-      Prefix voor SearXNG state-, attributen- en beschikbaarheidstopics. 
-      Meestal niet nodig om aan te passen.
+      Prefix met letters, cijfers, underscores, streepjes of schuine strepen voor SearXNG-topics.
       
   disabled_engines_general:
     name: Uitgeschakelde zoekmachines - Algemeen
