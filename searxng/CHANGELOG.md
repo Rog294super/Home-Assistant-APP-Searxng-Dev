@@ -2,23 +2,6 @@
 
 All notable changes to this Home Assistant SearXNG App are documented here.
 
-## Unreleased
-
-### Changed
-- Redacted invalid `base_url` values from startup warnings to prevent credentials
-  from appearing in app logs.
-- Enforced the fixed port `18080` in the startup script and statistics monitor,
-  including when old installations retain a removed `port` option.
-- Added an explicit `Disabled` autocomplete option and made it the default;
-  users can select a provider to enable suggestions.
-- Run the SearXNG web process as the unprivileged `searxng` user and restart
-  the statistics monitor if it exits unexpectedly.
-- Validate MQTT topic prefixes and sanitize the broker client ID derived from
-  the instance name.
-- Corrected response-time reporting to match SearXNG's average-time gauge.
-- Split test-only YAML dependencies from image dependencies and pin the CI
-  Python version; CI also builds amd64 and aarch64 images.
-
 ## 1.3.1
 
 ### Added
@@ -39,6 +22,19 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   configuration and options.
 - Made MQTT engine state writes atomic and cleaned up removed discovery and
   state topics by publishing empty retained messages.
+- Redacted invalid `base_url` values from startup warnings to prevent credentials
+  from appearing in app logs.
+- Enforced the fixed port `18080` in the startup script and statistics monitor,
+  including when old installations retain a removed `port` option.
+- Added an explicit `Disabled` autocomplete option and made it the default;
+  users can select a provider to enable suggestions.
+- Run the SearXNG web process as the unprivileged `searxng` user and restart
+  the statistics monitor if it exits unexpectedly.
+- Validate MQTT topic prefixes and sanitize the broker client ID derived from
+  the instance name.
+- Corrected response-time reporting to match SearXNG's average-time gauge.
+- Split test-only YAML dependencies from image dependencies and pin the CI
+  Python version; CI also builds amd64 and aarch64 images.
 
 ### Fixed
 - Fixed reproducible dependency installation by pinning the Python dependency
