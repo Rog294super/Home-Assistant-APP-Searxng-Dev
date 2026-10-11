@@ -54,6 +54,7 @@ chmod 600 "$SECRET_FILE" "$METRICS_SECRET_FILE"
 SECRET_KEY="$SECRET_KEY" METRICS_SECRET="$(cat "$METRICS_SECRET_FILE")" \
     "$PYTHON" /generate_settings.py "$OPTIONS_FILE" "$SETTINGS_FILE"
 chmod 600 "$SETTINGS_FILE"
+chown searxng:searxng "$SETTINGS_FILE"
 
 echo "[searxng-app] Generated settings:"
 # Settings contain credentials; mask them before writing the generated YAML to logs.
@@ -78,9 +79,15 @@ fi
 
 echo "[searxng-app] Starting SearXNG on port $PORT via Granian"
 
-# Start SearXNG in the background
-# Clear the Supervisor token from the search process; only the monitor needs it.
-SUPERVISOR_TOKEN='' "$GRANIAN" \
+run_as_searxng() {
+    # Drop supplementary groups, primary group, and uid before execing the server.
+    SUPERVISOR_TOKEN='' "$PYTHON" -c \
+        'import os, sys; os.setgroups([977]); os.setgid(977); os.setuid(977); os.execv(sys.argv[1], sys.argv[1:])' \
+        "$@"
+}
+
+# Start SearXNG as the unprivileged app user without the Supervisor token.
+run_as_searxng "$GRANIAN" \
     --interface wsgi \
     --host 0.0.0.0 \
     --port "$PORT" \
@@ -107,7 +114,36 @@ if [ "$ENABLE_STATS_ENTITIES" = "true" ] && [ "$ENABLE_METRICS" = "true" ] && \
         PYTHON_BIN="python3"
     fi
     
-    "$PYTHON_BIN" /monitor.py &
+    supervise_monitor() {
+        MONITOR_CHILD_PID=""
+        # shellcheck disable=SC2317,SC2329
+        stop_monitor_supervisor() {
+            trap - TERM INT
+            if [ -n "$MONITOR_CHILD_PID" ]; then
+                kill "$MONITOR_CHILD_PID" 2>/dev/null || true
+                wait "$MONITOR_CHILD_PID" 2>/dev/null || true
+            fi
+            exit 0
+        }
+        trap stop_monitor_supervisor TERM INT
+
+        while kill -0 "$GRANIAN_PID" 2>/dev/null; do
+            "$PYTHON_BIN" /monitor.py &
+            MONITOR_CHILD_PID=$!
+            if wait "$MONITOR_CHILD_PID"; then
+                MONITOR_STATUS=0
+            else
+                MONITOR_STATUS=$?
+            fi
+            MONITOR_CHILD_PID=""
+            if kill -0 "$GRANIAN_PID" 2>/dev/null; then
+                echo "[searxng-app] WARNING: Entity monitor exited with status $MONITOR_STATUS; restarting in 10 seconds"
+                sleep 10
+            fi
+        done
+    }
+
+    supervise_monitor &
     MONITOR_PID=$!
     echo "[searxng-app] Monitor supervisor started with PID $MONITOR_PID"
 else
