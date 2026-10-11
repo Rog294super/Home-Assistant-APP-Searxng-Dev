@@ -2,6 +2,8 @@ name: Quality checks
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 permissions:
@@ -10,7 +12,7 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -36,10 +38,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.x'
+          python-version: '3.14'
 
       - name: Install pinned test dependencies
-        run: python -m pip install --require-hashes -r searxng/requirements.txt
+        run: >-
+          python -m pip install --require-hashes
+          -r searxng/requirements.txt
+          -r searxng/requirements-test.txt
 
       - name: Validate YAML and tests
         shell: bash
@@ -62,6 +67,11 @@ jobs:
             echo 'No Python tests found under searxng; skipping unittest discovery.'
           fi
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+        with:
+          platforms: arm64
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
@@ -75,4 +85,15 @@ jobs:
           --build-arg BUILD_VERSION="$APP_VERSION"
           --tag local/searxng:ci
           --load
+          searxng
+
+      - name: Build Home Assistant app image for aarch64
+        env:
+          APP_VERSION: ${{ steps.app-info.outputs.version }}
+        run: >-
+          docker buildx build
+          --platform linux/arm64
+          --build-arg BUILD_ARCH=aarch64
+          --build-arg BUILD_VERSION="$APP_VERSION"
+          --output=type=cacheonly
           searxng
