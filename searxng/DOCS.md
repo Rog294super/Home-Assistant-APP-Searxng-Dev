@@ -1,6 +1,6 @@
 # SearXNG for Home Assistant
 
-This app installs SearXNG as a self-hosted search engine for Home Assistant OS or Supervised installations. It is designed to run directly on your host network, expose per-engine switches in the app configuration UI, and be reached through your own local domain names such as `searxng.lan` or `searxng.local` rather than through Home Assistant ingress.
+This app installs SearXNG as a self-hosted search engine for Home Assistant OS or Supervised installations. It is designed to run directly on your host network, expose category-level engine controls in the app configuration UI, and be reached through your own local domain names such as `searxng.lan` or `searxng.local` rather than through Home Assistant ingress.
 
 ## What this app provides
 
@@ -83,14 +83,14 @@ This app publishes SearXNG statistics through Home Assistant MQTT Discovery, whi
 
 ### Enabling MQTT Discovery
 
-1. Install and configure the Mosquitto broker app with a user(searxng) and password.
-2. Make sure the MQTT integration is configured in Home Assistant.
+1. Install and configure an MQTT broker app such as Mosquitto.
+2. Configure Home Assistant's MQTT integration so Supervisor can provide the broker connection details.
 3. Install or restart SearXNG. When discovery is enabled, the monitor reads the broker host, port, username, and password from the optional Supervisor MQTT service requested by `mqtt:want`.
 4. Enable all three options: **Enable Stats Entities**, **Enable Metrics Endpoint**, and **Enable MQTT Discovery**.
 
 The monitor starts only when all three options are enabled. **Enable Stats Entities** controls whether the monitor runs, **Enable Metrics Endpoint** enables the authenticated SearXNG endpoint it reads, and **Enable MQTT Discovery** allows it to publish entities. If any one is disabled, SearXNG itself continues running, but the monitor does not start.
 
-No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS MQTT service. When the Supervisor MQTT service requests SSL, the monitor enables TLS automatically. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`.
+No MQTT username, password, host, or port can be entered in the SearXNG app configuration. These values are supplied exclusively by the HAOS MQTT service. When the Supervisor MQTT service requests SSL, the monitor enables TLS automatically. The default Discovery prefix is `homeassistant` and the state prefix is `searxng`. Custom prefixes may contain letters, numbers, underscores, hyphens, and slashes; MQTT wildcards are not allowed.
 
 The statistics monitor uses the authenticated metrics endpoint. Keep **Enable
 metrics endpoint** enabled to receive stats entities. If metrics are disabled,
@@ -108,7 +108,7 @@ enabled again; the search service remains available.
 Once enabled and connected to the broker, the following entities will be automatically created in Home Assistant:
 
 - `sensor.searxng_requests` - Total number of search requests
-- `sensor.searxng_average_response_time` - Median per-engine response time, averaged across engines, in milliseconds. The entity ID is retained for compatibility.
+- `sensor.searxng_average_response_time` - Mean of SearXNG's per-engine average total response times, in milliseconds. The existing entity ID is retained for compatibility.
 - `sensor.searxng_engine_count` - Number of active search engines
 - `sensor.searxng_last_checked` - Time of the most recent metrics check
 - `sensor.searxng_engine_*` - Per-engine statistics (one sensor per enabled engine)
@@ -168,5 +168,5 @@ The entity monitor process will not start if stats entities or MQTT Discovery ar
 - **Entities not appearing**: Check the app logs for broker connection errors and confirm that the MQTT integration uses the same discovery prefix.
 - **Update delays**: Entities are refreshed every 60 seconds. This is the monitor polling interval; dashboard and Recorder refresh behavior is controlled by Home Assistant.
 - **Missing engine entities**: Only engines that are enabled in the app configuration will have corresponding entities.
-- **Supervisor MQTT service unavailable at startup**: The monitor retries fetching the service configuration up to 12 times, waiting 5 seconds between attempts. If it still cannot get a broker host, MQTT is disabled for that monitor process; restart the app after fixing the service.
+- **Supervisor MQTT service unavailable at startup**: The monitor retries fetching the service configuration up to 12 times, waiting 5 seconds between attempts, with a 10-second request timeout. This can delay sensors by about three minutes, but does not delay SearXNG startup. If the monitor exits, the app restarts it automatically after 10 seconds.
 - **Broker disconnects after a successful connection**: Paho's network loop attempts to reconnect. The retained MQTT Last Will marks the entities offline while disconnected; they return online after reconnection.

@@ -18,7 +18,7 @@ This app is designed to provide a lightweight, easy-to-maintain integration for 
 * Runs directly on the Home Assistant host network.
 * Automatically generates and persists a secure `secret_key`.
 * Keeps configuration as close as possible to the upstream defaults.
-* Supports enabling and disabling search engines through the Home Assistant configuration.
+* Supports category-level search-engine disable lists in the Home Assistant configuration.
 * **Automatic entity registration** — SearXNG statistics are registered as Home Assistant entities.
 * Designed for minimal maintenance across future SearXNG releases.
 
@@ -57,7 +57,7 @@ Common configuration options include:
 * Base URL
 * Instance name
 * Search engine configuration
-* **Enable Metrics** — Enable the authenticated metrics endpoint used by the SearXNG statistics monitor (default: enabled)
+* **Enable Metrics Endpoint** — Enable the authenticated metrics endpoint used by the statistics monitor (default: enabled)
 * **Enable Stats Entities** — Enable automatic registration of SearXNG statistics as Home Assistant entities (default: enabled)
 
 For detailed information about entity registration and usage examples, see the [DOCS.md](searxng/DOCS.md#home-assistant-entity-registration) file.
