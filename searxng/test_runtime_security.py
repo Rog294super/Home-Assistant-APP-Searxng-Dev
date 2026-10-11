@@ -58,8 +58,8 @@ class TestRuntimeSecurity(unittest.TestCase):
 
         self.monitor._process_stats({
             "requests": 5,
-            "median_response_time": 42,
-            "engines": {"Google": {"total": 2, "median_response_time": 12}},
+            "average_response_time": 42,
+            "engines": {"Google": {"total": 2, "average_response_time": 12}},
         })
 
         publications = [call.args for call in self.monitor.mqtt_client.publish.call_args_list]

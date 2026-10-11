@@ -1,6 +1,7 @@
 import unittest
 import json
 import io
+import re
 import tempfile
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -21,6 +22,9 @@ class TestGenerateSettings(unittest.TestCase):
         self.assertIn("disabled", config["schema"]["autocomplete"])
         self.assertNotIn("port", config["options"])
         self.assertIn("PORT=18080", run_script)
+        for key in ("mqtt_discovery_prefix", "mqtt_base_topic"):
+            self.assertTrue(config["schema"][key].startswith("match("))
+            self.assertRegex(config["options"][key], r"^[A-Za-z0-9_/-]+$")
 
     def test_settings_keep_search_options_and_use_upstream_engines(self):
         settings = generate_settings(
