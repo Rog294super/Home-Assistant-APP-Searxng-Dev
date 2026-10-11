@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import re
 import tempfile
 import types
 import unittest
@@ -41,6 +42,40 @@ class TestMonitor(unittest.TestCase):
         self.monitor.mqtt_client.publish.return_value.rc = 0
         self.monitor._published_engines = set()
 
+    def test_mqtt_topic_prefix_rejects_wildcards_and_uses_default(self):
+        self.assertEqual(
+            monitor_module.normalize_mqtt_topic_prefix("search/metrics", "searxng"),
+            "search/metrics",
+        )
+        self.assertEqual(
+            monitor_module.normalize_mqtt_topic_prefix("search/+", "searxng"),
+            "searxng",
+        )
+        self.assertEqual(
+            monitor_module.normalize_mqtt_topic_prefix("///", "searxng"),
+            "searxng",
+        )
+
+    def test_mqtt_client_id_is_ascii_safe_and_bounded(self):
+        client_id = monitor_module.make_mqtt_client_id("Office #1 Café / SearXNG")
+
+        self.assertEqual(client_id, "searxng-office-1-caf-se")
+        self.assertRegex(client_id, re.compile(r"^[a-z0-9-]+$"))
+        self.assertLessEqual(len(client_id), 23)
+
+        self.assertEqual(
+            monitor_module.make_mqtt_client_id("x" * 100),
+            f"searxng-{'x' * 15}",
+        )
+
+    def test_startup_drops_server_privileges_and_supervises_monitor(self):
+        run_script = Path(__file__).with_name("run.sh").read_text(encoding="utf-8")
+
+        self.assertIn("chown searxng:searxng \"$SETTINGS_FILE\"", run_script)
+        self.assertIn("os.setgroups([977]); os.setgid(977); os.setuid(977)", run_script)
+        self.assertIn("supervise_monitor()", run_script)
+        self.assertIn("MONITOR_CHILD_PID", run_script)
+
     def test_legacy_port_option_does_not_change_metrics_port(self):
         with tempfile.TemporaryDirectory() as directory:
             options_path = Path(directory) / "options.json"
@@ -71,25 +106,25 @@ searxng_engines_request_count_total{engine_name="bing"} 3
             {
                 "requests": 10,
                 "engines": {
-                    "google": {"total": 7, "median_response_time": 420.0},
+                    "google": {"total": 7, "average_response_time": 420.0},
                     "bing": {"total": 3},
                 },
-                "median_response_time": 420.0,
+                "average_response_time": 420.0,
             },
         )
 
     def test_get_stats_rejects_non_json_html(self):
         self.assertEqual(
             self.monitor._parse_metrics("<html>Service unavailable</html>"),
-            {"requests": 0, "median_response_time": 0, "engines": {}},
+            {"requests": 0, "average_response_time": 0, "engines": {}},
         )
 
     def test_process_stats_publishes_discovery_and_state_topics(self):
         self.monitor._save_published_engines = MagicMock()
         self.assertTrue(self.monitor._process_stats({
             "requests": 10,
-            "median_response_time": 42.5,
-            "engines": {"Google News": {"total": 7, "median_response_time": 12.0}},
+            "average_response_time": 42.5,
+            "engines": {"Google News": {"total": 7, "average_response_time": 12.0}},
         }))
 
         publications = [call.args for call in self.monitor.mqtt_client.publish.call_args_list]
@@ -168,7 +203,7 @@ searxng_engines_request_count_total{engine_name="bing"} 3
         self.assertEqual(availability[0][1], "online")
 
     def test_reconnect_republishes_last_stats(self):
-        self.monitor._last_stats = {"requests": 3, "median_response_time": 10, "engines": {}}
+        self.monitor._last_stats = {"requests": 3, "average_response_time": 10, "engines": {}}
         self.monitor._process_stats = MagicMock()
         self.monitor._on_mqtt_connect(self.monitor.mqtt_client, None, {}, 0)
         self.monitor._process_stats.assert_called_once_with(self.monitor._last_stats)

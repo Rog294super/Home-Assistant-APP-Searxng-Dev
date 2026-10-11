@@ -26,6 +26,22 @@ logging.basicConfig(
 logger = logging.getLogger("searxng-monitor")
 
 
+def normalize_mqtt_topic_prefix(value: Any, default: str) -> str:
+    """Use a safe MQTT prefix or fall back when legacy options are invalid."""
+    prefix = str(value or "").strip("/")
+    if not prefix or not re.fullmatch(r"[A-Za-z0-9_/-]+", prefix) or "//" in prefix:
+        logger.warning("Invalid MQTT topic prefix; using the default value")
+        return default
+    return prefix
+
+
+def make_mqtt_client_id(instance_name: str) -> str:
+    """Create a bounded ASCII client ID from the user-facing instance name."""
+    slug = re.sub(r"[^a-z0-9]+", "-", instance_name.lower()).strip("-")
+    slug = slug[:15].rstrip("-") or "instance"
+    return f"searxng-{slug}"
+
+
 class SearXNGMonitor:
     """Monitor SearXNG stats and expose them through MQTT Discovery."""
 
@@ -50,8 +66,12 @@ class SearXNGMonitor:
         self.instance_name = self.options.get("instance_name", "SearXNG")
         self.metrics_password = self._get_metrics_password()
         self.mqtt_enabled = self.options.get("enable_mqtt_discovery", True)
-        self.discovery_prefix = self.options.get("mqtt_discovery_prefix", "homeassistant")
-        self.mqtt_base_topic = self.options.get("mqtt_base_topic", "searxng").strip("/")
+        self.discovery_prefix = normalize_mqtt_topic_prefix(
+            self.options.get("mqtt_discovery_prefix"), "homeassistant"
+        )
+        self.mqtt_base_topic = normalize_mqtt_topic_prefix(
+            self.options.get("mqtt_base_topic"), "searxng"
+        )
         self._published_engines: Set[str] = self._load_published_engines()
         self._last_stats: Optional[Dict[str, Any]] = None
         
@@ -164,17 +184,17 @@ class SearXNGMonitor:
                 engine["total"] = int(float(value))
             else:
                 # The exported response-time value is in seconds; entities use ms.
-                engine["median_response_time"] = round(float(value) * 1000, 2)
+                engine["average_response_time"] = round(float(value) * 1000, 2)
 
-        # The aggregate sensor is the mean of engines that reported a response time.
+        # SearXNG exports per-engine averages; expose their mean as the aggregate.
         response_times = [
-            engine["median_response_time"]
+            engine["average_response_time"]
             for engine in engines.values()
-            if "median_response_time" in engine
+            if "average_response_time" in engine
         ]
         return {
             "requests": sum(engine.get("total", 0) for engine in engines.values()),
-            "median_response_time": round(sum(response_times) / len(response_times), 2)
+            "average_response_time": round(sum(response_times) / len(response_times), 2)
             if response_times
             else 0,
             "engines": engines,
@@ -215,7 +235,7 @@ class SearXNGMonitor:
 
             client = mqtt.Client(
                 callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-                client_id=f"searxng-{self.instance_name.lower().replace(' ', '-')}"
+                client_id=make_mqtt_client_id(self.instance_name),
             )
             username = service.get("username")
             if username:
@@ -320,7 +340,7 @@ class SearXNGMonitor:
         # Extract key metrics
         metrics = {
             "requests": stats.get("requests", 0),
-            "median_response_time": round(stats.get("median_response_time", 0), 2),
+            "average_response_time": round(stats.get("average_response_time", 0), 2),
             "engine_count": len(stats.get("engines", {})),
         }
 
@@ -328,7 +348,7 @@ class SearXNGMonitor:
         # Each tuple supplies the sensor label, value, unit, state class, and device class.
         definitions = {
             "requests": ("SearXNG Requests", metrics["requests"], "count", "total_increasing", None),
-            "average_response_time": ("SearXNG Median Response Time", metrics["median_response_time"], "ms", "measurement", "duration"),
+            "average_response_time": ("SearXNG Average Response Time", metrics["average_response_time"], "ms", "measurement", "duration"),
             "engine_count": ("SearXNG Engine Count", metrics["engine_count"], None, "measurement", None),
             "last_checked": ("SearXNG Last Metrics Check", checked_at, None, None, "timestamp"),
         }
@@ -343,7 +363,7 @@ class SearXNGMonitor:
             current_engines.add(key)
             attributes = {
                 "requests": engine_stats.get("total", 0),
-                "median_response_time": round(engine_stats.get("median_response_time", 0), 2),
+                "average_response_time": round(engine_stats.get("average_response_time", 0), 2),
                 "last_checked": checked_at,
             }
             if self._publish_discovery(key, f"SearXNG Engine {engine_name}", engine_stats.get("total", 0), attributes, "count", "total_increasing", enabled_by_default=False):
