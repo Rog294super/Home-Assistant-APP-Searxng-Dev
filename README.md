@@ -6,7 +6,7 @@
 
 ![Project Maintenance][maintenance-shield]
 
-[![Open your Home Assistant instance and show the add app repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FRog294super%2FHome-Assistant-APP-Searxng)
+[![Open your Home Assistant instance and show the add app repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FRog294super%2FHome-Assistant-APP-Searxng-Dev)
 
 A Home Assistant OS app that runs the official [**SearXNG**](https://github.com/searxng/searxng) metasearch engine while staying as close as possible to the upstream project.
 
@@ -39,7 +39,7 @@ Click the button above to add this repository to Home Assistant.
 
 Alternatively, add the following repository manually:
 
-https://github.com/Rog294super/Home-Assistant-APP-Searxng
+https://github.com/Rog294super/Home-Assistant-APP-Searxng-Dev
 
 1. Open **Settings → apps → app Store**.
 2. Add this repository as a custom repository.
@@ -82,8 +82,8 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-[releases-shield]: https://img.shields.io/github/v/release/Rog294super/Home-Assistant-APP-Searxng.svg
+[releases-shield]: https://img.shields.io/github/v/release/Rog294super/Home-Assistant-APP-Searxng-Dev.svg
 [project-stage-shield]: https://img.shields.io/badge/Project%20stage-Development-red.svg
-[license-shield]: https://img.shields.io/github/license/Rog294super/Home-Assistant-APP-Searxng.svg
+[license-shield]: https://img.shields.io/github/license/Rog294super/Home-Assistant-APP-Searxng-Dev.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
-[releases]: https://github.com/Rog294super/Home-Assistant-APP-Searxng/releases
+[releases]: https://github.com/Rog294super/Home-Assistant-APP-Searxng-Dev/releases
