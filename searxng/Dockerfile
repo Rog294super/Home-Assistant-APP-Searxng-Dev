@@ -4,7 +4,7 @@
 # manifest, so the same FROM line resolves correctly on amd64/aarch64 hosts.
 # This image version should be updated with every version increase of the project. 
 # https://docs.searxng.org/#
-FROM searxng/searxng:2026.10.11-ad46ebd7d@sha256:ddd642cae6eac75412938fd846ddbf440a2df029cfeae8a562b8b205f4e35e25
+FROM searxng/searxng:2026.10.17-decdfa6f7@sha256:9611ad42d304f5111c72b6c57e675c7b7735705a69b69faf63a8cb8d6d0b18ee
 
 ARG BUILD_ARCH
 ARG BUILD_VERSION
