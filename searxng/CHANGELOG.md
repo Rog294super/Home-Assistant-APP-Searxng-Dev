@@ -2,6 +2,15 @@
 
 All notable changes to this Home Assistant SearXNG App are documented here.
 
+## 1.4.1
+
+### Changed
+- Use the multi-architecture GHCR manifest so Supervisor pulls one image name
+  for both supported architectures.
+- Set `org.opencontainers.image.source` to the Public repository. @[Rog294super](https://github.com/Rog294super)
+- Update searxng/searxng image from 2026-11-1 to 2026-11-2 @[Rog294super](https://github.com/Rog294super)
+- Update valkey/valkey from 9.1.2 to 9.1.3 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/5))
+
 ## 1.4.0
 
 ### Breaking changes
@@ -10,7 +19,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   automations.
 - Automatic updates from 1.3.x are intentionally blocked so users can read this
   entry before upgrading.
-- Removal of the deprecated `Disabled_engines` and `Engines` configurations.
+- Removal of the deprecated `disabled_engines` and `engines` configurations.
 
 ### Added
 - Added Home Assistant app metadata validation and a non-publishing BuildKit
@@ -43,7 +52,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   the instance name.
 - Corrected response-time reporting to match SearXNG's average-time gauge.
 - Pinned the CI Python version; CI builds `amd64` and `aarch64` images.
-- Update searxng/searxng image from 2026-10-29 to 2026-11.1
+- Update searxng/searxng image from 2026-10-29 to 2026-11-1
 
 
 ### Fixed
