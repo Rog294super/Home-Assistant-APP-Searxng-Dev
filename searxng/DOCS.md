@@ -70,9 +70,15 @@ need to be configured. Restart the app after changing this option.
 
 If the app cannot start Valkey, it will not start SearXNG with the limiter
 enabled. If SearXNG is behind a reverse proxy, configure the proxy to forward
-the original client IP and ensure SearXNG trusts that proxy for the forwarded
-address. Otherwise, requests may be rate-limited as if they came from the proxy
-itself, causing clients to share a limit.
+the original client IP. Nginx Proxy Manager normally forwards these headers.
+Then set **Trusted proxy IPs** to the IP address or CIDR range that NPM uses
+when connecting to this app. Enter multiple values separated by commas, for
+example `172.30.33.4/32` (replace this example with NPM's actual address). Use
+the address as seen by SearXNG, not the public address of a client or the
+hostname `searxng.local`. Leave this option empty
+for direct access without a reverse proxy. The app validates the entries and
+writes them to SearXNG's `limiter.toml` at startup. Trust only the proxy address
+or a narrowly scoped subnet; otherwise, clients may spoof forwarded IP headers.
 
 ## Autocomplete privacy
 
