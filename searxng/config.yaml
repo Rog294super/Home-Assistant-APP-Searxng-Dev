@@ -1,5 +1,6 @@
 name: "SearXNG-Dev"
 version: "1.4.0"
+image: ghcr.io/rog294super/{arch}-searxng
 slug: "searxng"
 description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
 url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng-Dev"
