@@ -12,6 +12,7 @@ fi
 
 OPTIONS_FILE="/data/options.json"
 SETTINGS_FILE="/etc/searxng/settings.yml"
+LIMITER_SETTINGS_FILE="/etc/searxng/limiter.toml"
 SECRET_FILE="/data/generated_secret"
 METRICS_SECRET_FILE="/data/generated_metrics_secret"
 
@@ -59,6 +60,8 @@ SECRET_KEY="$SECRET_KEY" METRICS_SECRET="$(cat "$METRICS_SECRET_FILE")" \
     "$PYTHON" /generate_settings.py "$OPTIONS_FILE" "$SETTINGS_FILE"
 chmod 600 "$SETTINGS_FILE"
 chown searxng:searxng "$SETTINGS_FILE"
+chmod 600 "$LIMITER_SETTINGS_FILE"
+chown searxng:searxng "$LIMITER_SETTINGS_FILE"
 
 echo "[searxng-app] Generated settings:"
 # Settings contain credentials; mask them before writing the generated YAML to logs.
