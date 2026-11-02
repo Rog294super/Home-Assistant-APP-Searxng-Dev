@@ -129,6 +129,7 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          context: searxng
           image: ${{ matrix.image }}
           image-tags: |
             ${{ needs.plan.outputs.version }}
