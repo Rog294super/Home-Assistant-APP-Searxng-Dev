@@ -1,5 +1,5 @@
 name: "SearXNG-Dev"
-version: "1.3.1"
+version: "1.4.0"
 slug: "searxng"
 description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
 url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng"
@@ -46,6 +46,9 @@ options:
   # Allow the JSON search API. Disable it when the app should expose only the HTML interface.
   enable_json_api: true
 
+  # Starts a private Valkey instance managed by this app when enabled.
+  enable_rate_limiter: false
+
   # MQTT Discovery is configured automatically through the HAOS MQTT service.
   # The service supplies broker host, port, username, and password.
   enable_mqtt_discovery: true
@@ -84,6 +87,7 @@ schema:
 
   enable_stats_entities: bool
   enable_json_api: bool
+  enable_rate_limiter: bool
   
   enable_mqtt_discovery: bool
   mqtt_discovery_prefix: "match(^[A-Za-z0-9_/-]+$)"
