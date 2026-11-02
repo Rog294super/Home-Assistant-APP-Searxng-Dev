@@ -49,6 +49,9 @@ options:
   # Starts a private Valkey instance managed by this app when enabled.
   enable_rate_limiter: false
 
+  # Comma-separated IP addresses or CIDR ranges of trusted reverse proxies.
+  limiter_trusted_proxies: ""
+
   # MQTT Discovery is configured automatically through the HAOS MQTT service.
   # The service supplies broker host, port, username, and password.
   enable_mqtt_discovery: true
@@ -88,6 +91,7 @@ schema:
   enable_stats_entities: bool
   enable_json_api: bool
   enable_rate_limiter: bool
+  limiter_trusted_proxies: str
   
   enable_mqtt_discovery: bool
   mqtt_discovery_prefix: "match(^[A-Za-z0-9_/-]+$)"
