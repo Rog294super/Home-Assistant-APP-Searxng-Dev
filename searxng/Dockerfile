@@ -1,4 +1,4 @@
-FROM valkey/valkey:9.1.2@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd AS valkey-runtime
+FROM valkey/valkey:9.1.3@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7 AS valkey-runtime
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -20,7 +20,7 @@ RUN mkdir -p /opt/valkey/bin /opt/valkey/lib && \
 # This image version should be updated with every version increase of the project. 
 # https://hub.docker.com/r/searxng/searxng/
 # https://hub.docker.com/r/searxng/searxng/tags
-FROM searxng/searxng:2026.11.1-10db664f1@sha256:63f50f92d266cd2859193ed46c10de9f39d4e44fc24344b2f2f1d2a80ba3689c
+FROM searxng/searxng:2026.11.2-cccbc9e15@sha256:892ed5710603e38f9dc201e6a0b2f3f14dbdb8108edcadac30e55b165c979fb7
 
 COPY --from=valkey-runtime /opt/valkey /opt/valkey
 COPY valkey-server.sh /valkey-server.sh
@@ -30,7 +30,7 @@ ARG BUILD_VERSION
 LABEL io.hass.version="${BUILD_VERSION}" \
     io.hass.type="app" \
     io.hass.arch="${BUILD_ARCH}" \
-    org.opencontainers.image.source="https://github.com/Rog294super/Home-Assistant-APP-Searxng-Dev"
+    org.opencontainers.image.source="https://github.com/Rog294super/Home-Assistant-APP-Searxng"
 
 COPY requirements.txt /tmp/searxng-requirements.txt
 RUN /usr/local/searxng/.venv/bin/python -m ensurepip --upgrade && \
