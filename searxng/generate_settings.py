@@ -23,7 +23,6 @@ DISABLED_ENGINE_KEYS = (
     "disabled_engines_files",
     "disabled_engines_social_media",
 )
-DEFAULT_TRUSTED_PROXIES = ("127.0.0.0/8", "::1")
 
 
 def parse_engine_names(values: Any) -> list[str]:
@@ -59,13 +58,8 @@ def parse_trusted_proxies(values: Any) -> list[str]:
 
 
 def generate_limiter_config(options: dict[str, Any]) -> str:
-    """Build limiter.toml using the botdetection table expected by SearXNG."""
-    proxies = list(DEFAULT_TRUSTED_PROXIES)
-    for proxy in parse_trusted_proxies(
-        options.get("limiter_trusted_proxies", "")
-    ):
-        if proxy not in proxies:
-            proxies.append(proxy)
+    """Build a botdetection override, leaving SearXNG's schema defaults intact."""
+    proxies = parse_trusted_proxies(options.get("limiter_trusted_proxies", ""))
     lines = ["[botdetection]", "trusted_proxies = ["]
     lines.extend(f"  {json.dumps(proxy)}," for proxy in proxies)
     lines.append("]")
