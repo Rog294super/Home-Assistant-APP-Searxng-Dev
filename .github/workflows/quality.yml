@@ -26,11 +26,20 @@ jobs:
         with:
           path: searxng
 
+      - name: Normalize app version
+        id: app-version
+        shell: bash
+        env:
+          VERSION_JSON: ${{ steps.app-info.outputs.version }}
+        run: |
+          version=$(jq -r . <<< "$VERSION_JSON")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Check PR bump requirement for existing image tag
         if: github.event_name == 'pull_request'
         shell: bash
         env:
-          IMAGE_REF: ghcr.io/rog294super/searxng:${{ steps.app-info.outputs.version }}
+          IMAGE_REF: ghcr.io/rog294super/searxng:${{ steps.app-version.outputs.version }}
         run: |
           if ! docker buildx imagetools inspect "${IMAGE_REF}" >/tmp/searxng-tag-check.txt 2>&1; then
             if grep -Eq 'not found|manifest unknown|MANIFEST_UNKNOWN' /tmp/searxng-tag-check.txt; then
@@ -99,7 +108,7 @@ jobs:
 
       - name: Build Home Assistant app image for amd64
         env:
-          APP_VERSION: ${{ steps.app-info.outputs.version }}
+          APP_VERSION: ${{ steps.app-version.outputs.version }}
         run: >-
           docker buildx build
           --platform linux/amd64
@@ -128,7 +137,7 @@ jobs:
 
       - name: Build Home Assistant app image for aarch64
         env:
-          APP_VERSION: ${{ steps.app-info.outputs.version }}
+          APP_VERSION: ${{ steps.app-version.outputs.version }}
         run: >-
           docker buildx build
           --platform linux/arm64
