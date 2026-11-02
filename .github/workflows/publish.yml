@@ -9,7 +9,7 @@ on:
       - searxng/config.yaml
       - searxng/Dockerfile
       - searxng/requirements.txt
-      - searxng/run.sh
+      - searxng/run.sh.
       - searxng/monitor.py
       - searxng/generate_settings.py
       - searxng/validate_base_url.py
