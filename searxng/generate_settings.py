@@ -59,14 +59,14 @@ def parse_trusted_proxies(values: Any) -> list[str]:
 
 
 def generate_limiter_config(options: dict[str, Any]) -> str:
-    """Build limiter.toml with only the explicitly trusted proxy networks."""
+    """Build limiter.toml using the botdetection table expected by SearXNG."""
     proxies = list(DEFAULT_TRUSTED_PROXIES)
     for proxy in parse_trusted_proxies(
         options.get("limiter_trusted_proxies", "")
     ):
         if proxy not in proxies:
             proxies.append(proxy)
-    lines = ["trusted_proxies = ["]
+    lines = ["[botdetection]", "trusted_proxies = ["]
     lines.extend(f"  {json.dumps(proxy)}," for proxy in proxies)
     lines.append("]")
     return "\n".join(lines) + "\n"

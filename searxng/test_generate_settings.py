@@ -92,7 +92,9 @@ class TestGenerateSettings(unittest.TestCase):
         self.assertEqual(contents.count("\nsearch:"), 1)
         self.assertEqual(settings["search"]["formats"], ["html", "json"])
         self.assertEqual(settings["search"]["autocomplete"], "google")
-        self.assertEqual(limiter["trusted_proxies"], ["127.0.0.0/8", "::1"])
+        self.assertEqual(
+            limiter["botdetection"]["trusted_proxies"], ["127.0.0.0/8", "::1"]
+        )
 
     def test_per_category_engines_are_deduplicated(self):
         settings = generate_settings(
@@ -133,7 +135,7 @@ class TestGenerateSettings(unittest.TestCase):
             )
 
         self.assertEqual(
-            limiter["trusted_proxies"],
+            limiter["botdetection"]["trusted_proxies"],
             ["127.0.0.0/8", "::1", "192.168.1.5/32", "10.0.0.0/24"],
         )
 
