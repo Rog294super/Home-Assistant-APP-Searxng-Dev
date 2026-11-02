@@ -5,8 +5,13 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN mkdir -p /opt/valkey/bin /opt/valkey/lib && \
         cp /usr/local/bin/valkey-server /opt/valkey/bin/valkey-server && \
         ldd /usr/local/bin/valkey-server | \
-            awk '/=> \// { print $3 } /^\/.*ld-linux/ { print $1 }' | \
-            sort -u | while read -r library; do cp -L "$library" /opt/valkey/lib/; done
+            awk '/=> \// { print $3 } /ld-linux/ { print $1 }' | \
+            sort -u | while read -r library; do cp -L "$library" /opt/valkey/lib/; done && \
+        case "$(uname -m)" in \
+            x86_64) test -x /opt/valkey/lib/ld-linux-x86-64.so.2 ;; \
+            aarch64) test -x /opt/valkey/lib/ld-linux-aarch64.so.1 ;; \
+            *) echo "Unsupported Valkey architecture: $(uname -m)" >&2; exit 1 ;; \
+        esac
 
 # We build straight on top of the official multi-arch SearXNG image rather
 # than a Home Assistant base image, since it already ships the full Python
