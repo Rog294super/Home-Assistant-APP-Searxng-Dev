@@ -27,6 +27,10 @@ PORT=18080
 ENABLE_MQTT_DISCOVERY=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_mqtt_discovery', True))).lower())")
 ENABLE_STATS_ENTITIES=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_stats_entities', True))).lower())")
 ENABLE_METRICS=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_metrics', True))).lower())")
+ENABLE_RATE_LIMITER=$("$PYTHON" -c "import json; print(str(bool(json.load(open('$OPTIONS_FILE')).get('enable_rate_limiter', False))).lower())")
+VALKEY_DATA_DIR="/data/searxng-valkey"
+VALKEY_SOCKET="$VALKEY_DATA_DIR/valkey.sock"
+VALKEY_PID=""
 
 # ---------------------------------------------------------
 # Persistent secret key — keep it stable across restarts
@@ -85,6 +89,51 @@ run_as_searxng() {
         'import os, sys; os.setgroups([977]); os.setgid(977); os.setuid(977); os.execv(sys.argv[1], sys.argv[1:])' \
         "$@"
 }
+
+wait_for_valkey() {
+    # Probe through the same private socket SearXNG will use; never open TCP.
+    "$PYTHON" -c 'import sys, time, valkey
+client = valkey.Valkey.from_url("unix://" + sys.argv[1] + "?db=0", socket_connect_timeout=1, socket_timeout=1)
+for _ in range(30):
+    try:
+        client.ping()
+        break
+    except Exception:
+        time.sleep(0.5)
+else:
+    raise SystemExit("Valkey did not become ready")' "$VALKEY_SOCKET"
+}
+
+start_valkey() {
+    # Keep the limiter backend private to the app: the socket lives under the
+    # app's own data directory and is never exposed as a host TCP port.
+    echo "[searxng-app] Starting private Valkey for the rate limiter"
+    mkdir -p "$VALKEY_DATA_DIR"
+    chown -R 977:977 "$VALKEY_DATA_DIR"
+    chmod 700 "$VALKEY_DATA_DIR"
+    run_as_searxng /valkey-server.sh \
+        --port 0 \
+        --unixsocket "$VALKEY_SOCKET" \
+        --unixsocketperm 700 \
+        --dir "$VALKEY_DATA_DIR" \
+        --appendonly yes \
+        --save "" \
+        --maxmemory 64mb \
+        --maxmemory-policy allkeys-lru \
+        --logfile "" &
+    VALKEY_PID=$!
+    if ! wait_for_valkey; then
+        echo "[searxng-app] ERROR: Private Valkey failed to start; refusing to start SearXNG with the rate limiter enabled."
+        kill "$VALKEY_PID" 2>/dev/null || true
+        wait "$VALKEY_PID" 2>/dev/null || true
+        exit 1
+    fi
+    echo "[searxng-app] Private Valkey is ready on its protected Unix socket"
+}
+
+if [ "$ENABLE_RATE_LIMITER" = "true" ]; then
+    start_valkey
+fi
 
 # Start SearXNG as the unprivileged app user without the Supervisor token.
 run_as_searxng "$GRANIAN" \
@@ -168,15 +217,30 @@ shutdown() {
     # Stop and reap both children so neither outlives the app container.
     trap - TERM INT
     kill "$GRANIAN_PID" 2>/dev/null || true
+    if [ -n "$VALKEY_PID" ]; then
+        kill "$VALKEY_PID" 2>/dev/null || true
+    fi
     if [ -n "$MONITOR_PID" ]; then
         kill "$MONITOR_PID" 2>/dev/null || true
     fi
     wait "$GRANIAN_PID" 2>/dev/null || true
+    if [ -n "$VALKEY_PID" ]; then
+        wait "$VALKEY_PID" 2>/dev/null || true
+    fi
     if [ -n "$MONITOR_PID" ]; then
         wait "$MONITOR_PID" 2>/dev/null || true
     fi
 }
 trap shutdown TERM INT
+
+while kill -0 "$GRANIAN_PID" 2>/dev/null; do
+    if [ -n "$VALKEY_PID" ] && ! kill -0 "$VALKEY_PID" 2>/dev/null; then
+        echo "[searxng-app] ERROR: Private Valkey stopped; stopping SearXNG so the supervisor can restart the app."
+        kill "$GRANIAN_PID" 2>/dev/null || true
+        break
+    fi
+    sleep 2
+done
 
 if wait "$GRANIAN_PID"; then
     GRANIAN_STATUS=0
@@ -186,6 +250,10 @@ fi
 if [ -n "$MONITOR_PID" ]; then
     kill "$MONITOR_PID" 2>/dev/null || true
     wait "$MONITOR_PID" 2>/dev/null || true
+fi
+if [ -n "$VALKEY_PID" ]; then
+    kill "$VALKEY_PID" 2>/dev/null || true
+    wait "$VALKEY_PID" 2>/dev/null || true
 fi
 echo "[searxng-app] SearXNG service stopped"
 exit "$GRANIAN_STATUS"
