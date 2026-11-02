@@ -1,0 +1,148 @@
+name: Publish app image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - searxng/config.yaml
+      - searxng/Dockerfile
+      - searxng/requirements.txt
+      - searxng/run.sh
+      - searxng/monitor.py
+      - searxng/generate_settings.py
+      - searxng/validate_base_url.py
+      - searxng/valkey-server.sh
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    uses: ./.github/workflows/quality.yml
+    permissions:
+      contents: read
+
+  plan:
+    name: Plan publish
+    needs: quality
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      version: ${{ steps.version.outputs.version }}
+      build: ${{ steps.check.outputs.build }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Get app version
+        id: version
+        uses: home-assistant/actions/helpers/info@86d4564712fa02543c808e3a693dd04f9d3f8361 # 2026-10-26
+        with:
+          path: searxng
+
+      - name: Prepare build matrix
+        id: matrix
+        uses: home-assistant/builder/actions/prepare-multi-arch-matrix@7412f0023ea9b6e58e8bb5059f1660f51376f49a # 2026.09.0
+        with:
+          architectures: '["amd64", "aarch64"]'
+          image-name: searxng
+          registry-prefix: ghcr.io/rog294super
+
+      - name: Decide whether to build and publish
+        id: check
+        shell: bash
+        env:
+          IMAGE_REF: ghcr.io/rog294super/searxng:${{ steps.version.outputs.version }}
+          BEFORE_SHA: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          if ! docker buildx imagetools inspect "${IMAGE_REF}" >/dev/null 2>&1; then
+            echo "Image tag ${IMAGE_REF} does not exist yet; build is required."
+            echo "build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            echo "Manual workflow dispatch: skipping publish because the tag already exists."
+            echo "build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${BEFORE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed=$(git diff --name-only "${BEFORE_SHA}" "${GITHUB_SHA}" -- \
+            searxng/Dockerfile \
+            searxng/requirements.txt \
+            searxng/run.sh \
+            searxng/monitor.py \
+            searxng/generate_settings.py \
+            searxng/validate_base_url.py \
+            searxng/valkey-server.sh)
+
+          if [[ -n "${changed}" ]]; then
+            echo "::error::Image files changed but version was not bumped. Never push a different image under an existing tag."
+            exit 1
+          fi
+
+          echo "Image tag already exists and no image-affecting files changed; skipping build."
+          echo "build=false" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.arch }} image
+    needs: [quality, plan]
+    if: needs.plan.outputs.build == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build image for ${{ matrix.arch }}
+        uses: home-assistant/builder/actions/build-image@7412f0023ea9b6e58e8bb5059f1660f51376f49a # 2026.09.0
+        with:
+          arch: ${{ matrix.arch }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          image: ${{ matrix.image }}
+          image-tags: |
+            ${{ needs.plan.outputs.version }}
+          push: "true"
+          skip-existing: ${{ needs.plan.outputs.version }}
+          version: ${{ needs.plan.outputs.version }}
+
+  manifest:
+    name: Publish multi-arch manifest
+    needs: [quality, plan, build]
+    if: needs.plan.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    steps:
+      - name: Publish manifest
+        uses: home-assistant/builder/actions/publish-multi-arch-manifest@7412f0023ea9b6e58e8bb5059f1660f51376f49a # 2026.09.0
+        with:
+          architectures: '["amd64", "aarch64"]'
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          image-name: searxng
+          image-tags: |
+            ${{ needs.plan.outputs.version }}
+          registry-prefix: ghcr.io/rog294super
+          skip-existing: ${{ needs.plan.outputs.version }}

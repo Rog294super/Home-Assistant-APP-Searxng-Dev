@@ -2,7 +2,7 @@ name: "SearXNG-Dev"
 version: "1.4.0"
 slug: "searxng"
 description: "Privacy-respecting metasearch engine, reachable at your own LAN hostname instead of through HA ingress"
-url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng"
+url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng-Dev"
 arch:
   - aarch64
   - amd64
@@ -71,12 +71,6 @@ options:
   disabled_engines_files: ""
   disabled_engines_social_media: ""
 
-  # Deprecated global compatibility field kept for older installs.
-  disabled_engines: ""
-
-  # Legacy configuration retained for backwards compatibility.
-  engines: {}
-
 
 # Visible part with type in HAOS
 schema:
@@ -107,19 +101,3 @@ schema:
   disabled_engines_science: str
   disabled_engines_files: str
   disabled_engines_social_media: str
-
-  # Deprecated compatibility field.
-  disabled_engines: str
-
-  engines:
-    google: "bool?"
-    bing: "bool?"
-    duckduckgo: "bool?"
-    startpage: "bool?"
-    qwant: "bool?"
-    wikipedia: "bool?"
-    github: "bool?"
-    youtube: "bool?"
-    reddit: "bool?"
-    stackoverflow: "bool?"
-    wolframalpha: "bool?"

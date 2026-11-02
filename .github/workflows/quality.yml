@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -12,7 +13,7 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -21,9 +22,31 @@ jobs:
 
       - name: Validate Home Assistant app metadata
         id: app-info
-        uses: home-assistant/actions/helpers/info@86d4564712fa02543c808e3a693dd04f9d3f8361 # 2026-09-10
+        uses: home-assistant/actions/helpers/info@86d4564712fa02543c808e3a693dd04f9d3f8361 # 2026-10-26
         with:
           path: searxng
+
+      - name: Check PR bump requirement for existing image tag
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          IMAGE_REF: ghcr.io/rog294super/searxng:${{ steps.app-info.outputs.version }}
+        run: |
+          if ! docker buildx imagetools inspect "${IMAGE_REF}" >/tmp/searxng-tag-check.txt 2>&1; then
+            if grep -Eq 'not found|manifest unknown|MANIFEST_UNKNOWN' /tmp/searxng-tag-check.txt; then
+              echo "Image tag ${IMAGE_REF} does not exist yet; PR check passes silently."
+              exit 0
+            fi
+            echo "Could not inspect ${IMAGE_REF}; assuming package is not yet published."
+            exit 0
+          fi
+
+          if git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- searxng/Dockerfile searxng/requirements.txt searxng/run.sh searxng/monitor.py searxng/generate_settings.py searxng/validate_base_url.py searxng/valkey-server.sh | grep -q .; then
+            echo "::error::Image files changed but version was not bumped. Never push a different image under an existing tag."
+            exit 1
+          fi
+
+          echo "Existing image tag found and no image-affecting changes detected; PR check passes."
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # 2.0.0
@@ -74,7 +97,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      - name: Build Home Assistant app image
+      - name: Build Home Assistant app image for amd64
         env:
           APP_VERSION: ${{ steps.app-info.outputs.version }}
         run: >-
@@ -82,9 +105,26 @@ jobs:
           --platform linux/amd64
           --build-arg BUILD_ARCH=amd64
           --build-arg BUILD_VERSION="$APP_VERSION"
-          --tag local/searxng:ci
+          --tag local/searxng:ci-amd64
           --load
           searxng
+
+      - name: Smoke test Valkey on amd64 image
+        run: >-
+          docker run --rm --platform linux/amd64 --entrypoint /valkey-server.sh
+          local/searxng:ci-amd64 --version
+          | tee /tmp/valkey-amd64.txt
+
+      - name: Assert Valkey version output on amd64
+        shell: bash
+        run: |
+          grep -Eq 'Valkey|v=' /tmp/valkey-amd64.txt
+
+      - name: Smoke test Python dependencies on amd64 image
+        run: >-
+          docker run --rm --platform linux/amd64
+          --entrypoint /usr/local/searxng/.venv/bin/python
+          local/searxng:ci-amd64 -c "import valkey, yaml, paho.mqtt.client"
 
       - name: Build Home Assistant app image for aarch64
         env:
@@ -94,5 +134,23 @@ jobs:
           --platform linux/arm64
           --build-arg BUILD_ARCH=aarch64
           --build-arg BUILD_VERSION="$APP_VERSION"
-          --output=type=cacheonly
+          --tag local/searxng:ci-aarch64
+          --load
           searxng
+
+      - name: Smoke test Valkey on aarch64 image
+        run: >-
+          docker run --rm --platform linux/arm64 --entrypoint /valkey-server.sh
+          local/searxng:ci-aarch64 --version
+          | tee /tmp/valkey-arm64.txt
+
+      - name: Assert Valkey version output on aarch64
+        shell: bash
+        run: |
+          grep -Eq 'Valkey|v=' /tmp/valkey-arm64.txt
+
+      - name: Smoke test Python dependencies on aarch64 image
+        run: >-
+          docker run --rm --platform linux/arm64
+          --entrypoint /usr/local/searxng/.venv/bin/python
+          local/searxng:ci-aarch64 -c "import valkey, yaml, paho.mqtt.client"

@@ -4,10 +4,17 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 
 ## 1.4.0
 
+### Breaking changes
+- The configurable runtime port was removed and the app now always uses port
+  `18080`. Users with a custom port must update bookmarks, reverse proxies, and
+  automations.
+- Automatic updates from 1.3.x are intentionally blocked so users can read this
+  entry before upgrading.
+- Removal of the deprecated `Disabled_engines` and `Engines` configurations.
+
 ### Added
 - Added Home Assistant app metadata validation and a non-publishing BuildKit
-  image build for `amd64` to CI. The image-build check currently covers only
-  `amd64`.
+  image build for `amd64` and `aarch64` to CI.
 - Added an optional rate limiter backed by a private Valkey instance managed
   by the app. No separate Valkey app or service configuration is required.
 - Added the `enable_json_api` option to allow the JSON search API to be
@@ -35,9 +42,8 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 - Validate MQTT topic prefixes and sanitize the broker client ID derived from
   the instance name.
 - Corrected response-time reporting to match SearXNG's average-time gauge.
-- Split test-only YAML dependencies from image dependencies and pin the CI
-  Python version; CI also builds amd64 and aarch64 images.
-- Update searxng/searxng image from 2026-10-29 to 2026-?-?
+- Pinned the CI Python version; CI builds `amd64` and `aarch64` images.
+- Update searxng/searxng image from 2026-10-29 to 2026-11.1
 
 
 ### Fixed
