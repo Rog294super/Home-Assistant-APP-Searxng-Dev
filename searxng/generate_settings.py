@@ -1,5 +1,6 @@
 """Generate SearXNG settings from Home Assistant app options."""
 
+import ipaddress
 import json
 import os
 import sys
@@ -22,6 +23,7 @@ DISABLED_ENGINE_KEYS = (
     "disabled_engines_files",
     "disabled_engines_social_media",
 )
+DEFAULT_TRUSTED_PROXIES = ("127.0.0.0/8", "::1")
 
 
 def parse_engine_names(values: Any) -> list[str]:
@@ -31,6 +33,43 @@ def parse_engine_names(values: Any) -> list[str]:
     if isinstance(values, list):
         return [str(value).strip() for value in values if str(value).strip()]
     return []
+
+
+def parse_trusted_proxies(values: Any) -> list[str]:
+    """Validate and normalize comma-separated proxy IPs and CIDR networks."""
+    if values is None or values == "":
+        return []
+    if not isinstance(values, str):
+        raise ValueError("limiter_trusted_proxies must be a comma-separated string")
+
+    proxies: list[str] = []
+    for candidate in values.split(","):
+        candidate = candidate.strip()
+        if not candidate:
+            continue
+        try:
+            proxy_network = str(ipaddress.ip_network(candidate, strict=False))
+        except ValueError as error:
+            raise ValueError(
+                f"Invalid trusted proxy {candidate!r}; use an IP address or CIDR network"
+            ) from error
+        if proxy_network not in proxies:
+            proxies.append(proxy_network)
+    return proxies
+
+
+def generate_limiter_config(options: dict[str, Any]) -> str:
+    """Build limiter.toml with only the explicitly trusted proxy networks."""
+    proxies = list(DEFAULT_TRUSTED_PROXIES)
+    for proxy in parse_trusted_proxies(
+        options.get("limiter_trusted_proxies", "")
+    ):
+        if proxy not in proxies:
+            proxies.append(proxy)
+    lines = ["trusted_proxies = ["]
+    lines.extend(f"  {json.dumps(proxy)}," for proxy in proxies)
+    lines.append("]")
+    return "\n".join(lines) + "\n"
 
 
 def generate_settings(
@@ -126,9 +165,13 @@ def write_settings(
     with Path(options_path).open(encoding="utf-8") as options_file:
         options = json.load(options_file)
     settings = generate_settings(options, secret_key, metrics_secret)
+    limiter_config = generate_limiter_config(options)
+    limiter_path = Path(settings_path).with_name("limiter.toml")
     with Path(settings_path).open("w", encoding="utf-8") as settings_file:
         yaml.safe_dump(settings, settings_file, sort_keys=False, allow_unicode=True)
+    limiter_path.write_text(limiter_config, encoding="utf-8")
     print(f"[searxng-app] Wrote {settings_path}")
+    print(f"[searxng-app] Wrote {limiter_path}")
 
 
 if __name__ == "__main__":

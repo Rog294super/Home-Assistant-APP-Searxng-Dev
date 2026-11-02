@@ -3,6 +3,7 @@ import json
 import io
 import re
 import tempfile
+import tomllib
 from contextlib import redirect_stdout
 from pathlib import Path
 
@@ -24,6 +25,8 @@ class TestGenerateSettings(unittest.TestCase):
         self.assertIn("PORT=18080", run_script)
         self.assertFalse(config["options"]["enable_rate_limiter"])
         self.assertEqual(config["schema"]["enable_rate_limiter"], "bool")
+        self.assertEqual(config["options"]["limiter_trusted_proxies"], "")
+        self.assertEqual(config["schema"]["limiter_trusted_proxies"], "str")
         for key in ("mqtt_discovery_prefix", "mqtt_base_topic"):
             self.assertTrue(config["schema"][key].startswith("match("))
             self.assertRegex(config["options"][key], r"^[A-Za-z0-9_/-]+$")
@@ -82,10 +85,14 @@ class TestGenerateSettings(unittest.TestCase):
 
             contents = settings_path.read_text(encoding="utf-8")
             settings = yaml.safe_load(contents)
+            limiter = tomllib.loads(
+                (Path(directory) / "limiter.toml").read_text(encoding="utf-8")
+            )
 
         self.assertEqual(contents.count("\nsearch:"), 1)
         self.assertEqual(settings["search"]["formats"], ["html", "json"])
         self.assertEqual(settings["search"]["autocomplete"], "google")
+        self.assertEqual(limiter["trusted_proxies"], ["127.0.0.0/8", "::1"])
 
     def test_per_category_engines_are_deduplicated(self):
         settings = generate_settings(
@@ -107,19 +114,40 @@ class TestGenerateSettings(unittest.TestCase):
 
         self.assertEqual(settings["search"]["formats"], ["html"])
 
-    def test_rate_limiter_uses_internal_valkey_only_when_enabled(self):
-        disabled = generate_settings({}, "secret", "metrics")
-        enabled = generate_settings(
-            {"enable_rate_limiter": True}, "secret", "metrics"
+    def test_trusted_proxies_are_normalized_and_deduplicated(self):
+        with tempfile.TemporaryDirectory() as directory:
+            options_path = Path(directory) / "options.json"
+            settings_path = Path(directory) / "settings.yml"
+            options_path.write_text(
+                json.dumps({
+                    "enable_rate_limiter": True,
+                    "limiter_trusted_proxies": "192.168.1.5, 10.0.0.7/24, 192.168.1.5",
+                }),
+                encoding="utf-8",
+            )
+
+            write_settings(str(options_path), str(settings_path), "secret", "metrics")
+
+            limiter = tomllib.loads(
+                (Path(directory) / "limiter.toml").read_text(encoding="utf-8")
+            )
+
+        self.assertEqual(
+            limiter["trusted_proxies"],
+            ["127.0.0.0/8", "::1", "192.168.1.5/32", "10.0.0.0/24"],
         )
 
-        self.assertFalse(disabled["server"]["limiter"])
-        self.assertNotIn("valkey", disabled)
-        self.assertTrue(enabled["server"]["limiter"])
-        self.assertEqual(
-            enabled["valkey"]["url"],
-            "unix:///data/searxng-valkey/valkey.sock?db=0",
-        )
+    def test_invalid_trusted_proxy_fails_settings_generation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            options_path = Path(directory) / "options.json"
+            settings_path = Path(directory) / "settings.yml"
+            options_path.write_text(
+                json.dumps({"limiter_trusted_proxies": "not-an-ip"}),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "Invalid trusted proxy"):
+                write_settings(str(options_path), str(settings_path), "secret", "metrics")
 
     def test_rate_limiter_uses_internal_valkey_only_when_enabled(self):
         disabled = generate_settings({}, "secret", "metrics")
