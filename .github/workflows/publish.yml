@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/publish.yml
       - searxng/config.yaml
       - searxng/Dockerfile
       - searxng/requirements.txt
@@ -40,10 +41,19 @@ jobs:
           persist-credentials: false
 
       - name: Get app version
-        id: version
+        id: app-info
         uses: home-assistant/actions/helpers/info@86d4564712fa02543c808e3a693dd04f9d3f8361 # 2026-10-26
         with:
           path: searxng
+
+      - name: Normalize app version
+        id: version
+        shell: bash
+        env:
+          VERSION_JSON: ${{ steps.app-info.outputs.version }}
+        run: |
+          version=$(jq -r . <<< "$VERSION_JSON")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Prepare build matrix
         id: matrix
