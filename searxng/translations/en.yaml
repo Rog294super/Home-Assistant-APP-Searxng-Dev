@@ -33,6 +33,16 @@ configuration:
     name: Enable JSON API
     description: Allow the SearXNG JSON search API. Disable this when only the HTML interface should be exposed.
 
+  enable_rate_limiter:
+    name: Enable Rate limiter
+    description: Enables the rate limiter and starts a private Valkey service.
+
+  limiter_trusted_proxies:
+    name: Trusted proxy IPs
+    description: >
+      Comma-separated IP addresses or CIDR ranges of reverse proxies in front
+      of SearXNG. Leave empty when accessing SearXNG directly.
+
   enable_mqtt_discovery:
     name: Enable MQTT Discovery
     description: Register statistics sensors through MQTT Discovery. An MQTT broker is required.

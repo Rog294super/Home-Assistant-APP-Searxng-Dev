@@ -35,6 +35,16 @@ configuration:
     name: JSON-API inschakelen
     description: Sta de SearXNG JSON-search API toe. Schakel dit uit wanneer alleen de HTML-interface beschikbaar moet zijn.
 
+  enable_rate_limiter:
+    name: Rate limiter inschakelen
+    description: Schakelt de rate limiter in en start een privé-Valkey-service.
+
+  limiter_trusted_proxies:
+    name: Vertrouwde proxy-IP's
+    description: >
+      Komma-gescheiden IP-adressen of CIDR-netwerken van reverse proxies vóór
+      SearXNG. Laat leeg wanneer je SearXNG rechtstreeks benadert.
+
   enable_mqtt_discovery:
     name: MQTT Discovery inschakelen
     description: Registreer statistieksensors via MQTT Discovery. Een MQTT-broker is vereist.
