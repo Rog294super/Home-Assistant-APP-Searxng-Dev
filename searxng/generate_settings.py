@@ -61,6 +61,7 @@ def generate_settings(
             "base_url": base_url,
             "image_proxy": bool(options.get("image_proxy", True)),
             "port": 18080,
+            "limiter": bool(options.get("enable_rate_limiter", False)),
         },
         "search": {
             "safesearch": int(options.get("safesearch", 0)),
@@ -68,6 +69,11 @@ def generate_settings(
             "formats": ["html"] if not bool(options.get("enable_json_api", True)) else ["html", "json"],
         },
     }
+
+    if settings["server"]["limiter"]:
+        settings["valkey"] = {
+            "url": "unix:///data/searxng-valkey/valkey.sock?db=0"
+        }
 
     # Omitting the key preserves SearXNG's upstream behavior when no provider is selected.
     autocomplete = options.get("autocomplete")
