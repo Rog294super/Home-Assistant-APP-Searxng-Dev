@@ -2,12 +2,14 @@
 
 All notable changes to this Home Assistant SearXNG App are documented here.
 
-## 1.3.1
+## 1.4.0
 
 ### Added
 - Added Home Assistant app metadata validation and a non-publishing BuildKit
   image build for `amd64` to CI. The image-build check currently covers only
   `amd64`.
+- Added an optional rate limiter backed by a private Valkey instance managed
+  by the app. No separate Valkey app or service configuration is required.
 - Added the `enable_json_api` option to allow the JSON search API to be
   disabled while keeping the HTML interface available.
 - Added an MQTT TLS connection when the Supervisor MQTT service requests SSL.
@@ -35,10 +37,21 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 - Corrected response-time reporting to match SearXNG's average-time gauge.
 - Split test-only YAML dependencies from image dependencies and pin the CI
   Python version; CI also builds amd64 and aarch64 images.
+- Update searxng/searxng image from 2026-10-29 to 2026-?-?
+
 
 ### Fixed
 - Fixed reproducible dependency installation by pinning the Python dependency
   hashes used by CI and the image build.
+
+## 1.3.1
+
+### Changed
+- Translations recarding base_url corrected for better explanations.
+- Update searxng from 2026.10.02 to 2026.10.11 @[Rog294super](https://github.com/Rog294super)
+- Update searxng to 2026.10.19 @[Dependabot](https://github.com/apps/dependabot) ([#1](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/1))
+- Update searxng to 2026.10.29 @[Rog294super](https://github.com/Rog294super)
+- Update actions/setup-python to 7.1.0 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/2))
 
 ## 1.3.0
 

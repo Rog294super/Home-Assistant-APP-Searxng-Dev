@@ -59,6 +59,21 @@ If you want a cleaner URL such as `http://searxng.lan/`, consider using a revers
 
 The app enables both the HTML interface and JSON search API by default. Disable **Enable JSON API** when the service should expose only the HTML interface. The generated SearXNG settings are updated immediately when the option changes and the app is restarted.
 
+## Rate limiting
+
+Enable **Enable Rate Limiter** in the app configuration to turn on SearXNG's
+rate limiter. It is disabled by default. When enabled, the app starts and
+supervises its own Valkey service, which SearXNG uses to track rate limits.
+Valkey communicates over a private Unix socket in the app's data directory;
+it does not open a host network port, and no separate Valkey app or credentials
+need to be configured. Restart the app after changing this option.
+
+If the app cannot start Valkey, it will not start SearXNG with the limiter
+enabled. If SearXNG is behind a reverse proxy, configure the proxy to forward
+the original client IP and ensure SearXNG trusts that proxy for the forwarded
+address. Otherwise, requests may be rate-limited as if they came from the proxy
+itself, causing clients to share a limit.
+
 ## Autocomplete privacy
 
 Autocomplete is disabled by default. Select **Disabled** to turn it off, or choose a provider to enable search suggestions; queries typed into the search box may then be sent to that provider. Existing installations may retain a previously selected provider until you select **Disabled**.
