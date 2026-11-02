@@ -22,6 +22,8 @@ class TestGenerateSettings(unittest.TestCase):
         self.assertIn("disabled", config["schema"]["autocomplete"])
         self.assertNotIn("port", config["options"])
         self.assertIn("PORT=18080", run_script)
+        self.assertFalse(config["options"]["enable_rate_limiter"])
+        self.assertEqual(config["schema"]["enable_rate_limiter"], "bool")
         for key in ("mqtt_discovery_prefix", "mqtt_base_topic"):
             self.assertTrue(config["schema"][key].startswith("match("))
             self.assertRegex(config["options"][key], r"^[A-Za-z0-9_/-]+$")
@@ -104,6 +106,34 @@ class TestGenerateSettings(unittest.TestCase):
         settings = generate_settings({"enable_json_api": False}, "secret", "metrics")
 
         self.assertEqual(settings["search"]["formats"], ["html"])
+
+    def test_rate_limiter_uses_internal_valkey_only_when_enabled(self):
+        disabled = generate_settings({}, "secret", "metrics")
+        enabled = generate_settings(
+            {"enable_rate_limiter": True}, "secret", "metrics"
+        )
+
+        self.assertFalse(disabled["server"]["limiter"])
+        self.assertNotIn("valkey", disabled)
+        self.assertTrue(enabled["server"]["limiter"])
+        self.assertEqual(
+            enabled["valkey"]["url"],
+            "unix:///data/searxng-valkey/valkey.sock?db=0",
+        )
+
+    def test_rate_limiter_uses_internal_valkey_only_when_enabled(self):
+        disabled = generate_settings({}, "secret", "metrics")
+        enabled = generate_settings(
+            {"enable_rate_limiter": True}, "secret", "metrics"
+        )
+
+        self.assertFalse(disabled["server"]["limiter"])
+        self.assertNotIn("valkey", disabled)
+        self.assertTrue(enabled["server"]["limiter"])
+        self.assertEqual(
+            enabled["valkey"]["url"],
+            "unix:///data/searxng-valkey/valkey.sock?db=0",
+        )
 
     def test_legacy_engine_overrides_remain_supported(self):
         settings = generate_settings(

@@ -75,6 +75,9 @@ class TestMonitor(unittest.TestCase):
         self.assertIn("os.setgroups([977]); os.setgid(977); os.setuid(977)", run_script)
         self.assertIn("supervise_monitor()", run_script)
         self.assertIn("MONITOR_CHILD_PID", run_script)
+        self.assertIn("start_valkey()", run_script)
+        self.assertIn("VALKEY_PID", run_script)
+        self.assertIn("unixsocket", run_script)
 
     def test_legacy_port_option_does_not_change_metrics_port(self):
         with tempfile.TemporaryDirectory() as directory:
