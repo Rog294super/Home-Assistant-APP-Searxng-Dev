@@ -98,10 +98,17 @@ def generate_settings(
         },
         "search": {
             "safesearch": int(options.get("safesearch", 0)),
-            # Keep HTML available; this option controls whether JSON is also exposed.
-            "formats": ["html"] if not bool(options.get("enable_json_api", True)) else ["html", "json"],
+            "formats": ["html"],
         },
     }
+
+    for option_name, output_format in (
+        ("enable_json_api", "json"),
+        ("enable_csv_api", "csv"),
+        ("enable_rss_api", "rss"),
+    ):
+        if bool(options.get(option_name, False)):
+            settings["search"]["formats"].append(output_format)
 
     if settings["server"]["limiter"]:
         settings["valkey"] = {
