@@ -55,9 +55,13 @@ The app listens on the fixed internal port `18080`. Home Assistant uses the host
 
 If you want a cleaner URL such as `http://searxng.lan/`, consider using a reverse proxy such as Nginx Proxy Manager or Caddy and forward traffic to your Home Assistant host IP on port `18080`.
 
-## JSON search API
+## Search API formats
 
-The app enables both the HTML interface and JSON search API by default. Disable **Enable JSON API** when the service should expose only the HTML interface. The generated SearXNG settings are updated immediately when the option changes and the app is restarted.
+The app serves HTML results by default. JSON, CSV, and RSS search formats are
+disabled by default because the app may be reachable from the WAN. Enable only
+the formats you need with **Enable JSON search format**, **Enable CSV search
+format**, or **Enable RSS search format**. The generated SearXNG settings are
+updated when an option changes and the app restarts.
 
 ## Rate limiting
 
