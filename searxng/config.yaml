@@ -43,8 +43,10 @@ options:
   # Home Assistant entity registration options
   enable_stats_entities: true
 
-  # Allow the JSON search API. Disable it when the app should expose only the HTML interface.
-  enable_json_api: true
+  # HTML stays available; each machine-readable search format is opt-in.
+  enable_json_api: false
+  enable_csv_api: false
+  enable_rss_api: false
 
   # Starts a private Valkey instance managed by this app when enabled.
   enable_rate_limiter: false
@@ -84,6 +86,8 @@ schema:
 
   enable_stats_entities: bool
   enable_json_api: bool
+  enable_csv_api: bool
+  enable_rss_api: bool
   enable_rate_limiter: bool
   limiter_trusted_proxies: str
   

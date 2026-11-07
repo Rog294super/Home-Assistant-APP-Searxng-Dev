@@ -30,8 +30,16 @@ configuration:
     description: Enable this for sensors with stats about the searxng app.
 
   enable_json_api:
-    name: Enable JSON API
-    description: Allow the SearXNG JSON search API. Disable this when only the HTML interface should be exposed.
+    name: Enable JSON search format
+    description: Allow search results to be requested in JSON format.
+
+  enable_csv_api:
+    name: Enable CSV search format
+    description: Allow search results to be requested in CSV format.
+
+  enable_rss_api:
+    name: Enable RSS search format
+    description: Allow search results to be requested in RSS format.
 
   enable_rate_limiter:
     name: Enable Rate limiter

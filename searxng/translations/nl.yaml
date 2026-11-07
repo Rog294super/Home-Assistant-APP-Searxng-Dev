@@ -32,8 +32,16 @@ configuration:
     description: Schakel dit in voor sensors met statistieken over de searxng app.
 
   enable_json_api:
-    name: JSON-API inschakelen
-    description: Sta de SearXNG JSON-search API toe. Schakel dit uit wanneer alleen de HTML-interface beschikbaar moet zijn.
+    name: JSON-zoekformaat inschakelen
+    description: Sta toe dat zoekresultaten in JSON-formaat worden opgevraagd.
+
+  enable_csv_api:
+    name: CSV-zoekformaat inschakelen
+    description: Sta toe dat zoekresultaten in CSV-formaat worden opgevraagd.
+
+  enable_rss_api:
+    name: RSS-zoekformaat inschakelen
+    description: Sta toe dat zoekresultaten in RSS-formaat worden opgevraagd.
 
   enable_rate_limiter:
     name: Rate limiter inschakelen

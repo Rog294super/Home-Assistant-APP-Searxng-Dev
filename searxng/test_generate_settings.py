@@ -25,6 +25,9 @@ class TestGenerateSettings(unittest.TestCase):
         self.assertIn("PORT=18080", run_script)
         self.assertFalse(config["options"]["enable_rate_limiter"])
         self.assertEqual(config["schema"]["enable_rate_limiter"], "bool")
+        for key in ("enable_json_api", "enable_csv_api", "enable_rss_api"):
+            self.assertFalse(config["options"][key])
+            self.assertEqual(config["schema"][key], "bool")
         self.assertEqual(config["options"]["limiter_trusted_proxies"], "")
         self.assertEqual(config["schema"]["limiter_trusted_proxies"], "str")
         for key in ("mqtt_discovery_prefix", "mqtt_base_topic"):
@@ -33,10 +36,18 @@ class TestGenerateSettings(unittest.TestCase):
 
     def test_settings_keep_search_options_and_use_upstream_engines(self):
         settings = generate_settings(
-            {"autocomplete": "google", "safesearch": 2}, "secret", "metrics"
+            {
+                "autocomplete": "google",
+                "safesearch": 2,
+                "enable_json_api": True,
+                "enable_csv_api": True,
+                "enable_rss_api": True,
+            },
+            "secret",
+            "metrics",
         )
 
-        self.assertEqual(settings["search"]["formats"], ["html", "json"])
+        self.assertEqual(settings["search"]["formats"], ["html", "json", "csv", "rss"])
         self.assertEqual(settings["search"]["autocomplete"], "google")
         self.assertEqual(settings["search"]["safesearch"], 2)
         self.assertNotIn("engines", settings)
@@ -72,6 +83,18 @@ class TestGenerateSettings(unittest.TestCase):
 
         self.assertNotIn("autocomplete", settings["search"])
 
+    def test_search_api_formats_are_disabled_by_default(self):
+        settings = generate_settings({}, "secret", "metrics")
+
+        self.assertEqual(settings["search"]["formats"], ["html"])
+
+    def test_csv_and_rss_can_be_enabled_without_json(self):
+        settings = generate_settings(
+            {"enable_csv_api": True, "enable_rss_api": True}, "secret", "metrics"
+        )
+
+        self.assertEqual(settings["search"]["formats"], ["html", "csv", "rss"])
+
     def test_write_settings_creates_one_search_mapping(self):
         with tempfile.TemporaryDirectory() as directory:
             options_path = Path(directory) / "options.json"
@@ -90,7 +113,7 @@ class TestGenerateSettings(unittest.TestCase):
             )
 
         self.assertEqual(contents.count("\nsearch:"), 1)
-        self.assertEqual(settings["search"]["formats"], ["html", "json"])
+        self.assertEqual(settings["search"]["formats"], ["html"])
         self.assertEqual(settings["search"]["autocomplete"], "google")
         self.assertEqual(limiter["botdetection"]["trusted_proxies"], [])
 
