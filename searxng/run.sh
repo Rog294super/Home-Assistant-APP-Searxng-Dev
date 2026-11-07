@@ -233,6 +233,7 @@ shutdown() {
     if [ -n "$MONITOR_PID" ]; then
         wait "$MONITOR_PID" 2>/dev/null || true
     fi
+    exit 0
 }
 trap shutdown TERM INT
 
