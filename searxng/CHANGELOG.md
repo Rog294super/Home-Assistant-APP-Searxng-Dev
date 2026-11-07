@@ -6,6 +6,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 
 ### Changed
 - Added separate opt-in settings for CSV and RSS search formats; these are disabled by default.
+- Exit cleanly after handling SIGTERM or SIGINT so Supervisor does not report exit code 143.
 - Use the multi-architecture GHCR manifest so Supervisor pulls one image name
   for both supported architectures.
 - Set `org.opencontainers.image.source` to the Public repository. @[Rog294super](https://github.com/Rog294super)
