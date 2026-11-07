@@ -5,10 +5,10 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 ## 1.4.1
 
 ### Changed
-- Added separate opt-in settings for CSV and RSS search formats; these are disabled by default.
-- Exit cleanly after handling SIGTERM or SIGINT so Supervisor does not report exit code 143.
+- Added separate opt-in settings for CSV and RSS search formats; these are disabled by default. @[Rog294super](https://github.com/Rog294super)
+- Exit cleanly after handling SIGTERM or SIGINT so Supervisor does not report exit code 143. @[Rog294super](https://github.com/Rog294super)
 - Use the multi-architecture GHCR manifest so Supervisor pulls one image name
-  for both supported architectures.
+  for both supported architectures. @[Rog294super](https://github.com/Rog294super)
 - Set `org.opencontainers.image.source` to the Public repository. @[Rog294super](https://github.com/Rog294super)
 - Update searxng/searxng image from 2026-11-1 to 2026-11-2 @[Rog294super](https://github.com/Rog294super)
 - Update valkey/valkey from 9.1.2 to 9.1.3 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/5))
