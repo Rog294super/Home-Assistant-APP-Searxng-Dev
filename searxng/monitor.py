@@ -9,12 +9,13 @@ import logging
 import os
 import signal
 import sys
-from threading import Event
+from threading import Event, RLock
 import time
 import urllib.request
 import urllib.error
 import base64
 import re
+from contextlib import nullcontext
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Set
 
@@ -52,6 +53,7 @@ class SearXNGMonitor:
         self.options_file = options_file
         self.options = self._load_options()
         self.stop_event = Event()
+        self._process_stats_lock = RLock()
         self.mqtt_client = None
         self.mqtt_connected = False
         self.metrics_enabled = self.options.get("enable_metrics", True)
@@ -262,7 +264,9 @@ class SearXNGMonitor:
         self.mqtt_connected = True
         self._publish_mqtt(self._availability_topic(), "online", retain=True, qos=1)
         if self._last_stats:
-            self._process_stats(self._last_stats)
+            lock = getattr(self, "_process_stats_lock", nullcontext())
+            with lock:
+                self._process_stats(self._last_stats)
         logger.info("Connected to MQTT broker")
 
     def _on_mqtt_disconnect(self, client: Any, userdata: Any, disconnect_flags: Any = None, reason_code: Any = None, properties: Any = None) -> None:
@@ -397,7 +401,9 @@ class SearXNGMonitor:
                 if stats:
                     self._last_stats = stats
                     if self.mqtt_connected:
-                        self._process_stats(stats)
+                        lock = getattr(self, "_process_stats_lock", nullcontext())
+                        with lock:
+                            self._process_stats(stats)
                     else:
                         logger.info("MQTT is not connected yet; waiting to publish stats")
                     consecutive_failures = 0
