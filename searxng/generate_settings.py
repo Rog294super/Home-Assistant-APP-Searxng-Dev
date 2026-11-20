@@ -52,6 +52,11 @@ def parse_trusted_proxies(values: Any) -> list[str]:
             raise ValueError(
                 f"Invalid trusted proxy {candidate!r}; use an IP address or CIDR network"
             ) from error
+        network = ipaddress.ip_network(candidate, strict=False)
+        if network.prefixlen == 0:
+            raise ValueError(
+                f"Invalid trusted proxy {candidate!r}; prefix length 0 is too broad"
+            )
         if proxy_network not in proxies:
             proxies.append(proxy_network)
     return proxies
