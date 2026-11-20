@@ -29,6 +29,16 @@ class TestValidateBaseUrl(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_base_url("https://example.com/searxng/#fragment")
 
+    def test_rejects_whitespace_control_characters_and_invalid_ports(self):
+        for candidate in (
+            "http://a\nb/",
+            "http://a b/",
+            "http://host:abc/",
+        ):
+            with self.subTest(candidate=candidate):
+                with self.assertRaises(ValueError):
+                    validate_base_url(candidate)
+
 
 if __name__ == "__main__":
     unittest.main()

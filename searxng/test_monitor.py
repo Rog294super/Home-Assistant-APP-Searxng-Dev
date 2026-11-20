@@ -72,12 +72,15 @@ class TestMonitor(unittest.TestCase):
         run_script = Path(__file__).with_name("run.sh").read_text(encoding="utf-8")
 
         self.assertIn("chown searxng:searxng \"$SETTINGS_FILE\"", run_script)
-        self.assertIn("os.setgroups([977]); os.setgid(977); os.setuid(977)", run_script)
+        self.assertIn("pwd.getpwnam(\"searxng\")", run_script)
+        self.assertIn("run_monitor_as_searxng", run_script)
         self.assertIn("supervise_monitor()", run_script)
         self.assertIn("MONITOR_CHILD_PID", run_script)
         self.assertIn("start_valkey()", run_script)
         self.assertIn("VALKEY_PID", run_script)
         self.assertIn("unixsocket", run_script)
+        self.assertIn("--appendonly no", run_script)
+        self.assertIn("^[0-9a-fA-F]{64}$", run_script)
 
     def test_legacy_port_option_does_not_change_metrics_port(self):
         with tempfile.TemporaryDirectory() as directory:

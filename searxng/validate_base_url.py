@@ -6,9 +6,13 @@ def validate_base_url(value):
     if value is None:
         raise ValueError("base_url is empty")
 
-    candidate = str(value).strip()
+    candidate = str(value)
     if not candidate:
         raise ValueError("base_url is empty")
+    if candidate != candidate.strip():
+        raise ValueError("base_url must not contain surrounding whitespace")
+    if any(character.isspace() or ord(character) < 32 or ord(character) == 127 for character in candidate):
+        raise ValueError("base_url must not contain whitespace or control characters")
 
     if not candidate.startswith(("http://", "https://")):
         raise ValueError("base_url must start with http:// or https://")
@@ -28,5 +32,9 @@ def validate_base_url(value):
         raise ValueError("base_url must not contain query strings or fragments")
     if not parsed.hostname:
         raise ValueError("base_url must include a valid hostname")
+    try:
+        parsed.port
+    except ValueError as error:
+        raise ValueError("base_url contains an invalid port") from error
 
     return candidate

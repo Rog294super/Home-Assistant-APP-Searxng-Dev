@@ -73,10 +73,15 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           GITHUB_SHA: ${{ github.sha }}
         run: |
-          if ! docker buildx imagetools inspect "${IMAGE_REF}" >/dev/null 2>&1; then
-            echo "Image tag ${IMAGE_REF} does not exist yet; build is required."
-            echo "build=true" >> "$GITHUB_OUTPUT"
-            exit 0
+          if ! docker buildx imagetools inspect "${IMAGE_REF}" >/tmp/searxng-tag-check.txt 2>&1; then
+            if grep -Eq 'not found|manifest unknown|MANIFEST_UNKNOWN' /tmp/searxng-tag-check.txt; then
+              echo "Image tag ${IMAGE_REF} does not exist yet; build is required."
+              echo "build=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::error::Could not inspect ${IMAGE_REF}; registry or authentication failure:"
+            cat /tmp/searxng-tag-check.txt
+            exit 1
           fi
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then

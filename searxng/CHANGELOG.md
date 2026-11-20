@@ -10,9 +10,11 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 - Use the multi-architecture GHCR manifest so Supervisor pulls one image name
   for both supported architectures. @[Rog294super](https://github.com/Rog294super)
 - Set `org.opencontainers.image.source` to the Public repository. @[Rog294super](https://github.com/Rog294super)
-- Update searxng/searxng image from 2026-11-1 to 2026-11-2 @[Rog294super](https://github.com/Rog294super)
-- Update valkey/valkey from 9.1.2 to 9.1.3 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/5))
 - Changed the default value for `enable_json_api` to `false` for safety reasons for when app is exposed to WAN.
+- Update searxng/searxng image from 2026-11-1 to 2026-11-2 @[Rog294super](https://github.com/Rog294super)
+- Update searxng/searxng image from 2026-11-2 to 2026-11-20 @[Rog294super](https://github.com/Rog294super)
+- Update valkey/valkey from 9.1.2 to 9.1.3 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/5))
+- Update paho-mqtt from 2.1.0 to 2.2.0 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/6))
 
 ## 1.4.0
 
@@ -22,7 +24,7 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   automations.
 - Automatic updates from 1.3.x are intentionally blocked so users can read this
   entry before upgrading.
-- Removal of the deprecated `disabled_engines` and `engines` configurations.
+- Deprecated legacy `disabled_engines` and `engines` configurations are no longer shown in the app schema, while remaining supported for existing installations.
 
 ### Added
 - Added Home Assistant app metadata validation and a non-publishing BuildKit
@@ -74,14 +76,9 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 ## 1.3.0
 
 ### Message DEV
-**LEGACY ENGINES**: It has been decided that the legacy `engines` configuration will be removed earlier than
-  1.4.0.
-  Possibly already by the next big update which as major update will be named V1.4.0.
-  If there is no next big update but enough small updates, To the level that the app will reach V1.4.0 because incrementations, it will also be removed.
-  If the removal happens earlier this will possibly be announced one update before.
-**LEGACY DISABLED_ENGINES**: With the addition of seperate category disabled engines, The following
-  configuration `disabled_engines` will be removed at the same time as `engines`.
-  Save your disabled engines in the specific category for the engines.
+**LEGACY ENGINES**: Legacy `engines` and `disabled_engines` settings remain
+  supported for existing installations. New installations should use the
+  per-category `disabled_engines_<category>` settings.
 
 ### Added
 - Extracted complete SearXNG settings generation from `run.sh` into a tested
@@ -126,8 +123,8 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   are disabled, SearXNG still starts; stats entities remain unavailable until
   the metrics endpoint is enabled again.
 - The legacy `engines` and `disabled_engines` options remain supported for now,
-  but are planned for removal in 1.4.0. Move saved engine choices to the
-  category fields before that release.
+  and per-category settings take precedence. Move saved engine choices to the
+  category fields when convenient.
 
 ## 1.2.1
 

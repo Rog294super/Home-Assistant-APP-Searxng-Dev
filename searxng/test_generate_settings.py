@@ -172,6 +172,18 @@ class TestGenerateSettings(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Invalid trusted proxy"):
                 write_settings(str(options_path), str(settings_path), "secret", "metrics")
 
+    def test_unrestricted_trusted_proxy_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            options_path = Path(directory) / "options.json"
+            settings_path = Path(directory) / "settings.yml"
+            options_path.write_text(
+                json.dumps({"limiter_trusted_proxies": "0.0.0.0/0, ::/0"}),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "prefix length 0"):
+                write_settings(str(options_path), str(settings_path), "secret", "metrics")
+
     def test_rate_limiter_uses_internal_valkey_only_when_enabled(self):
         disabled = generate_settings({}, "secret", "metrics")
         enabled = generate_settings(
