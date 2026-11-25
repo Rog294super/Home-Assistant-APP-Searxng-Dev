@@ -20,7 +20,7 @@ RUN mkdir -p /opt/valkey/bin /opt/valkey/lib && \
 # This image version should be updated with every version increase of the project. 
 # https://hub.docker.com/r/searxng/searxng/
 # https://hub.docker.com/r/searxng/searxng/tags
-FROM searxng/searxng:2026.11.20-cd6d28091@sha256:b513f1ad02c1b0a985d801190eafc3cbcacdf661de8b1fe7b54fa67bafe97a7e
+FROM searxng/searxng:2026.11.21-c6ee3e9fd@sha256:fc1d81d7e9d04d3c8b3e23c7162feddf5c3d6aecd32e67a56eaabcb8d8747f79
 
 COPY --from=valkey-runtime /opt/valkey /opt/valkey
 COPY valkey-server.sh /valkey-server.sh
