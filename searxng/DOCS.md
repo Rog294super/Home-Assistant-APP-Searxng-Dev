@@ -54,6 +54,10 @@ The app listens on the fixed internal port `18080`. Home Assistant uses the host
 
 If you want a cleaner URL such as `http://searxng.lan/`, consider using a reverse proxy such as Nginx Proxy Manager or Caddy and forward traffic to your Home Assistant host IP on port `18080`.
 
+The **Contact URL** setting identifies a public support page for this instance.
+Some upstream engines require it during startup. The default points to this
+app's issue tracker; you can replace it with your own support or contact page.
+
 ## Search API formats
 
 The app serves HTML results by default. JSON, CSV, and RSS search formats are
