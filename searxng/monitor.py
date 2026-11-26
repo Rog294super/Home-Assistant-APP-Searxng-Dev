@@ -9,6 +9,7 @@ import logging
 import os
 import signal
 import sys
+import tempfile
 from threading import Event, RLock
 import time
 import urllib.request
@@ -41,6 +42,35 @@ def make_mqtt_client_id(instance_name: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", instance_name.lower()).strip("-")
     slug = slug[:15].rstrip("-") or "instance"
     return f"searxng-{slug}"
+
+
+def write_monitor_options(options_file: str, destination: str) -> None:
+    """Write only the non-secret app options needed by the unprivileged monitor."""
+    monitor_keys = (
+        "enable_metrics",
+        "enable_stats_entities",
+        "instance_name",
+        "enable_mqtt_discovery",
+        "mqtt_discovery_prefix",
+        "mqtt_base_topic",
+    )
+    with open(options_file, "r", encoding="utf-8") as source:
+        options = json.load(source)
+    if not isinstance(options, dict):
+        raise ValueError("App options must be a JSON object")
+    monitor_options = {key: options[key] for key in monitor_keys if key in options}
+    temporary_fd, temporary_path = tempfile.mkstemp(
+        dir=os.path.dirname(destination) or "."
+    )
+    try:
+        with os.fdopen(temporary_fd, "w", encoding="utf-8") as target:
+            json.dump(monitor_options, target)
+        os.replace(temporary_path, destination)
+    finally:
+        try:
+            os.unlink(temporary_path)
+        except FileNotFoundError:
+            pass
 
 
 class SearXNGMonitor:
