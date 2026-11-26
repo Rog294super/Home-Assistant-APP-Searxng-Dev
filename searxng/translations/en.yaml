@@ -9,6 +9,12 @@ configuration:
     name: Instance name
     description: Name displayed by SearXNG.
 
+  contact_url:
+    name: Contact URL
+    description: >
+      Public support or contact page for this instance. Required by some
+      upstream search engines; defaults to this app's issue tracker.
+
   autocomplete:
     name: Autocomplete provider
     description: Select Disabled to turn off search suggestions, or choose a provider.

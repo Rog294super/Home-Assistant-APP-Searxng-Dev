@@ -9,6 +9,12 @@ configuration:
     name: Naam van de instantie
     description: Naam die door SearXNG wordt weergegeven.
 
+  contact_url:
+    name: Contact-URL
+    description: >
+      Openbare contact- of supportpagina voor deze instantie. Vereist door
+      sommige zoekmachines; standaard de issuepagina van deze app.
+
   autocomplete:
     name: Autocompleteprovider
     description: Kies Uitgeschakeld om zoeksuggesties uit te zetten, of kies een provider.

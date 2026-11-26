@@ -4,6 +4,12 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 
 ## 1.4.1
 
+### Fixed
+- Provide the monitor with a private, least-privilege copy of its required app
+  options instead of reading Home Assistant's protected `/data/options.json`.
+- Configure SearXNG's `general.contact_url` so engines that require it can
+  initialize.
+
 ### Changed
 - Added separate opt-in settings for CSV and RSS search formats; these are disabled by default. @[Rog294super](https://github.com/Rog294super)
 - Exit cleanly after handling SIGTERM or SIGINT so Supervisor does not report exit code 143. @[Rog294super](https://github.com/Rog294super)
