@@ -52,6 +52,19 @@ class TestGenerateSettings(unittest.TestCase):
         self.assertEqual(settings["search"]["safesearch"], 2)
         self.assertNotIn("engines", settings)
         self.assertEqual(yaml.safe_load(yaml.safe_dump(settings)), settings)
+        self.assertEqual(
+            settings["general"]["contact_url"],
+            "https://github.com/Rog294super/Home-Assistant-APP-Searxng/issues",
+        )
+
+    def test_custom_contact_url_is_written_to_general_settings(self):
+        settings = generate_settings(
+            {"contact_url": "https://example.com/contact"}, "secret", "metrics"
+        )
+
+        self.assertEqual(
+            settings["general"]["contact_url"], "https://example.com/contact"
+        )
 
     def test_legacy_port_option_does_not_change_server_port(self):
         settings = generate_settings({"port": 12345}, "secret", "metrics")
