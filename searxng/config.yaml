@@ -31,6 +31,7 @@ breaking_versions:
 options:
   base_url: ""
   instance_name: "SearXNG"
+  contact_url: "https://github.com/Rog294super/Home-Assistant-APP-Searxng-Dev/issues"
 
   autocomplete: disabled
   safesearch: 0
@@ -78,6 +79,7 @@ options:
 schema:
   base_url: str
   instance_name: str
+  contact_url: str
 
   autocomplete: list(disabled|360search|baidu|brave|dbpedia|duckduckgo|google|yandex|mwmbl|naver|seznam|sogou|startpage|stract|swisscows|quark|qwant|wikipedia)
   safesearch: int(0,2)
