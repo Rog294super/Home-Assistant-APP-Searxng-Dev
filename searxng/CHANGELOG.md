@@ -13,8 +13,11 @@ All notable changes to this Home Assistant SearXNG App are documented here.
 - Changed the default value for `enable_json_api` to `false` for safety reasons for when app is exposed to WAN.
 - Update searxng/searxng image from 2026-11-1 to 2026-11-2 @[Rog294super](https://github.com/Rog294super)
 - Update searxng/searxng image from 2026-11-2 to 2026-11-20 @[Rog294super](https://github.com/Rog294super)
-- Update valkey/valkey from 9.1.2 to 9.1.3 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/5))
-- Update paho-mqtt from 2.1.0 to 2.2.0 @[Dependabot](https://github.com/apps/dependabot) ([#2](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/6))
+- Update searxng/searxng image from 2026-11-20 to 2026-11-23 @[Rog294super](https://github.com/Rog294super)
+- Update valkey/valkey from 9.1.2 to 9.1.3 (Pre-release) @[Dependabot](https://github.com/apps/dependabot) ([#5](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/5))
+- Update valkey/valkey from 9.1.2 to 9.2.0 @[Dependabot](https://github.com/apps/dependabot) ([#7](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/7))
+- Update paho-mqtt from 2.1.0 to 2.2.0 @[Dependabot](https://github.com/apps/dependabot) ([#6](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/6))
+- Update pyyaml from 6.0.3 to 6.0.4 @[Dependabot](https://github.com/apps/dependabot) ([#9](https://github.com/Rog294super/Home-Assistant-APP-Searxng/pull/9))
 
 ## 1.4.0
 

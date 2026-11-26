@@ -1,4 +1,4 @@
-FROM valkey/valkey:9.1.3@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7 AS valkey-runtime
+FROM valkey/valkey:9.2.0@sha256:1c2b25b09f354c66fe994733acdf12fcfd4bdf6f3bd92b88a93a70378d884056 AS valkey-runtime
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -20,7 +20,7 @@ RUN mkdir -p /opt/valkey/bin /opt/valkey/lib && \
 # This image version should be updated with every version increase of the project. 
 # https://hub.docker.com/r/searxng/searxng/
 # https://hub.docker.com/r/searxng/searxng/tags
-FROM searxng/searxng:2026.11.20-cd6d28091@sha256:b513f1ad02c1b0a985d801190eafc3cbcacdf661de8b1fe7b54fa67bafe97a7e
+FROM searxng/searxng:2026.11.23-a7163d091@sha256:a7fc607aa6723f5a8982105bcc5ffba4d1b9fc7c6922a31a88d6e4cba49ef12a
 
 COPY --from=valkey-runtime /opt/valkey /opt/valkey
 COPY valkey-server.sh /valkey-server.sh
