@@ -92,7 +92,7 @@ def generate_settings(
         "general": {
             "instance_name": options.get("instance_name") or "SearXNG",
             "contact_url": options.get("contact_url")
-            or "https://github.com/Rog294super/Home-Assistant-APP-Searxng-Dev/issues",
+            or "https://github.com/Rog294super/Home-Assistant-APP-Searxng/issues",
             "enable_metrics": bool(options.get("enable_metrics", True)),
             "open_metrics": metrics_secret,
         },
