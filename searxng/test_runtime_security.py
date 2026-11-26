@@ -87,6 +87,31 @@ class TestRuntimeSecurity(unittest.TestCase):
             self.assertEqual(json.loads(state_path.read_text(encoding="utf-8")), ["engine_google"])
             self.assertFalse(state_path.with_name("state.json.tmp").exists())
 
+    def test_published_state_uses_configured_writable_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state_path = Path(directory) / "monitor" / "state.json"
+            state_path.parent.mkdir()
+            state_path.write_text('["engine_old"]', encoding="utf-8")
+            self.monitor._published_engines = {"engine_new"}
+
+            with patch.dict(
+                "os.environ", {"SEARXNG_MONITOR_STATE_PATH": str(state_path)}
+            ):
+                self.assertEqual(self.monitor._load_published_engines(), {"engine_old"})
+                self.monitor._save_published_engines()
+
+            self.assertEqual(
+                json.loads(state_path.read_text(encoding="utf-8")), ["engine_new"]
+            )
+
+    def test_startup_creates_private_monitor_state_directory(self):
+        run_script = Path(__file__).with_name("run.sh").read_text(encoding="utf-8")
+
+        self.assertIn('MONITOR_STATE_DIR="/data/searxng-monitor"', run_script)
+        self.assertIn('chown "$SEARXNG_UID:$SEARXNG_GID" "$MONITOR_STATE_DIR"', run_script)
+        self.assertIn('chmod 700 "$MONITOR_STATE_DIR"', run_script)
+        self.assertIn('export SEARXNG_MONITOR_STATE_PATH="$MONITOR_STATE_FILE"', run_script)
+
 
 if __name__ == "__main__":
     unittest.main()

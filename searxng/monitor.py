@@ -234,8 +234,16 @@ class SearXNGMonitor:
 
     def _load_published_engines(self) -> Set[str]:
         """Remember engine discovery topics so removed engines can be cleared."""
+        state_path = getattr(
+            self,
+            "_state_path",
+            os.environ.get(
+                "SEARXNG_MONITOR_STATE_PATH",
+                "/data/searxng_mqtt_engines.json",
+            ),
+        )
         try:
-            with open("/data/searxng_mqtt_engines.json") as state_file:
+            with open(state_path, encoding="utf-8") as state_file:
                 return set(json.load(state_file))
         except (OSError, TypeError, json.JSONDecodeError):
             # A missing or damaged cache is safe; the next publish refreshes it.
@@ -243,7 +251,14 @@ class SearXNGMonitor:
 
     def _save_published_engines(self) -> None:
         """Atomically save engine IDs so interrupted writes do not corrupt state."""
-        state_path = getattr(self, "_state_path", "/data/searxng_mqtt_engines.json")
+        state_path = getattr(
+            self,
+            "_state_path",
+            os.environ.get(
+                "SEARXNG_MONITOR_STATE_PATH",
+                "/data/searxng_mqtt_engines.json",
+            ),
+        )
         try:
             temp_path = f"{state_path}.tmp"
             with open(temp_path, "w", encoding="utf-8") as state_file:

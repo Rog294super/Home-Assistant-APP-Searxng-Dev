@@ -9,6 +9,8 @@ All notable changes to this Home Assistant SearXNG App are documented here.
   options instead of reading Home Assistant's protected `/data/options.json`.
 - Configure SearXNG's `general.contact_url` so engines that require it can
   initialize.
+- Store the MQTT engine cache in a dedicated directory writable only by the
+  unprivileged monitor, migrating the existing cache on startup.
 
 ### Changed
 - Added separate opt-in settings for CSV and RSS search formats; these are disabled by default. @[Rog294super](https://github.com/Rog294super)

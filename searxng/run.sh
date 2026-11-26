@@ -201,6 +201,20 @@ if [ "$ENABLE_STATS_ENTITIES" = "true" ] && [ "$ENABLE_METRICS" = "true" ] && \
     chown "$SEARXNG_UID:$SEARXNG_GID" "$MONITOR_OPTIONS_FILE"
     chmod 600 "$MONITOR_OPTIONS_FILE"
     export OPTIONS_FILE="$MONITOR_OPTIONS_FILE"
+
+    MONITOR_STATE_DIR="/data/searxng-monitor"
+    MONITOR_STATE_FILE="$MONITOR_STATE_DIR/engine-state.json"
+    mkdir -p "$MONITOR_STATE_DIR"
+    chown "$SEARXNG_UID:$SEARXNG_GID" "$MONITOR_STATE_DIR"
+    chmod 700 "$MONITOR_STATE_DIR"
+    if [ -f /data/searxng_mqtt_engines.json ] && [ ! -e "$MONITOR_STATE_FILE" ]; then
+        mv /data/searxng_mqtt_engines.json "$MONITOR_STATE_FILE"
+    fi
+    if [ -f "$MONITOR_STATE_FILE" ]; then
+        chown "$SEARXNG_UID:$SEARXNG_GID" "$MONITOR_STATE_FILE"
+        chmod 600 "$MONITOR_STATE_FILE"
+    fi
+    export SEARXNG_MONITOR_STATE_PATH="$MONITOR_STATE_FILE"
     
     echo "[searxng-app] Starting entity monitor service"
     
