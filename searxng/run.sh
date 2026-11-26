@@ -194,7 +194,13 @@ MONITOR_PID=""
 if [ "$ENABLE_STATS_ENTITIES" = "true" ] && [ "$ENABLE_METRICS" = "true" ] && \
     [ "$ENABLE_MQTT_DISCOVERY" = "true" ] && \
     { command -v python3 >/dev/null 2>&1 || command -v "$PYTHON" >/dev/null 2>&1; }; then
-    export OPTIONS_FILE="$OPTIONS_FILE"
+    MONITOR_OPTIONS_FILE="/tmp/searxng-monitor-options.json"
+    "$PYTHON" -c \
+        'import sys; sys.path.insert(0, "/"); from monitor import write_monitor_options; write_monitor_options(sys.argv[1], sys.argv[2])' \
+        "$OPTIONS_FILE" "$MONITOR_OPTIONS_FILE"
+    chown "$SEARXNG_UID:$SEARXNG_GID" "$MONITOR_OPTIONS_FILE"
+    chmod 600 "$MONITOR_OPTIONS_FILE"
+    export OPTIONS_FILE="$MONITOR_OPTIONS_FILE"
     
     echo "[searxng-app] Starting entity monitor service"
     
